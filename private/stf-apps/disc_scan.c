@@ -28,26 +28,40 @@ BOOLEAN disc_scanEntry(STF_DESCRIPTOR *d,
 		       unsigned *disc_sum_waveform) {
    int zero_dac = speUVoltToDAC(0, atwd_pedestal_dac);
    int window_dac = speUVoltToDAC(disc_scan_window_uvolts, 0);
+   int dac = (disc_spe_or_mpe) ? DOM_HAL_DAC_MULTIPLE_SPE_THRESH :
+      DOM_HAL_DAC_SINGLE_SPE_THRESH;
    int i;
    DOM_HAL_FPGA_PULSER_RATES rate;
    static const unsigned nominalRate = (1000*78)/100;
    unsigned sum;
 
    /* set pulser amplitude... */
+   halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER,
+               (int) (30.0*pulser_amplitude_uvolt/5000.0));
 
    /* pretest 4) turn on fe pulser */
    lookupPulserRate(78e3, &rate, NULL);
    hal_FPGA_TEST_set_pulser_rate(rate);
    hal_FPGA_TEST_enable_pulser();
 
+   /* 5. calculate discriminator level value */
+   /* 6. program spe/mpe dac */
+   if (disc_spe_or_mpe) {
+      zero_dac = mpeUVoltToDAC(0, atwd_pedestal_dac);
+   }
+   else {
+      zero_dac = speUVoltToDAC(0, atwd_pedestal_dac);
+   }
+
    /* clear waveform */
    memset(disc_sum_waveform, 0, sizeof(unsigned)*4096);
-   
+
+   /* create waveform */
    for (i=0; i<loop_count; i++) {
       int j, n;
       for (j=zero_dac-window_dac; j<=zero_dac+window_dac; j++, n++) {
          /* set the new dac value... */
-         halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH, j);
+         halWriteDAC(dac, j);
          
          /* wait 200ms for counts to show up */
          halUSleep(200*1000);

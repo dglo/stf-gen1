@@ -18,3 +18,4 @@ void getSummedWaveform(int loop_count, unsigned trigger_mask, int channel,
  */
 int speUVoltToDAC(float uv, int pedestal_dac);
 float speDACToUVolt(int dac);
+int mpeUVoltToDAC(float uv, int pedestal_dac);

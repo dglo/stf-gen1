@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "hal/DOM_MB_hal.h"
 #include "hal/DOM_MB_fpga.h"
@@ -137,3 +138,10 @@ int speUVoltToDAC(float uv, int pedestal_dac) {
 float speDACToUVolt(int dac) {
    return (float) 1.0/9.6 * (1000/(2200+1000)) * dac * 5e6 / 1024;
 }
+
+int mpeUVoltToDAC(float uv, int pedestal_dac) {
+   return  (unsigned)
+     (uv*9.6 + (pedestal_dac*5e6/4096.0)) * 1024/5e6;
+}
+
+
