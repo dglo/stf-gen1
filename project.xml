@@ -4,8 +4,10 @@
 		icecube.daq.stf
 	</packages>
 	<uses>
-		<libs>domhub-common.jar</libs>
-		<libs>daq-db</libs>
+		<libs>
+                  domhub-common.jar
+		  daq-db.jar
+                </libs>
 		<tools>log4j.jar</tools>
 	</uses>
 	<test>
