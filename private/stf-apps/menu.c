@@ -58,12 +58,6 @@ int  main()
 		else {
 	    	    printf("Runnable State: false\n");
 		}
-		if(testInProgress(d)) {
-	    	    printf("Current State: running\n");
-		}
-		else {
-	            printf("Current State: Not running\n");
-		}	
 
 		p=NULL;
 		p=getNextParam(d,p);
