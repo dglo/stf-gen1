@@ -118,7 +118,17 @@ static void characterData(void *userData, const XML_Char *s, int len) {
 	  (xmlTag==NULL) ? "NULL" : xmlTag, desc, param, *depth, str);
 #endif
 
+<<<<<<< stfserv.c
+   if (*depth == 1) {
+      if (strcmp(xmlTag, "test")) {
+	 printf("invalid top level object '%s', expecting 'test'\r\n",
+		xmlTag);
+      }
+   }
+   else if (*depth==2) {
+=======
    if (*depth==2) {
+>>>>>>> 1.5
       if (strcmp(xmlTag, "name")==0) {
 	 if ((desc = findTestByName(str))==NULL) {
 	    fprintf(stderr, "can't get descriptor name '%s'\r\n", str);

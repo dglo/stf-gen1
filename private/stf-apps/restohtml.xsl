@@ -7,7 +7,6 @@
     </head>
     <body>
       <h3><xsl:value-of select="test-results/name"/> (<xsl:value-of select="test-results/description"/>) </h3>
-
       <table>
 	<tbody>
 	    <tr>
