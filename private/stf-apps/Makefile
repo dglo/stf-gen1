@@ -50,7 +50,8 @@ all: stfserv.elf
 clean:
 	rm -f *.o *.i *.bin *.elf *.srec \
 		run-tests.html gendir stfDirectory.[ch] \
-		$(HTMLFILES)
+		$(HTMLFILES) $(TABS) all.tab \
+		stftcp mk-name
 
 STFOBJS = $(TESTOBJS) stfserv.o ../stf/stf.o stfDirectory.o memtests.o
 
@@ -95,11 +96,10 @@ html-install: run-tests.html index.html cgi-install $(HTMLFILES)
 CGIS = run-test view-results view-summary
 CGIHELPERS = mk-name stftcp sumtotable.awk common.sh qrytoxml.awk \
 	restotab.awk tabtosum.awk tabtohtml.awk
-XSLFILES = # restohtml.xsl restosum.xsl
 
 cgi: $(CGIS) $(CGIHELPERS)
 
-cgi-install: $(CGIS) $(CGIHELPERS) $(XSLFILES)
+cgi-install: $(CGIS) $(CGIHELPERS)
 	cp $(CGIS) /usr/lib/cgi-bin/stf
 	if [[ ! -f /var/www/stf/xml/uniq.txt ]]; then echo "0" > /var/www/stf/xml/uniq.txt; fi
 	cp $(CGIHELPERS) "/usr/lib/cgi-bin/stf/xml/bin"
@@ -115,3 +115,11 @@ all.tab: $(TABS)
 
 run-tests.html: run-tests.awk all.tab
 	awk -f run-tests.awk all.tab > run-tests.html
+
+
+
+
+
+
+
+
