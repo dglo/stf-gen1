@@ -73,6 +73,18 @@
   </outputParameter>
 
   <outputParameter>
+    <description>Flasher Board CPLD Configuration Time (us)</description>
+    <name>config_time_us</name>
+    <unsignedInt/>
+  </outputParameter>
+
+  <outputParameter>
+    <description>Flasher Board Clock Validation Time (us)</description>
+    <name>valid_time_us</name>
+    <unsignedInt/>
+  </outputParameter>
+
+  <outputParameter>
     <description>Missing Pulse Width Coverage (ATWD units, ~ns)</description>
     <name>missing_width</name>
 	<unsignedInt/>
