@@ -285,7 +285,7 @@ int main(int argc, char *argv[]) {
     }
     else {
        usage();
-      return 1;
+       return 1;
     }
   }
 

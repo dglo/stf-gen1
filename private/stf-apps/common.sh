@@ -11,6 +11,12 @@ export PATH
 
 xmlpath=/var/www/stf/xml
 
+function qryCookie() {
+    `awk 'BEGIN { FS="="; RS=";"; } { printf "%s\t%s\n", $1, $2; }' | \
+     grep -e "^$1	" | \
+     sed -n "s/^$1	//1p"`
+}
+
 #
 # splitParams, split the paramString into lines, translate
 #  as we go...

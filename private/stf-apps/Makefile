@@ -49,7 +49,7 @@ clean:
 		$(HTMLFILES) $(TABS) all.tab \
 		memory.h atwd_pedestal.h adwd_baseline.h \
 		StfEg.h \
-		stftcp mk-name
+		chkpt stftcp mk-name
 
 STFOBJS = $(TESTOBJS) ../stf/stf.o stfDirectory.o memtests.o stfUtils.o
 KOBJS = ../lib/crt0.o ../lib/libkernel.a
@@ -116,10 +116,7 @@ stf: stf.c
 
 install: html-install
 
-#StfEg.h: StfEg.xml stfDefn2Header.xsl
-#	xalan -IN StfEg.xml -OUT StfEg.h -XSL stfDefn2Header.xsl -Q
-
-html: $(HTMLFILES) $(TABS) all.tab
+html: run-tests.html $(HTMLFILES) $(TABS) all.tab
 
 html-dirs:
 	(cd /var/www/stf/xml; mkdir -p $(HTMLDIRS))
@@ -127,10 +124,13 @@ html-dirs:
 html-install: run-tests.html index.html cgi-install html html-dirs
 	cp *.html /var/www/stf
 	cp all.tab /var/www/stf/xml
+	cp servers /var/www/stf/xml
 
-CGIS = run-test view-results view-summary validate-param
-CGIHELPERS = mk-name stftcp sumtotable.awk common.sh qrytoxml.awk \
-	restotab.awk tabtosum.awk tabtohtml.awk validate-qry.awk
+
+CGIS = run-test view-results view-summary validate-param pick-server
+CGIHELPERS = mk-name chkpt stftcp sumtotable.awk common.sh qrytoxml.awk \
+	restotab.awk tabtosum.awk tabtohtml.awk validate-qry.awk \
+	servertab.awk
 
 cgi: $(CGIS) $(CGIHELPERS)
 
@@ -143,11 +143,23 @@ mk-name: mk-name.c
 	gcc -o mk-name -Wall mk-name.c
 
 stftcp: stftcp.c
-	gcc -o stftcp -Wall -I../../public -I../../../hal/public stftcp.c
+	gcc -o stftcp -Wall -I../public stftcp.c
+
+chkpt: chkpt.c
+	gcc -o chkpt -Wall chkpt.c
 
 all.tab: $(TABS)
 	cat $(TABS) > all.tab
 
 run-tests.html: run-tests.awk all.tab
 	awk -f run-tests.awk all.tab > run-tests.html
+
+
+
+
+
+
+
+
+
 
