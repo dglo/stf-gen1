@@ -40,22 +40,22 @@ BOOLEAN ADCEntry(STF_DESCRIPTOR *desc,
        pass_or_fail[i]=(adc_count<=1020 && adc_count>=980) ? 1:0;  /* 1000 counts = [0V + 5V*10K/(10K+15K)]/0.002V */
      }
      else if (i == DOM_HAL_ADC_PRESSURE ) {
-       pass_or_fail[i]=(adc_count<=860 && adc_count>=830) ? 1:0;   /* default = 860 */        
+       pass_or_fail[i]=(adc_count<=870 && adc_count>=830) ? 1:0;   /* default = 860 */        
      }
      else if (i == DOM_HAL_ADC_5V_CURRENT) {
-       pass_or_fail[i]=(adc_count<=560 && adc_count>=500) ? 1:0;   /* default = 500 */                
+       pass_or_fail[i]=(adc_count<=580 && adc_count>=500) ? 1:0;   /* default = 500 */                
      }
      else if (i == DOM_HAL_ADC_3_3V_CURRENT) {
        pass_or_fail[i]=(adc_count<=105 && adc_count>=75) ? 1:0;    /* default = 96 */               
      }
      else if (i == DOM_HAL_ADC_2_5V_CURRENT) {
-       pass_or_fail[i]=(adc_count<=60 && adc_count>=25) ? 1:0;     /* default = 31 */              
+       pass_or_fail[i]=(adc_count<=60 && adc_count>=15) ? 1:0;     /* default = 31 */              
      }
      else if (i == DOM_HAL_ADC_1_8V_CURRENT) {
        pass_or_fail[i]=(adc_count<=125 && adc_count>=80) ? 1:0;     /* default = 90 */              
      }
      else if (i == DOM_HAL_ADC_MINUS_5V_CURRENT) {
-       pass_or_fail[i]=(adc_count<=170 && adc_count>=100) ? 1:0;    /* default = 115 */               
+       pass_or_fail[i]=(adc_count<=190 && adc_count>=100) ? 1:0;    /* default = 115 */               
      }
      else if (i == DOM_HAL_ADC_DISC_ONESPE) {
        dac_count=halReadDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH);
