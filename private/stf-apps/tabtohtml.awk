@@ -17,14 +17,35 @@ BEGIN {
 	print "<tbody>";
 	
 	print "<tr>";
-	print "<th>Parameter</th><th>Value</th>";
+	print "<th>Parameter</th><th>Type</th><th>Value</th>";
 	print "</tr>";
 
 	first = false;
     }
 
+    #
+    # get input/output
+    #
+    if ( $2 == "passed" ) {
+	type = "output";
+    }
+    else if ($2 == "testRunnable" ) {
+	type = "output";
+    }
+    else if ( $2 == "boardID" ) {
+	type = "output";
+    }
+    else if ( $2 == "errorMessage" ) {
+	type = "output";
+    }
+    else {
+	type = "";
+	cmd =  "awk '/^" $1 "\t" $2 "\t/ { print $3; }' /var/www/stf/xml/all.tab";
+	cmd | getline type;
+    }
+    
     print "<tr>";
-    print "<td>" $2 "</td><td>" $3 "</td";
+    print "<td>" $2 "</td><td>" type "</td><td>" $3 "</td";
     print  "</tr";
 }
 

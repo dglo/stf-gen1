@@ -90,8 +90,11 @@ install: html-install
 #StfEg.h: StfEg.xml stfDefn2Header.xsl
 #	xalan -IN StfEg.xml -OUT StfEg.h -XSL stfDefn2Header.xsl -Q
 
-html-install: run-tests.html index.html cgi-install $(HTMLFILES)
+html: $(HTMLFILES) $(TABS) all.tab
+
+html-install: run-tests.html index.html cgi-install html
 	cp *.html /var/www/stf
+	cp all.tab /var/www/stf/xml
 
 CGIS = run-test view-results view-summary
 CGIHELPERS = mk-name stftcp sumtotable.awk common.sh qrytoxml.awk \

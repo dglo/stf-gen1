@@ -58,7 +58,7 @@ static const char *xmlTag = NULL;
 static const char *errorMessage = NULL;
 
 static void clearError(void) {
-   if (errorMessage==NULL) {
+   if (errorMessage!=NULL) {
       free((char *)errorMessage);
       errorMessage = NULL;
    }
