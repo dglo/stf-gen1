@@ -145,7 +145,7 @@ int scanSPE(int atwd_pedestal_dac, unsigned *ret) {
    lookupPulserRate(78e3, &rate, NULL);
    hal_FPGA_TEST_set_pulser_rate(rate);
    hal_FPGA_TEST_set_scalar_period(DOM_HAL_FPGA_SCALAR_10MS);
-   hal_FPGA_TEST_disable_pulser(); /* FIXME: should be enable */
+   hal_FPGA_TEST_enable_pulser(); /* FIXME: should be enable */
    halUSleep(10000);
 
 #if 0   
