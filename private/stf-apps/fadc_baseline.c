@@ -32,7 +32,7 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   unsigned baseline_mean,baseline_rms;
   unsigned sample_max,sample_min,sample_sum;
   int sample_rms,sample_diff,sample_sqrs;
-  unsigned count;
+  unsigned count,time_out;
   unsigned lp1,lp2;
   int temp;
   float tmp_float;
@@ -44,7 +44,9 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   /*  A.Pretest checks:*/ 
   /*    1.The two input DAC settings are programmed.*/
   halWriteDAC(DOM_HAL_DAC_FAST_ADC_REF,fadc_reference_dac);
+  halUSleep(500000);
   halWriteDAC(DOM_HAL_DAC_PMT_FE_PEDESTAL,atwd_pedestal_dac);
+  halUSleep(500000);
   /*    2.If HV base is connected HV is set to 0.  */
   /* Always assume base is installed */
   halSetPMT_HV(0);
@@ -67,7 +69,7 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   for(lp2=0;lp2<loop_count;lp2++)
     {
            hal_FPGA_TEST_trigger_forced(HAL_FPGA_TEST_TRIGGER_FADC);
-           hal_FPGA_TEST_readout(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,waveform,256,HAL_FPGA_TEST_TRIGGER_FADC);
+           time_out = hal_FPGA_TEST_readout(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,waveform,256,HAL_FPGA_TEST_TRIGGER_FADC);
   /*    2.Calculate the mean of all the 256 samples values (integers ok, range [0-1023]):
           this is the baseline for this waveform.*/
 	   sample_sum=0;
@@ -105,7 +107,7 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   /*printf("loops complete\n");  */
 /*    5.Fill the output array FADC_BASELINE_HISTOGRAM with the baseline distribution.*/
       /*printf("filling output arrays\n");*/
-      for(lp1=0;lp1<256;lp1++)
+      for(lp1=0;lp1<1024;lp1++)
       {
 	fadc_baseline_histogram[lp1] = (unsigned int)histogram[lp1];
       }
@@ -135,13 +137,13 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   if(abs((int)baseline_mean-temp)>80) return FALSE;
 
   /*    3.Baseline mean value > 100*/
-  if(baseline_mean<100) return FALSE;
+  if(baseline_mean<=100) return FALSE;
   /*    4.Baseline mean value < 250*/
-  if(baseline_mean>250) return FALSE;
+  if(baseline_mean>=250) return FALSE;
   /*    5.Maximum-Minimum < 5*/
-  if(baseline_max-baseline_min>5) return FALSE;
+  if(baseline_max-baseline_min>=5) return FALSE;
   /*    6.Baseline RMS < 3*/
-  if(baseline_rms>3) return FALSE;
+  if(baseline_rms>=3) return FALSE;
 
   return TRUE;
 }

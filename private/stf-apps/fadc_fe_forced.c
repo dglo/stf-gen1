@@ -59,9 +59,12 @@ BOOLEAN fadc_fe_forcedEntry(STF_DESCRIPTOR *d,
   /*    1.The two input DAC settings are programmed.*/
   /*  printf("%p,%p,%p,%p\n\r",waveform,waveform_sum,waveform_avg,fadc_fe_pulser_waveform);*/
          halWriteDAC(DOM_HAL_DAC_FAST_ADC_REF,fadc_reference_dac);
+	 halUSleep(200000);
            halWriteDAC(DOM_HAL_DAC_PMT_FE_PEDESTAL,atwd_pedestal_dac);
+         halUSleep(200000);
   /*    2.Set the Front-End pulser amplitude DAC to zero.*/
            halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER,0);
+         halUSleep(200000);
            hal_FPGA_TEST_disable_pulser();
 
 	   baseline_sum = 0;
@@ -95,7 +98,7 @@ BOOLEAN fadc_fe_forcedEntry(STF_DESCRIPTOR *d,
 	  (this uses the ad-hoc knowledge that 25 DAC units produce a 5 mV signal at the front end).*/
        temp = (pulser_amplitude_uvolt*25)/5000;
        halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER,temp);
-       halUSleep(1000);
+       halUSleep(100000);
 
        for(lp1=0;lp1<512;lp1++)
          {
@@ -176,7 +179,7 @@ BOOLEAN fadc_fe_forcedEntry(STF_DESCRIPTOR *d,
 	if((*fadc_fe_pulser_position) >=0 && (*fadc_fe_pulser_position)<512)
 	for(lp1= (*fadc_fe_pulser_position);lp1<512;lp1++)
 	  {
-	    if(waveform_avg[lp1] < half_max) pos = lp1;	  
+	    if(waveform_avg[lp1] < half_max) {pos = lp1;break;}	  
 	  }
 	end_width = pos;
 	/*printf("step 19 done\n\r");*/
@@ -185,9 +188,9 @@ BOOLEAN fadc_fe_forcedEntry(STF_DESCRIPTOR *d,
            If no value if found to meet this condition save the minimum position=1.*/
 	pos = 1;
         if((*fadc_fe_pulser_position) >1 && (*fadc_fe_pulser_position)<512)
-	for(lp1= (*fadc_fe_pulser_position);lp1>1;lp1--)
+	for(lp1= (*fadc_fe_pulser_position);lp1>0;lp1--)
 	  {
-	    if(waveform_avg[lp1] < half_max) pos = lp1;
+	    if(waveform_avg[lp1] < half_max) {pos = lp1;break;}
 	  }
         start_width = pos;
 	/*	printf("step 20 done\n\r");*/

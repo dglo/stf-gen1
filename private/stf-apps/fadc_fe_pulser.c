@@ -32,7 +32,7 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
   unsigned read_zero,read_nonzero,read_fail;
   unsigned baseline,baseline_sum,baseline_mean,waveform_mean;
   unsigned temp,pos,amp;
-  unsigned lp1,lp2;
+  unsigned lp1,lp2,actual_loops;
   unsigned scan_value,spe_rate;
   unsigned half_max,start_width,end_width;
   unsigned discrim_in_mv = 0;
@@ -51,7 +51,9 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
   /*  A.Pretest checks:*/
   /*  1.The two input DAC settings are programmed.*/
   halWriteDAC(DOM_HAL_DAC_FAST_ADC_REF,fadc_reference_dac);
+  halUSleep(500000);
   halWriteDAC(DOM_HAL_DAC_PMT_FE_PEDESTAL,atwd_pedestal_dac);
+  halUSleep(500000);
 
   /*  2.If HV base is connected HV is set to 0.*/
   /* Always assume base is installed */
@@ -59,6 +61,7 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
 
   /*  3.Set the Front-End pulser amplitude DAC to zero.*/
   halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER,0);
+  halUSleep(500000);
 
   /*  4.Turn ON  the front end pulser.*/
   hal_FPGA_TEST_enable_pulser();
@@ -117,6 +120,15 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
   if(read_fail)
   {
     /*printf("read failed\n\r");*/
+    *fadc_baseline_mean = 0;
+    *fadc_fe_pulser_amplitude = 0;
+    *fadc_fe_pulser_width = 0;
+    *fadc_fe_pulser_position = 0;
+    for(lp1=0;lp1<512;lp1++)
+    {
+      fadc_fe_pulser_waveform[lp1] = 0;
+    }
+
        free(waveform); 
        free(waveform_sum); 
        free(waveform_avg); 
@@ -129,7 +141,7 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
 
   /*  9.Set the SPE_DAC to the TRIGGERABLE_SPE_DAC value.*/
   halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH,*triggerable_spe_dac); 
-  halUSleep(1000);
+  halUSleep(100000);
        
   /*  B.Test algorithm: */
   baseline_sum = 0;
@@ -168,7 +180,7 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
        (this uses the ad-hoc knowledge that 25 DAC units produce a 5 mV signal at the front end).*/
   temp = (pulser_amplitude_uvolt*25)/5000;
   halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER,temp);
-  halUSleep(1000);
+  halUSleep(100000);
 
   /*   8.Take LOOP_COUNT waveforms for the FADC with the SPE- trigger,
        keeping a sum-waveform to obtain the average waveform
@@ -196,21 +208,22 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
       waveform_sum[lp1] += waveform[lp1];
     }
   }
+  actual_loops = lp2;
        
   /*   9.Calculate the average waveform:
        for each sample in the waveform offset its baseline by adding 100 and subtracting FADC_BASELINE_MEAN.
        This makes a baseline-subtracted waveform with a baseline at 100 counts
        (good for plotting and for negative going pulses).
        If a negative sample value is obtained set to zero.  */
-  for(lp1=0;lp1<512;lp1++)
+  for(lp1=0;lp1<512;lp1++) 
   {
-    temp = waveform_sum[lp1] / loop_count;
+    temp = waveform_sum[lp1] / actual_loops; /*loop_count;*/
     if((100+temp) < *fadc_baseline_mean)  waveform_avg[lp1]=0;
     else  waveform_avg[lp1] = (100+temp) - *fadc_baseline_mean;
   }
 	
   /*   10.Fill the FADC_FE_PULSER_WAVEFORM output array with the baseline subtracted average waveform.*/
-    for(lp1=0;lp1<512;lp1++)
+  for(lp1=0;lp1<512;lp1++)  
     {
 	fadc_fe_pulser_waveform[lp1] = waveform_avg[lp1];
     }
