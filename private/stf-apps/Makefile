@@ -88,7 +88,7 @@ memory.html: memory.xml restohtml.xsl
 StfEg.h: StfEg.xml stfDefn2Header.xsl
 	xalan -IN StfEg.xml -OUT StfEg.h -XSL stfDefn2Header.xsl -Q
 
-html-install: run-tests.html index.html
+html-install: run-tests.html index.html cgi-install
 	cp *.html "/c/program files/apache group/apache2/htdocs/stf"
 #	cp *.html ${HOME}/public_html/stf
 
