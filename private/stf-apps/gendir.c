@@ -87,7 +87,7 @@ static DescNode *parseFile(const char *fn, DescNode *next) {
       fprintf(stderr, "gendir: unable to allocate memory\n");
       return NULL;
    }
-   dn->desc.testRunnable = 0;
+   dn->desc.testRunnable = dn->desc.passed = 0;
    dn->parms = NULL;
    dn->next = NULL;
 
@@ -269,7 +269,7 @@ int main(int argc, char *argv[]) {
 	 
 	 fprintf(fptr, "\n");
 	 fprintf(fptr, "extern void %sInit(STF_DESCRIPTOR *);\n", tdn->desc.name);
-	 fprintf(fptr, "extern void %sEntry(STF_DESCRIPTOR *);\n",
+	 fprintf(fptr, "extern BOOLEAN %sEntry(STF_DESCRIPTOR *);\n",
 		 tdn->desc.name);
 	 
 	 fprintf(fptr, "\n");
@@ -280,6 +280,7 @@ int main(int argc, char *argv[]) {
 	 fprintf(fptr, "  .majorVersion = %d,\n", tdn->desc.majorVersion);
 	 fprintf(fptr, "  .minorVersion = %d,\n", tdn->desc.minorVersion);
 	 fprintf(fptr, "  .testRunnable = %d,\n", tdn->desc.testRunnable);
+	 fprintf(fptr, "  .passed = %d,\n", tdn->desc.passed);
 	 fprintf(fptr, "  .nParams = %d,\n", np);
 	 fprintf(fptr, "  .params = %s_params,\n", tdn->desc.name);
 	 fprintf(fptr, "  .initPt = %sInit,\n", tdn->desc.name);

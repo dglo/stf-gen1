@@ -167,8 +167,6 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
    idx += sprintf(buf+idx, " <description>%s</description>\r\n", stf->desc);
    idx += sprintf(buf+idx, " <version major=\"%d\" minor=\"%d\"/>\r\n", 
 		  stf->majorVersion, stf->minorVersion);
-   idx += sprintf(buf+idx, " <testRunnable>%s</testRunnable>\r\n",
-		  stf->testRunnable ? BOOLEAN_TRUE : BOOLEAN_FALSE);
 
    for (i=0; i<stf->nParams; i++) {
       int j;
@@ -211,6 +209,20 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
 		     stf->params[i].arraySize);
       idx += sprintf(buf+idx, "  </%sParameter>\r\n", stf->params[i].class);
    }
+
+   sprintf(buf+idx, "  <outputParameter>\r\n");
+   sprintf(buf+idx, "    <name>passed</name>\r\n");
+   sprintf(buf+idx, "    <value>%s</value>\r\n", 
+	   stf->passed ? BOOLEAN_TRUE : BOOLEAN_FALSE);
+   sprintf(buf+idx, "  </outputParameter>\r\n");
+   
+   sprintf(buf+idx, "  <outputParameter>\r\n");
+   sprintf(buf+idx, "    <name>testRunnable</name>\r\n");
+   sprintf(buf+idx, "    <value>%s</value>\r\n", 
+	   stf->testRunnable ? BOOLEAN_TRUE : BOOLEAN_FALSE);
+   sprintf(buf+idx, "  </outputParameter>\r\n");
+   
+
    idx += sprintf(buf+idx, "</test-results>\r\n");
    return idx;
 }
@@ -385,7 +397,7 @@ int main() {
 	 }
 	 else {
 	    if (!sd->isInit) {
-	       sd->initPt(sd);
+	       sd->testRunnable = sd->initPt(sd);
 	       sd->isInit = 1;
 	    }
 	    
@@ -394,7 +406,7 @@ int main() {
 	       state = 6;
 	    }
 	    else {
-	       sd->entryPt(sd);
+	       sd->passed = sd->entryPt(sd);
 	       state = 1;
 	    }
 	 }

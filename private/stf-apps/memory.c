@@ -8,12 +8,12 @@
 
 #include "stf/stf.h"
 
-void memoryInit(STF_DESCRIPTOR *d) {
+BOOLEAN memoryInit(STF_DESCRIPTOR *d) {
    printf("memoryInit\r\n");
-    d->testRunnable=TRUE;
+    return TRUE;
 }
 
-void memoryEntry(STF_DESCRIPTOR *d) {
+BOOLEAN memoryEntry(STF_DESCRIPTOR *d) {
    printf("memoryEntry\r\n");
 }
 
