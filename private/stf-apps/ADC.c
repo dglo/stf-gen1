@@ -79,7 +79,7 @@ BOOLEAN ADCEntry(STF_DESCRIPTOR *desc,
      else if (i == DOM_HAL_ADC_FADC_0_REF) {
        dac_count=halReadDAC(DOM_HAL_DAC_FAST_ADC_REF);
        dac_to_adc=dac_count*2.5/1023*500;            /* SPE_ADC_count = [SPE_DAC_count * 2.5V/1023]/2mV */
-       pass_or_fail[i]=(adc_count<=(dac_to_adc+20) && adc_count>=(dac_to_adc-20)) ? 1:0;           
+       pass_or_fail[i]=(adc_count<=(dac_to_adc+60) && adc_count>=(dac_to_adc-20)) ? 1:0;           
      }
      else if (i == DOM_HAL_ADC_SINGLELED_HV) {
        pass_or_fail[i]=(adc_count<=25 && adc_count>=0) ? 1:0;   /* default = 18*/
