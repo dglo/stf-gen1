@@ -27,6 +27,9 @@
  *
  * 6  ERR msg\r\n
  *    (goto 1)
+ *
+ *
+ * FIXME: loop count input and output!!!!
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -211,22 +214,22 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
       idx += sprintf(buf+idx, "  </%sParameter>\r\n", stf->params[i].class);
    }
 
-   sprintf(buf+idx, "  <outputParameter>\r\n");
-   sprintf(buf+idx, "    <name>passed</name>\r\n");
-   sprintf(buf+idx, "    <value>%s</value>\r\n", 
+   idx += sprintf(buf+idx, "  <outputParameter>\r\n");
+   idx += sprintf(buf+idx, "    <name>passed</name>\r\n");
+   idx += sprintf(buf+idx, "    <value>%s</value>\r\n", 
 	   stf->passed ? BOOLEAN_TRUE : BOOLEAN_FALSE);
-   sprintf(buf+idx, "  </outputParameter>\r\n");
+   idx += sprintf(buf+idx, "  </outputParameter>\r\n");
    
-   sprintf(buf+idx, "  <outputParameter>\r\n");
-   sprintf(buf+idx, "    <name>testRunnable</name>\r\n");
-   sprintf(buf+idx, "    <value>%s</value>\r\n", 
-	   stf->testRunnable ? BOOLEAN_TRUE : BOOLEAN_FALSE);
-   sprintf(buf+idx, "  </outputParameter>\r\n");
+   idx += sprintf(buf+idx, "  <outputParameter>\r\n");
+   idx += sprintf(buf+idx, "    <name>testRunnable</name>\r\n");
+   idx += sprintf(buf+idx, "    <value>%s</value>\r\n", 
+		  stf->testRunnable ? BOOLEAN_TRUE : BOOLEAN_FALSE);
+   idx += sprintf(buf+idx, "  </outputParameter>\r\n");
    
-   sprintf(buf+idx, "  <outputParameter>\r\n");
-   sprintf(buf+idx, "    <name>boardID</name>\r\n");
-   sprintf(buf+idx, "    <value>%s</value>\r\n", getBoardID());
-   sprintf(buf+idx, "  </outputParameter>\r\n");
+   idx += sprintf(buf+idx, "  <outputParameter>\r\n");
+   idx += sprintf(buf+idx, "    <name>boardID</name>\r\n");
+   idx += sprintf(buf+idx, "    <value>%s</value>\r\n", getBoardID());
+   idx += sprintf(buf+idx, "  </outputParameter>\r\n");
    
    idx += sprintf(buf+idx, "</test-results>\r\n");
    return idx;
@@ -406,7 +409,7 @@ int main() {
 	       sd->isInit = 1;
 	    }
 	    
-	    if (!sd->testRunnable) {
+	    if (sd->testRunnable==0) {
 	       sprintf(msg, "test '%s' is not runnable", name);
 	       state = 6;
 	    }

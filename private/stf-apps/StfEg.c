@@ -10,7 +10,7 @@
 
 BOOLEAN StfEgInit(STF_DESCRIPTOR *d) {
    printf("memoryInit\r\n");
-    return TRUE;
+   return TRUE;
 }
 
 BOOLEAN StfEgEntry(STF_DESCRIPTOR *d) {
