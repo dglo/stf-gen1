@@ -79,9 +79,9 @@ memory.c: stfDirectory.h memory.h
 ADC.c: stfDirectory.h
 atwd_pedestal.c: stfDirectory.h atwd_pedestal.h
 atwd_baseline.c: stfDirectory.h atwd_baseline.h
-pmt_hv_ramp.c: stfDirectory.h
-pmt_hv_stability.c: stfDirectory.h
-pressure.c: stfDirectory.h
+pmt_hv_ramp.c: stfDirectory.h pmt_hv_ramp.h
+pmt_hv_stability.c: stfDirectory.h pmt_hv_stability.h
+pressure.c: stfDirectory.h pressure.h
 fadc_fe_pulser.c: stfDirectory.h
 
 memory.h:
@@ -95,3 +95,13 @@ atwd_baseline.h:
 
 StfEg.h:
 	ln -s stfDirectory.h StfEg.h
+
+pressure.h:
+	ln -s stfDirectory.h pressure.h
+
+pmt_hv_ramp.h:
+	ln -s stfDirectory.h pmt_hv_ramp.h
+
+pmt_hv_stability.h:
+	ln -s stfDirectory.h pmt_hv_stability.h
+

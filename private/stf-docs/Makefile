@@ -28,29 +28,29 @@ clean:
 		stf-tests.ilg *.tab *-inputs.tex *-outputs.tex \
 		stf-tests.idx stf-tests.out stf-tests.pdf stf-tests.toc
 
-ADC.tab: ../stf-apps/stftotab.awk ../stf-apps/ADC.xml
+ADC.tab: ../stf-sfe/stftotab.awk ../stf-apps/ADC.xml
 	xmlv ../stf-apps/ADC.xml | \
-		awk -v description="y" -f ../stf-apps/stftotab.awk > ADC.tab
+		awk -v description="y" -f ../stf-sfe/stftotab.awk > ADC.tab
 
-atwd_pedestal.tab: ../stf-apps/stftotab.awk ../stf-apps/atwd_pedestal.xml
+atwd_pedestal.tab: ../stf-sfe/stftotab.awk ../stf-apps/atwd_pedestal.xml
 	xmlv ../stf-apps/atwd_pedestal.xml | \
-		awk -v description="y" -f ../stf-apps/stftotab.awk > atwd_pedestal.tab
+		awk -v description="y" -f ../stf-sfe/stftotab.awk > atwd_pedestal.tab
 
-atwd_baseline.tab: ../stf-apps/stftotab.awk ../stf-apps/atwd_baseline.xml
+atwd_baseline.tab: ../stf-sfe/stftotab.awk ../stf-apps/atwd_baseline.xml
 	xmlv ../stf-apps/atwd_baseline.xml | \
-		awk -v description="y" -f ../stf-apps/stftotab.awk > atwd_baseline.tab
+		awk -v description="y" -f ../stf-sfe/stftotab.awk > atwd_baseline.tab
 
-pressure.tab: ../stf-apps/stftotab.awk ../stf-apps/pressure.xml
+pressure.tab: ../stf-sfe/stftotab.awk ../stf-apps/pressure.xml
 	xmlv ../stf-apps/pressure.xml | \
-		awk -v description="y" -f ../stf-apps/stftotab.awk > pressure.tab
+		awk -v description="y" -f ../stf-sfe/stftotab.awk > pressure.tab
 
-atwd_pulser.tab: ../stf-apps/stftotab.awk ../stf-apps/atwd_pulser.xml
+atwd_pulser.tab: ../stf-sfe/stftotab.awk ../stf-apps/atwd_pulser.xml
 	xmlv ../stf-apps/atwd_pulser.xml | \
-		awk -v description="y" -f ../stf-apps/stftotab.awk > atwd_pulser.tab
+		awk -v description="y" -f ../stf-sfe/stftotab.awk > atwd_pulser.tab
 
-memory.tab: ../stf-apps/stftotab.awk ../stf-apps/memory.xml
+memory.tab: ../stf-sfe/stftotab.awk ../stf-apps/memory.xml
 	xmlv ../stf-apps/memory.xml | \
-		awk -v description="y" -f ../stf-apps/stftotab.awk > memory.tab
+		awk -v description="y" -f ../stf-sfe/stftotab.awk > memory.tab
 
 ADC-inputs.tex: ADC.tab tabtotex.awk
 	awk -v input=y -f tabtotex.awk ADC.tab | \
