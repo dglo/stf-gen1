@@ -153,7 +153,7 @@ static void characterData(void *userData, const XML_Char *s, int len) {
 	    param->value.longValue = strtol(str, 0, NULL);
 	 }
 	 else if (strcmp(param->type, BOOLEAN_TYPE)==0) {
-	    param->value.boolValue = atoi(str);
+	    param->value.boolValue = strcmp(str, BOOLEAN_TRUE)==0;
 	 }
       }
       else if (strcmp(xmlTag, "arraySize")==0) {
