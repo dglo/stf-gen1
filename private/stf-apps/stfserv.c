@@ -31,6 +31,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "xmlparse.h"
 
@@ -39,14 +40,18 @@
 extern int read(int , void *, int);
 extern int write(int , void *, int);
 
+#define talloc(a) ((a) *) malloc(sizeof(a))
+
+static STF_DESCRIPTOR *desc = NULL;
+static STF_PARAM *param = NULL;
+static const char *xmlTag = NULL;
+
 /* when we get a new element...
  */
 static void startElement(void *userData, const char *name, const char **atts) {
-  int i;
-  int *depthPtr = userData;
-  for (i=0; i<*depthPtr; i++) printf(" ");
-  printf("%s\r\n", name);
-  *depthPtr = *depthPtr + 1;
+  int *depth = userData;
+  xmlTag = name;
+  *depth = *depth + 1;
 }
 
 /* when an element is done...
@@ -54,6 +59,88 @@ static void startElement(void *userData, const char *name, const char **atts) {
 static void endElement(void *userData, const char *name) {
   int *depthPtr = userData;
   *depthPtr = *depthPtr - 1;
+}
+
+/* s is not 0 terminated. */
+static void characterData(void *userData, const XML_Char *s, int len) {
+   const int *depth = userData;
+   char str[64];
+   memcpy(str, s, len);
+   str[len] = 0;
+
+   /* remove trailing whitespace...
+    */
+   while (len>0 && 
+	  (str[len-1]==' ' || str[len-1]=='\r' || str[len-1]=='\n' ||
+	   str[len-1]=='\t')) { 
+      str[len-1] = 0; len--; 
+   }
+
+   if (len==0) return;
+
+#if 0   
+   printf("xmlTag = %s, desc = %p, param = %p, depth = %d, s = '%s'\r\n",
+	  (xmlTag==NULL) ? "NULL" : xmlTag, desc, param, *depth, str);
+#endif
+
+#if 1
+   if (*depth == 1) {
+      if (strcmp(xmlTag, "test")) {
+	 printf("invalid top level object '%s', expecting 'test'\r\n",
+		xmlTag);
+      }
+   }
+   else if (*depth==2) {
+      if (strcmp(xmlTag, "name")==0) {
+	 if ((desc = findTestByName(str))==NULL) {
+	    fprintf(stderr, "can't get descriptor name '%s'\r\n", str);
+	 }
+      }
+      else if (strcmp(xmlTag, "desc")==0) {
+	 desc->desc = strdup(str);
+      }
+      else if (strcmp(xmlTag, "majorVersion")==0) {
+	 desc->majorVersion = atoi(str);
+      }
+      else if (strcmp(xmlTag, "minorVersion")==0) {
+	 desc->minorVersion = atoi(str);
+      }
+      else if (strcmp(xmlTag, "testRunnable")==0) {
+	 desc->testRunnable = strcmp(str, "TRUE")==0;
+      }
+      else if (strcmp(xmlTag, "param")==0) {
+	 /* name must be first!
+	  */
+	 param = NULL;
+      }
+   }
+   else if (*depth == 3) {
+      if (strcmp(xmlTag, "name")==0) {
+	 if ((param = getParamByName(desc, str))==NULL) {
+	    fprintf(stderr, "can't get param name '%s'\r\n", s);
+	 }
+      }
+      if (strcmp(xmlTag, "class")==0) {
+	 param->class = strdup(str);
+      }
+      else if (strcmp(xmlTag, "type")==0) {
+	 param->type = strdup(str);
+      }
+      else if (strcmp(xmlTag, "maxValue")==0) {
+	 param->maxValue = strdup(str);
+      }
+      else if (strcmp(xmlTag, "minValue")==0) {
+	 param->minValue = strdup(str);
+      }
+      else if (strcmp(xmlTag, "defValue")==0) {
+	 param->defValue = strdup(str);
+      }
+      else if (strcmp(xmlTag, "arraySize")==0) {
+	 param->arraySize = strdup(str);
+	 param->arrayLength = atoi(param->arraySize);
+      }
+   }
+#endif
 }
 
 /* turn a directory entry into a xml file...
@@ -68,33 +155,33 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
    int idx = 0;
    int i;
 
-   idx += sprintf(buf+idx, "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
-   idx += sprintf(buf+idx, "<test>\n");
-   idx += sprintf(buf+idx, " <name>%s</name>\n", stf->name);
-   idx += sprintf(buf+idx, " <desc>%s</desc>\n", stf->desc);
-   idx += sprintf(buf+idx, " <majorVersion>%d</majorVersion>\n", 
+   idx += sprintf(buf+idx, "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n");
+   idx += sprintf(buf+idx, "<test>\r\n");
+   idx += sprintf(buf+idx, " <name>%s</name>\r\n", stf->name);
+   idx += sprintf(buf+idx, " <desc>%s</desc>\r\n", stf->desc);
+   idx += sprintf(buf+idx, " <majorVersion>%d</majorVersion>\r\n", 
 		  stf->majorVersion);
-   idx += sprintf(buf+idx, " <minorVersion>%d</minorVersion>\n",
+   idx += sprintf(buf+idx, " <minorVersion>%d</minorVersion>\r\n",
 		  stf->minorVersion);
-   idx += sprintf(buf+idx, " <testRunnable>%s</testRunnable>\n",
+   idx += sprintf(buf+idx, " <testRunnable>%s</testRunnable>\r\n",
 		  stf->testRunnable ? "TRUE" : "FALSE");
 
    for (i=0; i<stf->nParams; i++) {
-      idx += sprintf(buf+idx, "  <param>\n");
-      idx += sprintf(buf+idx, "   <name>%s</name>\n", stf->params[i].name);
-      idx += sprintf(buf+idx, "   <class>%s</class>\n", stf->params[i].class);
-      idx += sprintf(buf+idx, "   <type>%s</type>\n", stf->params[i].type);
-      idx += sprintf(buf+idx, "   <maxValue>%s</maxValue>\n", 
+      idx += sprintf(buf+idx, "  <param>\r\n");
+      idx += sprintf(buf+idx, "   <name>%s</name>\r\n", stf->params[i].name);
+      idx += sprintf(buf+idx, "   <class>%s</class>\r\n", stf->params[i].class);
+      idx += sprintf(buf+idx, "   <type>%s</type>\r\n", stf->params[i].type);
+      idx += sprintf(buf+idx, "   <maxValue>%s</maxValue>\r\n", 
 		     stf->params[i].maxValue);
-      idx += sprintf(buf+idx, "   <minValue>%s</minValue>\n", 
+      idx += sprintf(buf+idx, "   <minValue>%s</minValue>\r\n", 
 		     stf->params[i].minValue);
-      idx += sprintf(buf+idx, "   <defValue>%s</defValue>\n", 
+      idx += sprintf(buf+idx, "   <defValue>%s</defValue>\r\n", 
 		     stf->params[i].defValue);
-      idx += sprintf(buf+idx, "   <arraySize>%s</arraySize>\n",
+      idx += sprintf(buf+idx, "   <arraySize>%s</arraySize>\r\n",
 		     stf->params[i].arraySize);
-      idx += sprintf(buf+idx, "  </param>\n");
+      idx += sprintf(buf+idx, "  </param>\r\n");
    }
-   idx += sprintf(buf+idx, "</test>\n");
+   idx += sprintf(buf+idx, "</test>\r\n");
    return idx;
 }
 
@@ -157,14 +244,10 @@ int main() {
    char *buf = NULL;
    int buflen = 0;
    int state = 1;
-   XML_Parser parser = XML_ParserCreate(NULL);
    int depth = 0;
 
-   XML_SetUserData(parser, &depth);
-   XML_SetElementHandler(parser, startElement, endElement);
-
    while (1) {
-      printf("state: %d, needAck: %d\r\n", state, needAck);
+      /* printf("state: %d, needAck: %d\r\n", state, needAck);*/
       
       if (needAck) {
 	 if (getLine(line, sizeof(line))) {
@@ -213,14 +296,15 @@ int main() {
 	 
 	 /* realloc buf if necessary...
 	  */
-	 if (buflen<nbytes) {
-	    void *nb = malloc(nbytes);
+	 if (buflen<nbytes+1) {
+	    void *nb = malloc(nbytes+1);
 	    if (nb==NULL) {
 	       sprintf(msg, "unable to alloc %d bytes\r\n", nbytes);
 	       state = 6;
+	       continue;
 	    }
 	    buf = nb;
-	    buflen = nbytes;
+	    buflen = nbytes+1;
 	 }
 	 printf("OK\r\n");
 
@@ -232,8 +316,16 @@ int main() {
 	    state = 6;
 	 }
 	 else {
+	    XML_Parser parser = XML_ParserCreate(NULL);
+
+	    buf[nbytes] = 0;
+	    printf("parse: '%s'\r\n", buf);
+	    
 	    /* now parse data...
 	     */
+	    XML_SetUserData(parser, &depth);
+	    XML_SetElementHandler(parser, startElement, endElement);
+	    XML_SetCharacterDataHandler(parser, characterData);
 	    if (!XML_Parse(parser, buf, nbytes, 1)) {
 	       sprintf(msg,
 		       "%s at line %d\r\n",
@@ -242,8 +334,11 @@ int main() {
 	       state = 6;
 	    }
 	    else {
+	       /* done parsing...
+		*/
 	       state = 1;
 	    }
+	    XML_ParserFree(parser);
 	 }
       }
       else if (state==3) {
@@ -276,9 +371,7 @@ int main() {
       }
       else if (state==4) {
 	 STF_DESCRIPTOR *sd;
-	 
 	 const int minbl = 32*1024;
-	 int nb;
 	 
 	 /* test is now done
 	  *
@@ -301,7 +394,7 @@ int main() {
 	       state = 6;
 	    }
 	    else {
-	       printf("SEND %d\r\n", nb);
+	       printf("SEND %d\r\n", nbytes);
 	       needAck = 1;
 	       state = 5;
 	    }

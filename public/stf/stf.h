@@ -36,10 +36,10 @@
 #define FALSE 0
 
 /** define tags for primitive types */
-#define CHAR_TYPE "char"
-#define UINT_TYPE "unsigned int"
-#define ULONG_TYPE "unsigned long"
-#define BOOLEAN_TYPE "BOOLEAN"
+#define CHAR_TYPE "string"
+#define UINT_TYPE "unsignedInt"
+#define ULONG_TYPE "unsignedLong"
+#define BOOLEAN_TYPE "boolean"
 #define BOOLEAN_TRUE "true"
 #define BOOLEAN_FLASE "false"
 #define UINT_ARRAY_TYPE "unsigned int array"
@@ -68,10 +68,10 @@ typedef struct {
 	/** name of test parameter (must be unique to individual test) */
 	char	*name;
 	/** parameter class (see xxx_PARAM defines) */
-	char	*class;
+   const char	*class;
 	/** conversion format to be applied to char *value field 
 	 * (see xxx_FORMAT defines) */
-	char	*type;
+   const char	*type;
 	/** char representstion of minimum param value */
 	char	*maxValue;
 	/** char representation of maximum param value */
@@ -84,7 +84,7 @@ typedef struct {
 	/** representation of value (see type above).  Note this
 	* field is writable */
 	union {
-	    char charValue[MAX_VALUE_CHAR_LEN];
+	   char *charValue; /* [MAX_VALUE_CHAR_LEN]; */
 	    unsigned int intValue;
 	    unsigned long longValue;
 	    BOOLEAN boolValue;
@@ -137,7 +137,7 @@ void executeTest(STF_DESCRIPTOR *d);
 STF_DESCRIPTOR * findNextTest(STF_DESCRIPTOR *d);
 
 /** find test by name */
-STF_DESCRIPTOR * findTestByName(char *name);
+STF_DESCRIPTOR * findTestByName(const char *name);
 
 /** get test name */
 char * getTestName(STF_DESCRIPTOR *d);
@@ -155,7 +155,7 @@ int getTestMinorVersion(STF_DESCRIPTOR *d);
 STF_PARAM * getNextParam(STF_DESCRIPTOR *d, STF_PARAM *p);
 
 /** get param by name */
-STF_PARAM * getParamByName(STF_DESCRIPTOR *p, char *name);
+STF_PARAM * getParamByName(STF_DESCRIPTOR *p, const char *name);
 
 /** get param name */
 char * getParamName(STF_PARAM *p);

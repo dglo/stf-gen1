@@ -88,7 +88,7 @@ STF_DESCRIPTOR * findNextTest(STF_DESCRIPTOR *d)
 
 /*------------------------------------------------------------
  */
-STF_DESCRIPTOR * findTestByName(char *name)
+STF_DESCRIPTOR * findTestByName(const char *name)
 {
     int i;
 
@@ -158,7 +158,7 @@ STF_PARAM * getNextParam(STF_DESCRIPTOR *d, STF_PARAM *p)
 
 /*------------------------------------------------------------
  */
-STF_PARAM * getParamByName(STF_DESCRIPTOR *d, char *name)
+STF_PARAM * getParamByName(STF_DESCRIPTOR *d, const char *name)
 {
     STF_PARAM *newParam=d->params;
 
