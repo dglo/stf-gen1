@@ -68,7 +68,7 @@ echo "<tr> <th>Card</th> <th>Ch</th> <th>DOM</th> <th>Sel</th>"
 i=1
 for f in ${testnames}; do
     fullqxml=${xmlpath}/std-tests/$f
-    testname=`xmlv ${fullqxml} | \
+    testname=`cat ${fullqxml} | xmlv | \
 	awk '/^\(/ { depth++; if (depth==2) print substr($0, 2); } '`
     echo "<th><a href=\"/cgi-bin/stf/conf-test?testname=${testname}\">${i}</a></th>"
     i=`expr ${i} + 1`
@@ -108,9 +108,9 @@ for (( i=1; i<=${ndoms}; i++ )); do
 	fullqxml=${xmlpath}/std-tests/$f
 	fullrxml=${respath}/$f
 
-	testname=`xmlv ${fullqxml} | \
-	    awk '/^\(/ { depth++; if (depth==2) print substr($0, 2); } '`
-	    
+	testname=`cat ${fullqxml} | xmlv | \
+	    awk '/^\(/ { depth++; if (depth==2) print substr($0, 2); }'`
+	   
 	touch ${xmlpath}/${stfserver}:${stfport}
 	chkpt 100 \
 	    stftcp ${stfserver} `expr ${stfport} + 3000` \

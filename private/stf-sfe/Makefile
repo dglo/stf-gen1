@@ -38,9 +38,9 @@ install: html-install
 html: $(TABS) all.tab
 
 html-dirs:
-	(cd /var/www/stf/xml; mkdir -p $(HTMLDIRS); chmod g+w $(HTMLDIRS))
-	(cd /var/www/stf/xml; mkdir -p std-tests; chmod g+w std-tests)
-	(cd /var/www/stf/xml; mkdir -p std-results; chmod g+w std-results)
+	(cd /var/www/stf/xml; mkdir -p $(HTMLDIRS))
+	(cd /var/www/stf/xml; mkdir -p std-tests)
+	(cd /var/www/stf/xml; mkdir -p std-results)
 
 html-install: index.html cgi-install html html-dirs
 	cp index.html /var/www/stf

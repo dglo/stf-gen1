@@ -200,7 +200,7 @@ function addResults() {
     local restt=${awkpath}/restotab.awk
     
     # tab the xml results...
-    xmlv $1 | awk -f ${restt} > /tmp/results-tab.$$
+    cat $1 | xmlv | awk -f ${restt} > /tmp/results-tab.$$
 
     # get the test name...
     local testname=`head -1 /tmp/results-tab.$$ | awk '{ print $1; }'`
