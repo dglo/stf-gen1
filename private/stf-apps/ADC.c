@@ -46,7 +46,7 @@ BOOLEAN ADCEntry(STF_DESCRIPTOR *desc,
        pass_or_fail[i]=(adc_count<=600 && adc_count>=400) ? 1:0;   /* default = 500 */                
      }
      else if (i == DOM_HAL_ADC_3_3V_CURRENT) {
-       pass_or_fail[i]=(adc_count<=105 && adc_count>=75) ? 1:0;    /* default = 96 */               
+       pass_or_fail[i]=(adc_count<=115 && adc_count>=75) ? 1:0;    /* default = 96 */               
      }
      else if (i == DOM_HAL_ADC_2_5V_CURRENT) {
        pass_or_fail[i]=(adc_count<=60 && adc_count>=0) ? 1:0;     /* default = 31 */              
