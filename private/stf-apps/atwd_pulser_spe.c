@@ -43,6 +43,7 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    int trigger_mask = (atwd_chip_a_or_b) ? 
       HAL_FPGA_TEST_TRIGGER_ATWD0 : HAL_FPGA_TEST_TRIGGER_ATWD1;
    int spe_dac_nominal, fe_pulser_dac;
+   int atwd_waveform_position;
 
    /* pretest 1) all five atwd dac settings are programmed... */
    halWriteDAC(ch, atwd_sampling_speed_dac);
@@ -191,14 +192,20 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
 
        /* 14 */
        *atwd_waveform_width = hmxIdx - hmnIdx;
+
+       atwd_waveform_position = maxIdx + 1;
    }
    
    *atwd_expected_amplitude = (int)
       (pulser_amplitude_uvolt * 40.0/5000.0/pow(8, atwd_channel));
 
    free(buffer);
-   
-   return TRUE; 
+
+   return 
+      atwd_waveform_position > 2 &&
+      atwd_waveform_position < 9 &&
+      *atwd_waveform_width > 2 &&
+      *atwd_waveform_width < 6;
 }
 
 
