@@ -162,5 +162,5 @@ BOOLEAN disc_scanEntry(STF_DESCRIPTOR *d,
 
    return 
       (*disc_scan_end_flat_range - *disc_scan_begin_flat_range + 1) > 2 &&
-      *disc_scan_noise_uvolt < 150;
+      *disc_scan_noise_uvolt < 200;
 }
