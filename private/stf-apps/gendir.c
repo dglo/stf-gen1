@@ -10,6 +10,7 @@
 #include <libxml/parser.h>
 
 #include "stf/stf.h"
+#include "hal/DOM_MB_fpga.h"
 
 struct ParamNodeStruct;
 typedef struct ParamNodeStruct ParamNode;
@@ -92,6 +93,45 @@ static void fillParam(STF_PARAM *param, xmlDocPtr doc,
    }
 }
 
+static unsigned fillDependencies(struct _xmlNode *children) {
+   xmlNodePtr pxn;
+   unsigned mask = 0;
+
+   for (pxn = children; pxn!=NULL; pxn=pxn->next) {
+      if (xmlStrcmp(pxn->name, "COM_FIFO")==0) {
+	 mask |= DOM_HAL_FPGA_COMP_COM_FIFO;
+      }
+      else if (xmlStrcmp(pxn->name, "DAQ")==0) {
+	 mask |= DOM_HAL_FPGA_COMP_DAQ;
+      }
+      else if (xmlStrcmp(pxn->name, "PULSERS")==0) {
+	 mask |= DOM_HAL_FPGA_COMP_PULSERS;
+      }
+      else if (xmlStrcmp(pxn->name, "DISCRIMINATOR_RATE")==0) {
+	 mask |= DOM_HAL_FPGA_COMP_DISCRIMINATOR_RATE;
+      }
+      else if (xmlStrcmp(pxn->name, "LOCAL_COINC")==0) {
+	 mask |= DOM_HAL_FPGA_COMP_LOCAL_COINC;
+      }
+      else if (xmlStrcmp(pxn->name, "FLASHER_BOARD")==0) {
+	 mask |= DOM_HAL_FPGA_COMP_FLASHER_BOARD;
+      }
+      else if (xmlStrcmp(pxn->name, "TRIGGER")==0) {
+	 mask |= DOM_HAL_FPGA_COMP_TRIGGER;
+      }
+      else if (xmlStrcmp(pxn->name, "LOCAL_CLOCK")==0) {
+	 mask |= DOM_HAL_FPGA_COMP_LOCAL_CLOCK;
+      }
+      else if (xmlStrcmp(pxn->name, "SUPERNOVA")==0) {
+	 mask |= DOM_HAL_FPGA_COMP_SUPERNOVA;
+      }
+      else if (xmlStrcmp(pxn->name, "ALL")==0) {
+	 mask |= DOM_HAL_FPGA_COMP_ALL;
+      }
+   }
+   return mask;
+}
+
 static DescNode *parseFile(const char *fn, DescNode *next) {
    xmlDocPtr doc;
    xmlNodePtr cur;
@@ -102,6 +142,7 @@ static DescNode *parseFile(const char *fn, DescNode *next) {
       return NULL;
    }
    dn->desc.testRunnable = dn->desc.passed = 0;
+   dn->desc.fpgaDependencies = 0;
    dn->parms = NULL;
    dn->next = NULL;
 
@@ -132,6 +173,9 @@ static DescNode *parseFile(const char *fn, DescNode *next) {
       else if (xmlStrcmp(cur->name, (const xmlChar *) "version")==0) {
 	 dn->desc.majorVersion = atoi(xmlGetProp(cur, "major"));
 	 dn->desc.minorVersion = atoi(xmlGetProp(cur, "minor"));
+      }
+      else if (xmlStrcmp(cur->name, (const xmlChar *) "fpgaDependencies")==0) {
+	 dn->desc.fpgaDependencies = fillDependencies(cur->xmlChildrenNode);
       }
       else if (xmlStrcmp(cur->name, (const xmlChar *) "inputParameter")==0 ||
 	       xmlStrcmp(cur->name, (const xmlChar *) "outputParameter")==0) {
@@ -534,6 +578,8 @@ int main(int argc, char *argv[]) {
 	 fprintf(fptr, "  .minorVersion = %d,\n", tdn->desc.minorVersion);
 	 fprintf(fptr, "  .testRunnable = %d,\n", tdn->desc.testRunnable);
 	 fprintf(fptr, "  .passed = %d,\n", tdn->desc.passed);
+	 fprintf(fptr, "  .fpgaDependencies = 0x%08x,\n", 
+		 tdn->desc.fpgaDependencies);
 	 fprintf(fptr, "  .nParams = %d,\n", np);
 	 fprintf(fptr, "  .params = %s_params,\n", tdn->desc.name);
 	 fprintf(fptr, "  .initPt = %sInit,\n", tdn->desc.name);

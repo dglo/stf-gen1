@@ -9,6 +9,7 @@
 #include <string.h>
 
 #include "stf/stf.h"
+#include "hal/DOM_MB_fpga.h"
 
 /* Prototypes
  */
@@ -18,8 +19,15 @@
 void stfInitTest(STF_DESCRIPTOR *sd) {
    if (!sd->isInit) {
       int i;
-      
-      sd->testRunnable = sd->initPt(sd);
+
+      /* make sure dependencies are valid...
+       *
+       * FIXME: we only have ICEBOOT fpga, change
+       * this to STF when we actually have one!
+       */
+      sd->testRunnable = 
+	 sd->initPt(sd) && hal_FPGA_query_versions(DOM_HAL_FPGA_TYPE_ICEBOOT,
+						   sd->fpgaDependencies)==0;
       sd->isInit = 1;
       
       for (i=0; i<sd->nParams; i++) {
