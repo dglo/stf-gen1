@@ -15,7 +15,7 @@ SYSLIBS = /usr/local/arm-elf/arm-elf/lib/libc.a \
 	/usr/local/arm-elf/arm-elf/lib/libm.a \
 	/usr/local/arm-elf/lib/gcc-lib/arm-elf/3.2/libgcc.a
 
-.SUFFIXES: .c .o .S .elf .srec .xml .html
+.SUFFIXES: .c .o .S .elf .srec .xml .html .tab
 
 .c.o:
 	$(CC) -c $(CFLAGS) $<
@@ -31,15 +31,28 @@ SYSLIBS = /usr/local/arm-elf/arm-elf/lib/libc.a \
 	$(LD) --script=raw.x -o $*-raw.elf $*-raw.o
 	$(OBJCOPY) -O srec $*-raw.elf $*.srec
 
+.xml.tab:
+	xmlv $< | awk -f stftotab.awk > $*.tab
+
+.tab.html:
+	awk -v test=$* -f tabtoqry.awk $< > $*.html
+
+#
+# add tests to each here...
+#
+TESTOBJS  = ADC.o memory.o StfEg.o
+TABS      = ADC.tab memory.tab StfEg.tab
+XMLFILES  = ADC.xml memory.xml StfEg.xml
+HTMLFILES = ADC.html memory.html StfEg.html
+
 all: stfserv.elf
 
 clean:
 	rm -f *.o *.i *.bin *.elf *.srec \
-		run-tests.html gendir genqry stfDirectory.[ch]
+		run-tests.html gendir stfDirectory.[ch] \
+		$(HTMLFILES)
 
-TESTOBJS = adc.o memory.o StfEg.o
 STFOBJS = $(TESTOBJS) stfserv.o ../stf/stf.o stfDirectory.o memtests.o
-XMLFILES = adc.xml memory.xml StfEg.xml
 
 stfserv.elf: $(STFOBJS) 
 	$(LD) -r -o stfserv.elf \
@@ -52,11 +65,8 @@ gendir: gendir.c ../../public/stf/stf.h
 	gcc -o gendir -I../../public -I../../../hal/public \
 		-I/usr/include/libxml2 gendir.c -Wall -g -lxml2
 
-genqry: genqry.c
-	gcc -o genqry -I/usr/include/libxml2 genqry.c -Wall -g -lxml2
-
-run-tests.html: genqry $(XMLFILES)
-	./genqry $(XMLFILES)
+#genqry: genqry.c
+#	gcc -o genqry -I/usr/include/libxml2 genqry.c -Wall -g -lxml2
 
 stfDirectory.c: $(XMLFILES) gendir
 	./gendir -skeleton $(XMLFILES)
@@ -66,7 +76,8 @@ stfDirectory.h: $(XMLFILES) gendir
 
 StfEg.c: stfDirectory.h
 memory.c: stfDirectory.h
- 
+ADC.c: stfDirectory.h
+
 test-cgi: test-cgi.c
 	gcc -Wall -o test-cgi test-cgi.c
 
@@ -78,13 +89,13 @@ install: html-install
 #StfEg.h: StfEg.xml stfDefn2Header.xsl
 #	xalan -IN StfEg.xml -OUT StfEg.h -XSL stfDefn2Header.xsl -Q
 
-html-install: run-tests.html index.html cgi-install
+html-install: run-tests.html index.html cgi-install $(HTMLFILES)
 	cp *.html /var/www/stf
 
 CGIS = run-test view-results view-summary
 CGIHELPERS = mk-name stftcp sumtotable.awk common.sh qrytoxml.awk \
 	restotab.awk tabtosum.awk tabtohtml.awk
-XSLFILES = restohtml.xsl restosum.xsl
+XSLFILES = # restohtml.xsl restosum.xsl
 
 cgi: $(CGIS) $(CGIHELPERS)
 
@@ -92,7 +103,6 @@ cgi-install: $(CGIS) $(CGIHELPERS) $(XSLFILES)
 	cp $(CGIS) /usr/lib/cgi-bin/stf
 	if [[ ! -f /var/www/stf/xml/uniq.txt ]]; then echo "0" > /var/www/stf/xml/uniq.txt; fi
 	cp $(CGIHELPERS) "/usr/lib/cgi-bin/stf/xml/bin"
-	cp $(XSLFILES) "/var/www/stf/xml"
 
 mk-name: mk-name.c
 	gcc -o mk-name -Wall mk-name.c
@@ -100,9 +110,8 @@ mk-name: mk-name.c
 stftcp: stftcp.c
 	gcc -o stftcp -Wall -I../../public -I../../../hal/public stftcp.c
 
+all.tab: $(TABS)
+	cat $(TABS) > all.tab
 
-
-
-
-
-
+run-tests.html: run-tests.awk all.tab
+	awk -f run-tests.awk all.tab > run-tests.html

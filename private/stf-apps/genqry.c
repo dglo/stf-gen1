@@ -171,7 +171,7 @@ int main(int argc, char *argv[]) {
       fprintf(stderr, "can't open run-tests.html\n");
       return 1;
    }
-   
+
    fprintf(fptr, "<html>\n<head>\n  <title>Run STF tests</title>\n</head>\n");
    fprintf(fptr, "<body>\n");
    fprintf(fptr, "<h2>Configure and run an STF test</h2>\n");
@@ -183,6 +183,6 @@ int main(int argc, char *argv[]) {
    fprintf(fptr, "</ul>\n");
    fprintf(fptr, "</body>\n</html>\n");
    fclose(fptr);
-   
+
    return 0;
 }
