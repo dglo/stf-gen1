@@ -10,6 +10,7 @@
 
 #include "stf/stf.h"
 #include "hal/DOM_MB_fpga.h"
+#include "hal/DOM_MB_pld.h"
 
 /* Prototypes
  */
@@ -49,8 +50,48 @@ void stfInitTest(STF_DESCRIPTOR *sd) {
 				   sizeof(unsigned long));
 	 }
       }
-      
    }
+
+   /* always clear pld and fpga state...
+    */
+   {  const int xxx = 0;
+      
+   /* make sure atwd mux is on led */
+   halSelectAnalogMuxInput(DOM_HAL_MUX_PMT_LED_CURRENT);
+   
+   halDisableBarometer();
+   halDisableFlasher();
+   halDisableLEDPS();
+   halDisablePMT_HV();
+   
+   halWriteDAC(DOM_HAL_DAC_ATWD0_TRIGGER_BIAS, 850 );
+   halWriteDAC(DOM_HAL_DAC_ATWD0_RAMP_TOP, 2097 );
+   halWriteDAC(DOM_HAL_DAC_ATWD0_RAMP_RATE , 3000 );
+   halWriteDAC(DOM_HAL_DAC_ATWD_ANALOG_REF , 2048 );
+   halWriteDAC(DOM_HAL_DAC_ATWD1_TRIGGER_BIAS , 850 );
+   halWriteDAC(DOM_HAL_DAC_ATWD1_RAMP_TOP , 2097 );
+   halWriteDAC(DOM_HAL_DAC_ATWD1_RAMP_RATE , 3000 );
+   halWriteDAC(DOM_HAL_DAC_PMT_FE_PEDESTAL , 1925 );
+   halWriteDAC(DOM_HAL_DAC_MULTIPLE_SPE_THRESH , xxx );
+   halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH , 500 );
+   halWriteDAC(DOM_HAL_DAC_LED_BRIGHTNESS , xxx );
+   halWriteDAC(DOM_HAL_DAC_FAST_ADC_REF , xxx );
+   halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER , 500 );
+   halWriteDAC(DOM_HAL_DAC_FE_AMP_LOWER_CLAMP , xxx );
+   halWriteDAC(DOM_HAL_DAC_SPARE_ADC0 , xxx );
+   halWriteDAC(DOM_HAL_DAC_SPARE_ADC1 , xxx );
+   }
+   
+   /* Thorsten recommends we wait a bit for these things to
+    * settle...
+    */
+   halUSleep(1000);
+   
+   /* fpga routines...
+    */
+   hal_FPGA_TEST_disable_ping_pong();
+   hal_FPGA_TEST_disable_pulser();
+   hal_FPGA_TEST_clear_trigger();
 }
 
 /*------------------------------------------------------------

@@ -29,13 +29,6 @@ void reverseATWDIntWaveform(unsigned *p) {
 void prescanATWD(unsigned trigger_mask) {
    int i;
 
-   /* make sure atwd mux is on led */
-   halSelectAnalogMuxInput(DOM_HAL_MUX_PMT_LED_CURRENT);
-   
-   /* Thorsten recommends we wait a bit...
-    */
-   halUSleep(1000);
-   
    /* azriel recommends to throw away a few atwd captures first...
     */
    for (i=0; i<8; i++) {
@@ -115,5 +108,3 @@ void getSummedWaveform(int loop_count, unsigned trigger_mask, int channel,
 
    free(buffer);
 }
-
-
