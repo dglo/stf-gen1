@@ -110,14 +110,22 @@ struct STF_DESCRIPTOR_STRUCT {
 	/** BOOLEAN to indicate that this test is runnable (determined
 	 * at initialization time) */
 	BOOLEAN	testRunnable;
-        /** number of parameters */
+        BOOLEAN passed; /* valid after entryPt called... */
+   
+         /** number of parameters */
         int nParams;
 	/** pointer to this test's STF_PARAM structure */
 	STF_PARAM *params;
-	/** pointer to this test's initialization entry point */
-	void	(*initPt)(STF_DESCRIPTOR *);
-	/** pointer to this test's execution entry point */
-	void	(*entryPt)(STF_DESCRIPTOR *);
+	/** pointer to this test's initialization entry point 
+	 *
+	 * returns true if test is runnable...
+	 */
+	BOOLEAN	(*initPt)(STF_DESCRIPTOR *);
+        /** pointer to this test's execution entry point 
+	 *
+	 * returns true if test passed...
+	 */
+        BOOLEAN	(*entryPt)(STF_DESCRIPTOR *);
 
    /** used internally...
     */
