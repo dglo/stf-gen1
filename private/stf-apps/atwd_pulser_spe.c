@@ -1,12 +1,15 @@
 /* atwd_pulser_spe.c, skeleton file created by gendir
  */
 #include <stdlib.h>
+#include <math.h>
 
 #include "stf/stf.h"
 #include "stf-apps/atwd_pulser_spe.h"
 
 #include "hal/DOM_MB_hal.h"
 #include "hal/DOM_MB_fpga.h"
+
+#include "stf-apps/atwdUtils.h"
 
 BOOLEAN atwd_pulser_speInit(STF_DESCRIPTOR *d) {
    return TRUE;
@@ -33,9 +36,6 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
                     unsigned *atwd_waveform_pulser_spe) {
    const int ch = (atwd_chip_a_or_b) ? 0 : 4;
    int i;
-   unsigned pedestal_nominal, nominal_mvolts,
-      pedestal_half_range, half_range_mvolts,
-      pedestal_full_range, full_range_mvolts;
    DOM_HAL_FPGA_PULSER_RATES rate;
    const int cnt = 128;
    short *channels[4] = { NULL, NULL, NULL, NULL };
@@ -99,25 +99,21 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    /* clear atwd */
    prescanATWD(trigger_mask);
 
-   if (pedestal_subtraction) {
-      for (i=0; i<cnt; i++) atwd_baseline_waveform[i] = 0;
-      for (i=0; i<n_pedestal_waveforms; i++) {
-	 int j;
-	 
-	 hal_FPGA_TEST_trigger_forced(trigger_mask);
-	 channels[atwd_channel] = buffer;
-	 hal_FPGA_TEST_readout(channels[0], channels[1], channels[2], 
-			       channels[3], 
-			       channels[0], channels[1], channels[2], 
-			       channels[3],
-			       cnt, NULL, 0, trigger_mask);
-	 for (j=0; j<cnt; j++) atwd_baseline_waveform[j] += buffer[j];
-      }
-      for (i=0; i<cnt; i++) atwd_baseline_waveform[i] /= n_pedestal_waveforms;
+   /* acquire pedestal baseline */
+   for (i=0; i<cnt; i++) atwd_baseline_waveform[i] = 0;
+   for (i=0; i<n_pedestal_waveforms; i++) {
+      int j;
+      
+      hal_FPGA_TEST_trigger_forced(trigger_mask);
+      channels[atwd_channel] = buffer;
+      hal_FPGA_TEST_readout(channels[0], channels[1], channels[2], 
+			    channels[3], 
+			    channels[0], channels[1], channels[2], 
+			    channels[3],
+			    cnt, NULL, 0, trigger_mask);
+      for (j=0; j<cnt; j++) atwd_baseline_waveform[j] += buffer[j];
    }
-   else {
-      for (i=0; i<cnt; i++) atwd_baseline_waveform[i] = 100;
-   }
+   for (i=0; i<cnt; i++) atwd_baseline_waveform[i] /= n_pedestal_waveforms;
 
    /* 2) set fe pulser dac... */
    fe_pulser_dac = (int) (pulser_amplitude_uvolt * (25.0/5000.0));
@@ -146,11 +142,59 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    }
    for (i=0; i<cnt; i++) atwd_waveform_pulser_spe[i] /= loop_count;
 
-   /* 6) */
+   /* 6), 7) */
    if (pedestal_subtraction) {
-      atwd_waveform_pulser_spe[i] =
-	 atwd_waveform_pulser_spe[i] - atwd_baseline_waveform[i] + 100;
+      for (i=0; i<cnt; i++) {
+	 atwd_waveform_pulser_spe[i] =
+	    atwd_waveform_pulser_spe[i] - atwd_baseline_waveform[i] + 100;
+      }
+      for (i=0; i<cnt; i++) atwd_baseline_waveform[i] = 100;
    }
+   else {
+      reverseATWDIntWaveform(atwd_baseline_waveform);
+   }
+   
+   /* 8) reverse waveform */
+   reverseATWDIntWaveform(atwd_waveform_pulser_spe);
+
+   /* 9) find max index */
+   {   int maxIdx = 0;
+       unsigned maxValue = atwd_waveform_pulser_spe[maxIdx];
+       int half_max, hmxIdx = 127, hmnIdx = 0;
+       
+       for (i=1; i<128; i++) {
+	  if (maxValue < atwd_waveform_pulser_spe[i]) {
+	     maxIdx = i;
+	     maxValue = atwd_waveform_pulser_spe[i];
+	  }
+       }
+
+       /* 10) */
+       *atwd_waveform_amplitude = maxValue - atwd_baseline_waveform[maxIdx];
+
+       /* 11) */
+       half_max = 
+	  (*atwd_waveform_amplitude)/2 + atwd_baseline_waveform[maxIdx];
+
+       for (i=maxIdx; i<cnt; i++) {
+	  if (atwd_waveform_pulser_spe[i]<half_max) {
+	     hmxIdx = i;
+	     break;
+	  }
+       }
+       for (i=maxIdx; i>=0; i--) {
+	  if (atwd_waveform_pulser_spe[i]<half_max) {
+	     hmnIdx = i;
+	     break;
+	  }
+       }
+
+       /* 14 */
+       *atwd_waveform_width = hmxIdx - hmnIdx;
+   }
+   
+   *atwd_expected_amplitude = (int)
+      (pulser_amplitude_uvolt * 40.0/5000.0/pow(8, atwd_channel));
 
    free(buffer);
    

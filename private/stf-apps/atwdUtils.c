@@ -7,10 +7,19 @@
 
 /* reverse an atwd waveform in time...
  */
-void swapWaveform(short *p) {
+void reverseATWDWaveform(short *p) {
    int i;
    for (i=0; i<128/2; i++) {
       const short t = p[i];
+      p[i] = p[127-i];
+      p[127-i] = t;
+   }
+}
+
+void reverseATWDIntWaveform(unsigned *p) {
+   int i;
+   for (i=0; i<128/2; i++) {
+      const unsigned t = p[i];
       p[i] = p[127-i];
       p[127-i] = t;
    }
