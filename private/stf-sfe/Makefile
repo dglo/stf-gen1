@@ -44,6 +44,8 @@ html-dirs:
 
 html-install: index.html cgi-install html html-dirs
 	cp index.html /var/www/stf
+	if [[ ! -d /var/www/stf ]]; then echo "no /var/www/stf"; fi
+	if [[ ! -d /var/www/stf/xml ]]; then mkdir /var/www/stf/xml; fi
 	cp all.tab /var/www/stf/xml
 	cp servers /var/www/stf/xml
 
@@ -58,7 +60,9 @@ cgi: $(CGIS) $(CGIHELPERS)
 
 cgi-install: $(CGIS) $(CGIHELPERS)
 	cp $(CGIS) /usr/lib/cgi-bin/stf
+	if [[ ! -d /var/www/stf/xml ]]; then mkdir /var/www/stf/xml; fi
 	if [[ ! -f /var/www/stf/xml/uniq.txt ]]; then echo "0" > /var/www/stf/xml/uniq.txt; fi
+	if [[ ! -d /usr/lib/cgi-bin/stf/xml/bin ]]; then mkdir -p /usr/lib/cgi-bin/stf/xml/bin; fi
 	cp $(CGIHELPERS) "/usr/lib/cgi-bin/stf/xml/bin"
 
 mk-name: mk-name.c
