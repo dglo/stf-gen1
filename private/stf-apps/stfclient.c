@@ -13,7 +13,7 @@
 #include <termios.h>
 #include <poll.h>
 
-#include "stf.h"
+#include "stf/stf.h"
 
 static int fdSer = -1;
 

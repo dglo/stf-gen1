@@ -2,7 +2,7 @@ AFLAGS = -mcpu=arm920t
 CFLAGS = -mlittle-endian -mcpu=arm920 -Wall \
 	-nostdinc -I/usr/local/arm-elf/arm-elf/include \
 	-I/usr/local/arm-elf/lib/gcc-lib/arm-elf/3.2/include \
-	-I../expat/xmlparse -I../../include/stf
+	-I../expat -I../../include
 
 CPP = arm-elf-cpp
 CC = arm-elf-gcc
@@ -48,7 +48,7 @@ stfserv.elf: $(STFOBJS)
 stfserv.srec: stfserv.elf
 
 gendir: gendir.c ../../include/stf/stf.h
-	gcc -o gendir -I../../include/stf \
+	gcc -o gendir -I../../include \
 		-I/usr/include/libxml2 gendir.c -Wall -g -lxml2
 
 stfDirectory.c: $(XMLFILES) gendir
@@ -56,3 +56,10 @@ stfDirectory.c: $(XMLFILES) gendir
 
 test-cgi: test-cgi.c
 	gcc -Wall -o test-cgi test-cgi.c
+
+memory.html: memory.xml restohtml.xsl
+	xalan -IN memory.xml -OUT memory.html -HTML -XSL restohtml.xsl -Q
+
+StfEg.h: StfEg.xml stfDefn2Header.xsl
+	xalan -IN StfEg.xml -OUT StfEg.h -XSL stfDefn2Header.xsl -Q
+

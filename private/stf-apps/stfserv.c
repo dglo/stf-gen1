@@ -33,9 +33,9 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "xmlparse.h"
+#include "xmlparse/xmlparse.h"
 
-#include "stf.h"
+#include "stf/stf.h"
 
 extern int read(int , void *, int);
 extern int write(int , void *, int);
@@ -45,12 +45,18 @@ extern int write(int , void *, int);
 static STF_DESCRIPTOR *desc = NULL;
 static STF_PARAM *param = NULL;
 static const char *xmlTag = NULL;
+static const char *xmlAttrs[2] = { NULL, NULL };
 
 /* when we get a new element...
  */
 static void startElement(void *userData, const char *name, const char **atts) {
   int *depth = userData;
   xmlTag = name;
+  if (strcmp(xmlTag, "version")==0) {
+     xmlAttrs[0] = atts[0];
+     xmlAttrs[1] = atts[1];
+  }
+  
   *depth = *depth + 1;
 }
 
@@ -65,6 +71,8 @@ static void endElement(void *userData, const char *name) {
 static void characterData(void *userData, const XML_Char *s, int len) {
    const int *depth = userData;
    char str[64];
+   static char *parmType;
+   
    memcpy(str, s, len);
    str[len] = 0;
 
@@ -96,21 +104,24 @@ static void characterData(void *userData, const XML_Char *s, int len) {
 	    fprintf(stderr, "can't get descriptor name '%s'\r\n", str);
 	 }
       }
-      else if (strcmp(xmlTag, "desc")==0) {
+      else if (strcmp(xmlTag, "description")==0) {
 	 desc->desc = strdup(str);
       }
-      else if (strcmp(xmlTag, "majorVersion")==0) {
-	 desc->majorVersion = atoi(str);
-      }
-      else if (strcmp(xmlTag, "minorVersion")==0) {
-	 desc->minorVersion = atoi(str);
+      else if (strcmp(xmlTag, "version")==0) {
+	 desc->majorVersion = atoi(xmlAttrs[0]);
+	 desc->minorVersion = atoi(xmlAttrs[1]);
       }
       else if (strcmp(xmlTag, "testRunnable")==0) {
 	 desc->testRunnable = strcmp(str, "TRUE")==0;
       }
-      else if (strcmp(xmlTag, "param")==0) {
+      else if (strcmp(xmlTag, "inputParameter")==0) {
+	 parmType = INPUT_PARAM;
+	 param = NULL;
+      }
+      else if (strcmp(xmlTag, "outputParameter")==0) {
 	 /* name must be first!
 	  */
+	 parmType = OUTPUT_PARAM;
 	 param = NULL;
       }
    }
@@ -119,6 +130,7 @@ static void characterData(void *userData, const XML_Char *s, int len) {
 	 if ((param = getParamByName(desc, str))==NULL) {
 	    fprintf(stderr, "can't get param name '%s'\r\n", s);
 	 }
+	 param->class = parmType;
       }
       if (strcmp(xmlTag, "class")==0) {
 	 param->class = strdup(str);
@@ -156,23 +168,19 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
    int i;
 
    idx += sprintf(buf+idx, "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n");
-   idx += sprintf(buf+idx, "<test>\r\n");
+   idx += sprintf(buf+idx, "<test-results>\r\n");
    idx += sprintf(buf+idx, " <name>%s</name>\r\n", stf->name);
-   idx += sprintf(buf+idx, " <desc>%s</desc>\r\n", stf->desc);
-   idx += sprintf(buf+idx, " <majorVersion>%d</majorVersion>\r\n", 
-		  stf->majorVersion);
-   idx += sprintf(buf+idx, " <minorVersion>%d</minorVersion>\r\n",
-		  stf->minorVersion);
+   idx += sprintf(buf+idx, " <description>%s</description>\r\n", stf->desc);
+   idx += sprintf(buf+idx, " <version major=\"%d\" minor=\"%d\"/>\r\n", 
+		  stf->majorVersion, stf->minorVersion);
    idx += sprintf(buf+idx, " <testRunnable>%s</testRunnable>\r\n",
-		  stf->testRunnable ? "TRUE" : "FALSE");
+		  stf->testRunnable ? BOOLEAN_TRUE : BOOLEAN_FALSE);
 
    for (i=0; i<stf->nParams; i++) {
       int j;
       
-      idx += sprintf(buf+idx, "  <param>\r\n");
+      idx += sprintf(buf+idx, "  <%sParameter>\r\n", stf->params[i].class);
       idx += sprintf(buf+idx, "   <name>%s</name>\r\n", stf->params[i].name);
-      idx += sprintf(buf+idx, "   <class>%s</class>\r\n", stf->params[i].class);
-      idx += sprintf(buf+idx, "   <type>%s</type>\r\n", stf->params[i].type);
 
       idx += sprintf(buf+idx, "   <value>");
       if (strcmp(stf->params[i].type, CHAR_TYPE)==0) {
@@ -202,13 +210,12 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
       else {
 	 idx += sprintf(buf+idx, "?");
       }
-      idx+=sprintf(buf+idx, "</value>\r\n");
-      
+      idx += sprintf(buf+idx, "</value>\r\n");
       idx += sprintf(buf+idx, "   <arraySize>%s</arraySize>\r\n",
 		     stf->params[i].arraySize);
-      idx += sprintf(buf+idx, "  </param>\r\n");
+      idx += sprintf(buf+idx, "  </%sParameter>\r\n", stf->params[i].class);
    }
-   idx += sprintf(buf+idx, "</test>\r\n");
+   idx += sprintf(buf+idx, "</test-results>\r\n");
    return idx;
 }
 
