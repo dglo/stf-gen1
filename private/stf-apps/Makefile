@@ -1,3 +1,6 @@
+#
+# adding a new test?  add the .o to TESTOBJS below...
+#
 .SUFFIXES: .c .o .S .elf .srec .xml .html .tab .bin
 
 .c.o:
