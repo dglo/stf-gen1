@@ -81,6 +81,8 @@ atwd_pedestal.c: stfDirectory.h atwd_pedestal.h
 atwd_baseline.c: stfDirectory.h atwd_baseline.h
 pmt_hv_ramp.c: stfDirectory.h
 pmt_hv_stability.c: stfDirectory.h
+pressure.c: stfDirectory.h
+fadc_fe_pulser.c: stfDirectory.h
 
 memory.h:
 	ln -s stfDirectory.h memory.h
@@ -93,13 +95,3 @@ atwd_baseline.h:
 
 StfEg.h:
 	ln -s stfDirectory.h StfEg.h
-
-
-
-
-
-
-
-
-
-
