@@ -45,18 +45,42 @@ extern int write(int , void *, int);
 static STF_DESCRIPTOR *desc = NULL;
 static STF_PARAM *param = NULL;
 static const char *xmlTag = NULL;
-static const char *xmlAttrs[2] = { NULL, NULL };
+static char *parmType = NULL;
 
 /* when we get a new element...
  */
 static void startElement(void *userData, const char *name, const char **atts) {
   int *depth = userData;
+
   xmlTag = name;
+
+  /* FIXME: put these at the proper depth...
+   */
   if (strcmp(xmlTag, "version")==0) {
-     xmlAttrs[0] = atts[0];
-     xmlAttrs[1] = atts[1];
+     const int major = atoi(atts[0]);
+     const int minor = atoi(atts[1]);
+     const int err = 
+	major!=desc->majorVersion || minor!=desc->minorVersion;
+     
+     /* FIXME: what do we do now?!?!
+      */
   }
-  
+  else if (strcmp(xmlTag, "inputParameter")==0) {
+     parmType = INPUT_PARAM;
+     param = NULL;
+  }
+  else if (strcmp(xmlTag, "outputParameter")==0) {
+     parmType = OUTPUT_PARAM;
+     param = NULL;
+  }
+
+  if (*depth == 0) {
+     if (strcmp(xmlTag, "test")) {
+	printf("invalid top level object '%s', expecting 'test'\r\n",
+	       xmlTag);
+     }
+  }
+
   *depth = *depth + 1;
 }
 
@@ -71,7 +95,6 @@ static void endElement(void *userData, const char *name) {
 static void characterData(void *userData, const XML_Char *s, int len) {
    const int *depth = userData;
    char str[64];
-   static char *parmType;
    
    memcpy(str, s, len);
    str[len] = 0;
@@ -91,38 +114,11 @@ static void characterData(void *userData, const XML_Char *s, int len) {
 	  (xmlTag==NULL) ? "NULL" : xmlTag, desc, param, *depth, str);
 #endif
 
-#if 1
-   if (*depth == 1) {
-      if (strcmp(xmlTag, "test")) {
-	 printf("invalid top level object '%s', expecting 'test'\r\n",
-		xmlTag);
-      }
-   }
-   else if (*depth==2) {
+   if (*depth==2) {
       if (strcmp(xmlTag, "name")==0) {
 	 if ((desc = findTestByName(str))==NULL) {
 	    fprintf(stderr, "can't get descriptor name '%s'\r\n", str);
 	 }
-      }
-      else if (strcmp(xmlTag, "description")==0) {
-	 desc->desc = strdup(str);
-      }
-      else if (strcmp(xmlTag, "version")==0) {
-	 desc->majorVersion = atoi(xmlAttrs[0]);
-	 desc->minorVersion = atoi(xmlAttrs[1]);
-      }
-      else if (strcmp(xmlTag, "testRunnable")==0) {
-	 desc->testRunnable = strcmp(str, "TRUE")==0;
-      }
-      else if (strcmp(xmlTag, "inputParameter")==0) {
-	 parmType = INPUT_PARAM;
-	 param = NULL;
-      }
-      else if (strcmp(xmlTag, "outputParameter")==0) {
-	 /* name must be first!
-	  */
-	 parmType = OUTPUT_PARAM;
-	 param = NULL;
       }
    }
    else if (*depth == 3) {
@@ -132,27 +128,25 @@ static void characterData(void *userData, const XML_Char *s, int len) {
 	 }
 	 param->class = parmType;
       }
-      if (strcmp(xmlTag, "class")==0) {
-	 param->class = strdup(str);
-      }
-      else if (strcmp(xmlTag, "type")==0) {
-	 param->type = strdup(str);
-      }
-      else if (strcmp(xmlTag, "maxValue")==0) {
-	 param->maxValue = strdup(str);
-      }
-      else if (strcmp(xmlTag, "minValue")==0) {
-	 param->minValue = strdup(str);
-      }
-      else if (strcmp(xmlTag, "defValue")==0) {
-	 param->defValue = strdup(str);
+      if (strcmp(xmlTag, "value")==0) {
+	 if (strcmp(param->type, CHAR_TYPE)==0) {
+	    param->value.charValue = strdup(str);
+	 }
+	 else if (strcmp(param->type, UINT_TYPE)==0) {
+	    param->value.intValue = atoi(str);
+	 }
+	 else if (strcmp(param->type, ULONG_TYPE)==0) {
+	    param->value.longValue = strtol(str, 0, NULL);
+	 }
+	 else if (strcmp(param->type, BOOLEAN_TYPE)==0) {
+	    param->value.boolValue = atoi(str);
+	 }
       }
       else if (strcmp(xmlTag, "arraySize")==0) {
 	 param->arraySize = strdup(str);
 	 param->arrayLength = atoi(param->arraySize);
       }
    }
-#endif
 }
 
 /* turn a directory entry into a xml file...
@@ -199,12 +193,14 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
       }
       else if (strcmp(stf->params[i].type, UINT_ARRAY_TYPE)==0) {
 	 for (j=0; j<stf->params[i].arrayLength; j++) {
-	    idx += sprintf(buf+idx, "%u ", stf->params[i].value.intArrayPtr[j]);
+	    idx += sprintf(buf+idx, "%u ", 
+			   stf->params[i].value.intArrayPtr[j]);
 	 }
       }
       else if (strcmp(stf->params[i].type, ULONG_ARRAY_TYPE)==0) {
 	 for (j=0; j<stf->params[i].arrayLength; j++) {
-	    idx += sprintf(buf+idx, "%lu ", stf->params[i].value.longArrayPtr[j]);
+	    idx += sprintf(buf+idx, "%lu ", 
+			   stf->params[i].value.longArrayPtr[j]);
 	 }
       }
       else {
@@ -456,14 +452,3 @@ int main() {
 
    return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
