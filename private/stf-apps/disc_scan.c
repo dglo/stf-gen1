@@ -145,8 +145,17 @@ BOOLEAN disc_scanEntry(STF_DESCRIPTOR *d,
    {  int start=*disc_scan_edge_pos - (zero_dac - window_dac);
       i = start;
       while (i>=0 && disc_sum_waveform[i]<(unsigned) (0.95*nominalRate)) i--;
-      *disc_scan_noise_uvolt = 
-         (unsigned) speDACToUVolt(start - i);
+   
+      if (disc_spe_or_mpe) {
+         *disc_scan_noise_uvolt = 
+            mpeDACToUVolt(i, atwd_pedestal_dac) -
+            mpeDACToUVolt(start, atwd_pedestal_dac);
+      }
+      else {
+         *disc_scan_noise_uvolt = 
+            speDACToUVolt(i, atwd_pedestal_dac) -
+            speDACToUVolt(start, atwd_pedestal_dac);
+      }
    }
 
    return 
