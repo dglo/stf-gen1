@@ -320,9 +320,8 @@ int main() {
 	    state = 6;
 	 }
 	 else {
-	    if (strcmp(line, "EXIT")==0) {
-	       fprintf(stdout, "exiting...\r\n");
-	       return 0;
+	    if (strcmp(line, "REBOOT")==0) {
+	       halBoardReboot();
 	    }
 	    else if (sscanf(line, "SEND %d", &nbytes)==1) {
 	       state = 2;
