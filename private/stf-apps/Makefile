@@ -70,7 +70,7 @@ run-tests.html: genqry.exe $(XMLFILES)
 	./genqry.exe $(XMLFILES)
 
 stfDirectory.c: $(XMLFILES) gendir
-	./gendir $(XMLFILES)
+	./gendir -skeleton $(XMLFILES)
 
 test-cgi.exe: test-cgi.c
 	gcc -Wall -o test-cgi.exe test-cgi.c
