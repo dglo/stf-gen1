@@ -26,7 +26,7 @@ void stfInitAllTests()
 
     d=findNextTest(d);
     while(d!=NULL) {
-	(d->initPt)(d);
+	d->testRunnable = (d->initPt)(d);
 	
         // init all params for this test to their default values
         newParam=d->params;
@@ -66,7 +66,7 @@ void stfInitAllTests()
  */
 void executeTest(STF_DESCRIPTOR *d)
 {
-    (d->entryPt)(d);
+   d->passed = (d->entryPt)(d);
 }
 
 /*------------------------------------------------------------
