@@ -271,7 +271,7 @@ int main() {
    int state = 1;
    int depth = 0;
 
-   setlinebuf(stdout);
+   setvbuf(stdout, (char *)NULL, _IOLBF, 0);
 
    while (1) {
       /* fprintf(stdout, "state: %d, needAck: %d\r\n", state, needAck);*/
