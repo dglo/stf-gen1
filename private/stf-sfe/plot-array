@@ -26,7 +26,7 @@ if xmlv $xmlfname | \
     # create an R script...
     #
     echo "setwd('/tmp')" > /tmp/$$.R
-    echo " v <- scan('data.$$');" >> /tmp/$$.R
+    echo "v <- scan('data.$$');" >> /tmp/$$.R
     echo "bitmap(file='plot.$$.png')" >> /tmp/$$.R
     echo "plot(v, ylab='${param}', type='l')" >> /tmp/$$.R
     echo "graphics.off()" >> /tmp/$$.R
@@ -42,7 +42,7 @@ if xmlv $xmlfname | \
 	cat /tmp/$$.Rout
 	echo "</pre>"
     fi
-    rm -f /tmp/plot.$$.png /tmp/$$.Rout # /tmp/$$.R
+    rm -f /tmp/plot.$$.png /tmp/$$.Rout /tmp/$$.R
 else
     echo "Content-type: text/html"
     echo
