@@ -2,7 +2,7 @@ AFLAGS = -mcpu=arm920t
 CFLAGS = -mlittle-endian -mcpu=arm920 -Wall \
 	-nostdinc -I/usr/local/arm-elf/arm-elf/include \
 	-I/usr/local/arm-elf/lib/gcc-lib/arm-elf/3.2/include \
-	-I../expat -I../../include -I../../../hal/include
+	-I../expat -I../../public -I../../../hal/public
 
 CPP = arm-elf-cpp
 CC = arm-elf-gcc
@@ -47,11 +47,11 @@ stfserv.elf: $(STFOBJS)
 	$(LD) -r -o stfserv.elf \
 		$(STFOBJS) \
 		../expat/xmlparse/libexpat.a \
-		../../../lib/epxa10/libhal.a \
+		../../../epxa10/lib/libhal.a \
 		$(SYSLIBS)
 
-gendir: gendir.c ../../include/stf/stf.h
-	gcc -o gendir -I../../include -I../../../hal/include \
+gendir: gendir.c ../../public/stf/stf.h
+	gcc -o gendir -I../../public -I../../../hal/public \
 		-I/usr/include/libxml2 gendir.c -Wall -g -lxml2
 
 genqry: genqry.c
