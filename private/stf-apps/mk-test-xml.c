@@ -15,6 +15,7 @@ int main(int argc, char *argv[]) {
       if (strcmp(nms[i], "test")==0) {
 	printf("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n");
 	printf("<test>\n");
+	printf("  <name>%s</name>\n", vals[i]+4 /* remove "Run " */);
 	break;
       }
     }
