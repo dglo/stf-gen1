@@ -74,4 +74,10 @@ void lookupPulserRate(int repetition_rate, DOM_HAL_FPGA_PULSER_RATES *rate,
    if (hz!=NULL) *hz = (int) rates[idx].rate;
 }
 
+/* calculate nominal spe dac setting...
+ */
+int speDACNominal(float disc_mv, int pedestal_dac) {
+   return (int)
+      (disc_mv*9.6*(2240+249)/249.0 + pedestal_dac*5000.0/4096.0);
+}
 

@@ -13,7 +13,8 @@ vpath %.xml ../stf-apps
 #
 TESTS = ADC memory StfEg atwd_pedestal atwd_baseline pmt_hv_ramp \
 		pmt_hv_stability pressure pulser_spe_mpe \
-		atwd_pedestal_sweep_forced atwd_pulser_spe
+		atwd_pedestal_sweep_forced atwd_pulser_spe \
+		atwd_pedestal_spe
 
 TABS      = $(TESTS:%=%.tab)
 HTMLFILES = $(TESTS:%=%.html)
@@ -38,7 +39,7 @@ install: html-install
 html: run-tests.html $(HTMLFILES) $(TABS) all.tab
 
 html-dirs:
-	(cd /var/www/stf/xml; mkdir -p $(HTMLDIRS))
+	(cd /var/www/stf/xml; mkdir -p $(HTMLDIRS); chmod g+w $(HTMLDIRS))
 
 html-install: run-tests.html index.html cgi-install html html-dirs
 	cp *.html /var/www/stf

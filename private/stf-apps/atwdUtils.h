@@ -9,3 +9,4 @@ void lookupPulserRate(int repetition_rate, DOM_HAL_FPGA_PULSER_RATES *rate,
 void reverseATWDWaveform(short *p);
 void reverseATWDIntWaveform(unsigned *p);
 
+int speDACNominal(float disc_mv, int pedestal_dac);
