@@ -39,6 +39,7 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
    unsigned minv, maxv;
    const int cnt = 128;
    short *buffer = (short *) calloc(cnt, sizeof(short));
+   short *channels[4] = { NULL, NULL, NULL, NULL };
    unsigned *values = (unsigned *) calloc(loop_count, sizeof(unsigned));
    unsigned sm = 0, sm2 = 0;
 
@@ -82,7 +83,10 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
 
       /* D.  Take one waveform for the channel requested...
        */
-      hal_FPGA_TEST_atwd_readout(buffer, cnt, atwd_chip_a_or_b, atwd_channel);
+      channels[atwd_channel] = buffer;
+      hal_FPGA_TEST_atwd_readout(channels[0], channels[1], channels[2],
+				 channels[3],
+				 cnt, atwd_chip_a_or_b);
 
       /* sum it... */
       for (j=0; j<cnt; j++) sum+=buffer[j];
