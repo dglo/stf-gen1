@@ -58,7 +58,11 @@ static STF_DESCRIPTOR <xsl:copy-of select="$testName"/>_descriptor = {
   <xsl:template match="stf:test/*/boolean" mode="value">bool</xsl:template>
   <xsl:template match="stf:test/*/string" mode="value">char</xsl:template>
   <xsl:template match="stf:test/*/unsignedInt" mode="value">int</xsl:template>
-  <xsl:template match="stf:test/*/unsingedLong" mode="value">long</xsl:template>
+  <xsl:template match="stf:test/*/unsignedLong" mode="value">long</xsl:template>
   <xsl:template match="stf:test/*/*" mode="initialValue">0</xsl:template>
   <xsl:template match="stf:test/*/string" mode="initialValue">""</xsl:template>
+  <xsl:template match="stf:test/inputParameter/*" mode="initialValue"><xsl:value-of select="@default"/></xsl:template>
+  <xsl:template match="stf:test/inputParameter/boolean[@default='false']" mode="initialValue">0</xsl:template>
+  <xsl:template match="stf:test/inputParameter/boolean[@default='true']" mode="initialValue">1</xsl:template>
+  <xsl:template match="stf:test/inputParameter/string" mode="initialValue">"<xsl:value-of select="@default"/>"</xsl:template>
 </xsl:stylesheet>
