@@ -10,8 +10,8 @@ BEGIN {
     print "";
     print "public class STFParameterLookup {";
     print "  private static HashMap lookup;";
-    print "  public static final STFParameter STFParameterLookup(String test,";
-    print "                                                      String name)";
+    print "  public static final STFParameter lookup(String test,";
+    print "                                          String name)";
     print "    throws DOMProdTestException, IOException {";
     print "    if (lookup==null) lookup = mkLookup(); /* FIXME: lock here? above? */";
     print "    HashMap pm = (HashMap) lookup.get(test);";
@@ -42,7 +42,7 @@ END {
 	#
 	if ( $1 != testname ) {
 	    print "";
-	    print "    ret.put(hm=new HashMap(), \"" $1 "\");";
+	    print "    ret.put(\"" $1 "\", hm=new HashMap());";
 	}
 	testname = $1;
 	
@@ -65,7 +65,7 @@ END {
 	    print "    p.setMaxValue(\"" $7 "\");";
 	}
 
-	print "    hm.put(p, \"" $2 "\");";
+	print "    hm.put(\"" $2 "\", p);";
     }
 }
 
