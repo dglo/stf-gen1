@@ -30,11 +30,11 @@ BOOLEAN pressureEntry(STF_DESCRIPTOR *d,
   /*unsigned here;*/
   /*  unsigned *adc_5v_mean_mvolts;*/
   unsigned loop_n, pressure_sum, voltage_sum;
-  unsigned short pressure_value, voltage_value;
+  unsigned pressure_value, voltage_value;
   unsigned Adc_5v_mean_counts;
   double pressure_float, temp_float, temp2_float, sum_sqr_float;
-  unsigned short *buff = 
-     (unsigned short *) calloc(loop_count, sizeof(short));
+  unsigned *buff = 
+     (unsigned *) calloc(loop_count, sizeof(unsigned));
  
   if(buff == NULL)return FALSE;
   /*  adc_5v_mean_mvolts = &here;*/
@@ -47,6 +47,7 @@ BOOLEAN pressureEntry(STF_DESCRIPTOR *d,
   voltage_sum = 0;
   *adc_max_counts = 0;
   *adc_min_counts = 0xffff;
+
   for(loop_n=0;loop_n<loop_count;loop_n++)
     {
       buff[loop_n] = halReadADC(DOM_HAL_ADC_PRESSURE);
@@ -62,7 +63,7 @@ BOOLEAN pressureEntry(STF_DESCRIPTOR *d,
   *adc_mean_counts = pressure_sum/loop_count;
   Adc_5v_mean_counts = voltage_sum/loop_count;
   temp_float = (double)Adc_5v_mean_counts * 0.002 * (25.0/10.0)*1000.0;
-  *adc_5v_mean_mvolts = (unsigned short)floor(temp_float);
+  *adc_5v_mean_mvolts = (unsigned)floor(temp_float);
 
   sum_sqr_float = 0;
   for(loop_n=0;loop_n<loop_count;loop_n++)
@@ -71,22 +72,25 @@ BOOLEAN pressureEntry(STF_DESCRIPTOR *d,
       pressure_float = (double)(pressure_value-*adc_mean_counts);
       sum_sqr_float += pressure_float * pressure_float;
     }
+
+  free(buff);
+
   temp_float = sqrt( (1.0/((double)loop_count-1.0)) * sum_sqr_float );  
-  *adc_rms_counts = (unsigned short)floor(temp_float);
+  *adc_rms_counts = (unsigned)floor(temp_float);
     
   temp2_float = Adc_5v_mean_counts;
 
   temp_float = *adc_mean_counts;
-  *adc_mean_kpascal = (unsigned short)floor((temp_float/temp2_float + 0.095)/0.009);
+  *adc_mean_kpascal = (unsigned)floor((temp_float/temp2_float + 0.095)/0.009);
   
   temp_float = *adc_rms_counts;
-  *adc_rms_kpascal = (unsigned short)floor(temp_float/(temp2_float* 0.009));
+  *adc_rms_kpascal = (unsigned)floor(temp_float/(temp2_float* 0.009));
   
   temp_float = *adc_max_counts;
-  *adc_max_kpascal = (unsigned short)floor((temp_float/temp2_float + 0.095)/0.009);
+  *adc_max_kpascal = (unsigned)floor((temp_float/temp2_float + 0.095)/0.009);
 
   temp_float = *adc_min_counts;
-  *adc_min_kpascal = (unsigned short)floor((temp_float/temp2_float + 0.095)/0.009);
+  *adc_min_kpascal = (unsigned)floor((temp_float/temp2_float + 0.095)/0.009);
 
   if(*adc_5v_mean_mvolts <4850 || *adc_5v_mean_mvolts >5350)
     return FALSE;
