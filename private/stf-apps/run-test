@@ -69,10 +69,15 @@ fullrxml=${xmlpath}\\${testname}\\${fname}-results.xml
 stf -send ${fullqxml} -go ${testname} -rcv ${testname} ${fullrxml}
 
 #
-# 5) update summary file
+# 5) update summary files
+#   a) summary
+#   b) tests
+#   c) boards
 #
 fullsxsl=${xmlpath}\\restosum.xsl
 echo `prtTime` `Xalan ${fullrxml} ${fullsxsl}` ${fname} >> ${xmlpath}\\summary
+awk '{print $2 }' /e/arthur/xml/summary | sort | uniq > /e/arthur/xml/tests
+awk '{print $3 }' /e/arthur/xml/summary | sort | uniq > /e/arthur/xml/boards
 
 #
 # 6) display results...

@@ -3,20 +3,24 @@
 #
 BEGIN { 
   FS="\t";
-  print "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>"
-  print "<test>"
-  print "  <name>" test "</name>"
+  print "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>";
+  print 
+    "<stf:setup xmlns:stf=\"http://glacier.lbl.gov/icecube/daq/stf\""
+    "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\""
+    "  xsi:schemaLocation=\"http://glacier.lbl.gov/icecube/daq/stf stf.xsd\">";
+
+  print "<" test ">";
+  print "  <parameters>";
 }
 
 !/^test\t/ {
   if ( $1 != "" ) {
-    print "  <inputParameter>";
-    print "    <name>" $1 "</name>";
-    print "    <value>" $2 "</value>";
-    print "  </inputParameter>";
+    print "  <" $1 ">" $2 "</" $1 ">";
   }
 }
 
 END {
-  print "</test>"
+  print "  </parameters>";
+  print "</" test ">";
+  print "</stf:setup>";
 }

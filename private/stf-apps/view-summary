@@ -20,10 +20,25 @@ echo "  <body>"
 #
 # FIXME: check for parameters -- add link to search...
 #
-awk -f /e/arthur/xml/bin/sumtotable.awk /e/arthur/xml/summary
+nentries=`echo ${QUERY_STRING} | qryParam entries`
+if [ ${#nentries} == 0 ]; then
+    nentries=100
+fi
+
+grep -E "^[0-9]* (memory)|(StfEg) (epxa10-eval-board) (true)|(false) " /e/arthur/xml/summary | \
+    sort -r | \
+    tail -${nentries} | \
+    awk -f /e/arthur/xml/bin/sumtotable.awk
 
 #
 # FIXME: search code goes here...
 #
+echo "  <hr>"
+echo "  <form method=\"GET\" action=\"view-summary\">"
+echo "    <p>Last: <input name=\"entries\" value=\"${nentries}\"></input>"
+echo "    <button type=\"submit\" value=\"Search\">Search</button>"
+echo "    <input type=\"checkbox\" name=\"memory\" checked=\"true\" value=\"true\">memory</input>"
+echo "  </form>"
+
 echo "  </body>"
 echo "</html>"

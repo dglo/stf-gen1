@@ -5,7 +5,8 @@
 #
 # set proper path...
 #
-xpath=/e/apps/xerces-c2_1_0-win32/bin
+xpath=/usr/local/bin
+xpath=${xpath}:/e/apps/xerces-c2_1_0-win32/bin
 xpath=${xpath}:/e/apps/xml-xalan/c/Build/Win32/VC6/Release
 PATH=/d/apps/msys-1.0/bin:/d/apps/mingw/bin:/e/arthur/xml/bin:${xpath}
 

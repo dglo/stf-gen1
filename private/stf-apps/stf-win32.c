@@ -143,7 +143,7 @@ static int waitAck(void) {
       return 1;
     }
 
-    /*printf("line: '%s'\n", buf);*/
+    /* printf("line: '%s'\n", buf);*/
 
     if (strcmp(buf, "OK")==0) return 0;
   }
