@@ -4,9 +4,7 @@ XML_HDRS_SRCS := $(wildcard $(XML_HDR_SEARCH))
 XML_HDRS := $(patsubst %.xml,$(BUILD_DIR)/%.$(C_INC_SUFFIX), $(XML_HDRS_SRCS))
 XML_HDR_TARGETS :=$(subst $(PLATFORM_PUB_ROOT)/$(PLATFORM),$(PUB_ROOT), $(subst $(PVT_ROOT)/$(PLATFORM),$(PVT_ROOT), $(XML_HDRS)))
 
-INCS += $(XML_HDR_TARGETS)
-
-BUILT_FILES := $(BUILD_DIR)/$(PVT_DIR_NAME)/stf-apps/stfDictionary.c
+BUILT_FILES += $(XML_HDR_TARGETS) $(BUILD_DIR)/$(PVT_DIR_NAME)/stf-apps/stfDictionary.c
 
 vpath %.xml $(PLATFORM_PUB_ROOT) $(PUB_ROOT) $(PLATFORM_PVT_ROOT) $(PVT_ROOT)
 vpath %.xsd $(PLATFORM_PUB_ROOT) $(PUB_ROOT) $(PLATFORM_PVT_ROOT) $(PVT_ROOT)
