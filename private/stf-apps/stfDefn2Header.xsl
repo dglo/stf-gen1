@@ -103,7 +103,7 @@ static STF_DESCRIPTOR <xsl:copy-of select="$testName"/>_descriptor = {
   <xsl:template match="stf:test/fpgaDependencies/*">DOM_HAL_FPGA_COMP_<xsl:copy-of select="local-name()"/>
     <xsl:choose>
       <xsl:when test='(last()=position())'>,</xsl:when>
-      <xsl:otherwise> &amp;<xsl:copy-of select="$nl"/><xsl:text>        </xsl:text></xsl:otherwise>
+      <xsl:otherwise> |<xsl:copy-of select="$nl"/><xsl:text>        </xsl:text></xsl:otherwise>
     </xsl:choose>
   </xsl:template>
   <xsl:template match="stf:test/*/boolean" mode="signature">BOOLEAN</xsl:template>
