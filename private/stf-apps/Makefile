@@ -30,16 +30,11 @@
 #
 # add tests to each here...
 #
-TESTOBJS  = ADC.o memory.o StfEg.o atwd_pedestal.o \
-		atwd_baseline.o pmt_hv_ramp.o pmt_hv_stability.o
-TABS      = ADC.tab memory.tab StfEg.tab atwd_pedestal.tab \
-		atwd_baseline.tab pmt_hv_ramp.tab pmt_hv_stability.tab
-XMLFILES  = ADC.xml memory.xml StfEg.xml atwd_pedestal.xml \
-		atwd_baseline.xml pmt_hv_ramp.xml pmt_hv_stability.xml
-HTMLFILES = ADC.html memory.html StfEg.html atwd_pedestal.html \
-		atwd_baseline.html pmt_hv_ramp.html pmt_hv_stability.html
-HTMLDIRS  = ADC memory StfEg atwd_pedestal atwd_baseline pmt_hv_ramp \
-	        pmt_hv_stability
+TESTOBJS  = ADC.o memory.o StfEg.o atwd_pedestal.o atwd_baseline.o pmt_hv_ramp.o pmt_hv_stability.o pressure.o
+TABS      = ADC.tab memory.tab StfEg.tab atwd_pedestal.tab atwd_baseline.tab pmt_hv_ramp.tab pmt_hv_stability.tab pressure.tab
+XMLFILES  = ADC.xml memory.xml StfEg.xml atwd_pedestal.xml atwd_baseline.xml pmt_hv_ramp.xml pmt_hv_stability.xml pressure.xml
+HTMLFILES = ADC.html memory.html StfEg.html atwd_pedestal.html atwd_baseline.html pmt_hv_ramp.html pmt_hv_stability.html pressure.html
+HTMLDIRS  = ADC memory StfEg atwd_pedestal atwd_baseline pmt_hv_ramp pmt_hv_stability pressure
 
 all: stfserv.elf menu.elf
 
