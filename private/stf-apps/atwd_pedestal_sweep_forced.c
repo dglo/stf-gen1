@@ -135,7 +135,7 @@ BOOLEAN atwd_pedestal_sweep_forcedEntry(STF_DESCRIPTOR *d,
       *full_range_counts_per_volt > 400 &&
       *full_range_counts_per_volt < 700 &&
       *linearity_pedestal_percent > 95 &&
-      *linearity_pedestal_percent > 105; 
+      *linearity_pedestal_percent < 105; 
 }
 
 
