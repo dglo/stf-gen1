@@ -32,7 +32,9 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
                     unsigned *atwd_baseline_histogram,
                     unsigned *atwd_disc_threshold_dac) {
 
-   const int ch = (atwd_chip_a_or_b) ? 4 : 0;
+   const int ch = 
+      (atwd_chip_a_or_b) ? 
+      DOM_HAL_DAC_ATWD1_TRIGGER_BIAS : DOM_HAL_DAC_ATWD0_TRIGGER_BIAS;
    int i;
    unsigned minv, maxv;
    const int cnt = 128;
@@ -45,8 +47,8 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
    halWriteDAC(ch, atwd_sampling_speed_dac);
    halWriteDAC(ch+1, atwd_ramp_top_dac);
    halWriteDAC(ch+2, atwd_ramp_bias_dac);
-   halWriteDAC(3, atwd_analog_ref_dac);
-   halWriteDAC(7, atwd_pedestal_dac);
+   halWriteDAC(DOM_HAL_DAC_ATWD_ANALOG_REF, atwd_analog_ref_dac);
+   halWriteDAC(DOM_HAL_DAC_PMT_FE_PEDESTAL, atwd_pedestal_dac);
 
    /* C. if the SPE trigger was requested, calculate the SPE DAC that
     * corresponds to SPE_DISCRIMINATOR_UVOLT and program it...
@@ -55,7 +57,7 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
       *atwd_disc_threshold_dac = (unsigned) 
 	 ((spe_discriminator_uvolt * 9.6 * (2200+1000)/1000 + 
 	   atwd_pedestal_dac * 5000000 / 4096)*1024/5000000);
-      halWriteDAC(8, *atwd_disc_threshold_dac);
+      halWriteDAC(DOM_HAL_DAC_MULTIPLE_SPE_THRESH, *atwd_disc_threshold_dac);
    }
 
    /* Thorsten recommends we wait a bit...
