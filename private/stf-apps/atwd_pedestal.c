@@ -34,6 +34,8 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
    short *buffer = (short *) calloc(cnt, sizeof(short));
    short *channels[4] = { NULL, NULL, NULL, NULL };
    unsigned *sum = (unsigned *) calloc(cnt, sizeof(unsigned));
+   int trigger_mask = (atwd_chip_a_or_b) ? 
+      HAL_FPGA_TEST_TRIGGER_ATWD0 : HAL_FPGA_TEST_TRIGGER_ATWD1;
 
    /* A. all five atwd dac settings are programmed...
     */
@@ -65,11 +67,11 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
        */
       if (atwd_trig_forced_or_spe==0) {
 	 /* forced ... */
-	 hal_FPGA_TEST_atwd_trigger_forced(atwd_chip_a_or_b);
+	 hal_FPGA_TEST_trigger_forced(trigger_mask);
       }
       else {
 	 /* discriminator... */
-	 hal_FPGA_TEST_atwd_trigger_disc(atwd_chip_a_or_b);
+	 hal_FPGA_TEST_trigger_disc(trigger_mask);
       }
 
       /* D.  Take one waveform for the channel requested...
