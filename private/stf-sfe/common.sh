@@ -69,7 +69,6 @@ mysqlbatch="${mysqlargs} -B"
 #
 javacmd="java -classpath /usr/lib/cgi-bin/stf/xml/bin"
 
-
 #
 # view results from a result id...
 #
@@ -78,8 +77,7 @@ javacmd="java -classpath /usr/lib/cgi-bin/stf/xml/bin"
 function viewResults() {
     local tabth=${awkpath}/tabtohtml.awk
     local restt=${awkpath}/restotab.awk
-    local qry=`printf \
-	"select text from STFResultXML where stf_result_id=%s" $1`
+    local qry="select text from STFResultXML where stf_result_id=$1"
     ${mysqlcmd} "${qry}" | xmln | awk -f ${restt} | \
 	awk -v xml=$1 -f ${tabth}
 }

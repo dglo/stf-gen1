@@ -86,6 +86,8 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
        */
    }
 
+   reverseATWDIntWaveform(atwd_pedestal_pattern);
+
    /* F. divide the resulting sum waveform by LOOP_COUNT to get an average
     * waveform.
     */

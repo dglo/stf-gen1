@@ -32,6 +32,10 @@ BEGIN {
     #
     if ( $4 == 1 ) {
 	if ( $5 == "unsignedIntArray") {
+            #
+            # check for img file, if it doesn't exist, we
+	    # need to create it...
+	    #
 	    value = "<a href=\"/cgi-bin/stf/plot-array" \
 		"?file=" xml "&parameter=" $2 "\">plot</a>";
 	}
