@@ -243,28 +243,25 @@ static int getLine(char *line, int max) {
 
    memset(line, 0, max);
    while (idx<max-1) {
-      /* int i;*/
-      int nr;
+       int i;
       char *t;
 
-      if ((nr=read(0, line+idx, max-1-idx))<=0) {
+      if ((read(0, line+idx, 1))<=0) {
 	 return 1;
       }
 
 #if 0
-      for (i=0; i<idx+nr; i++) fprintf(stdout, "%02x ", line[i]);
+      for (i=0; i<idx; i++) fprintf(stdout, "%02x ", line[i]);
       fprintf(stdout, "\r\n");
 #endif
 
       /* look for '\r'...
        */
-      if ((t=strchr(line, '\r'))!=NULL) {
-	 *t = 0;
-	 if (t!=line) return 0;
+      if ('\r'==line[idx]) {
+         line[idx] = '\0';
+         return 0;
       }
-      else {
-	 idx += nr;
-      }
+      idx++;
    }
    return 1;
 }
