@@ -241,16 +241,16 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
 	   pos = 512;
 	   for(lp1=*fadc_fe_pulser_position;lp1<512;lp1++)
 	     {
-	      if(waveform_avg[lp1] < half_max) pos = lp1;
+	      if(waveform_avg[lp1] < half_max) { pos = lp1; break; }
              }
 	       end_width = pos;
   /*   15. Start at the position of the maximum sample and
        move down until the first sample with a value less than the half-maximum amplitude is found.
        Save that position. If no value if found to meet this condition save the minimum position=1.*/
            pos = 1;
-           for(lp1=*fadc_fe_pulser_position;lp1>=0;lp1--)
+           for(lp1=*fadc_fe_pulser_position;lp1>0;lp1--)
              {
-              if(waveform_avg[lp1] < half_max) pos = lp1;
+              if(waveform_avg[lp1] < half_max) { pos = lp1; break; }
              }
                start_width = pos;
   /*   16. Compute FADC_FE_PULSER_WIDTH =  result from 14 - result from step 15.*/
