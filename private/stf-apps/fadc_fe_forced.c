@@ -163,7 +163,7 @@ BOOLEAN fadc_fe_forcedEntry(STF_DESCRIPTOR *d,
 	    *fadc_fe_pulser_position = pos;
 
   /*    17.Compute the FADC_FE_PULSER_AMPLITUDE = Maximum sample value in average waveform -100.  */
-	    if(amp-100>0) *fadc_fe_pulser_amplitude = amp-100;
+	    if(amp>100) *fadc_fe_pulser_amplitude = amp-100;
 	    else *fadc_fe_pulser_amplitude = 0;
 
   /*    18.Compute the half-maximum amplitude as FADC_FE_PULSER_AMPLITUDE/2 + 100.*/

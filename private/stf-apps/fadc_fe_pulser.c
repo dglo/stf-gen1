@@ -77,10 +77,11 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
   read_zero = 0;
   read_nonzero = 0;
   scan_start = (unsigned)floor((double)spe_dac_nominal * 1.05);
-  scan_stop  = (unsigned)floor((double)spe_dac_nominal * 0.95);
+  scan_stop  = (unsigned)floor((double)spe_dac_nominal * 0.95); /*0.95);*/
   for(scan_value=scan_start;scan_value>scan_stop;scan_value--)
   {
        halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH,scan_value);
+       halUSleep(110000); /*wait 110ms */
        spe_rate = hal_FPGA_TEST_get_spe_rate();
   
        if(read_zero && read_nonzero)
@@ -115,6 +116,7 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
   }
   if(read_fail)
   {
+    /*printf("read failed\n\r");*/
        free(waveform); 
        free(waveform_sum); 
        free(waveform_avg); 
@@ -173,7 +175,7 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
        (that means 512 individual sums, one for each waveform sample).
        (If a timeout occurs while trying to get a trigger,
        the test fails and reports back zeros for the amplitude, width, position
-       but it fills the FADC_FE_PULSER_WAVEFORM -if requested- with the average waveform so far collected.)*/
+       but it fills the FADC_FE_PULSER_WAVEFORM with the average waveform so far collected.)*/
 
   for(lp1=0;lp1<512;lp1++)
   {
@@ -203,11 +205,11 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
   for(lp1=0;lp1<512;lp1++)
   {
     temp = waveform_sum[lp1] / loop_count;
-    if(100+temp < *fadc_baseline_mean)  waveform_avg[lp1]=0;
+    if((100+temp) < *fadc_baseline_mean)  waveform_avg[lp1]=0;
     else  waveform_avg[lp1] = (100+temp) - *fadc_baseline_mean;
   }
 	
-  /*   10.If requested, fill the FADC_FE_PULSER_WAVEFORM output array with the baseline subtracted average waveform.*/
+  /*   10.Fill the FADC_FE_PULSER_WAVEFORM output array with the baseline subtracted average waveform.*/
     for(lp1=0;lp1<512;lp1++)
     {
 	fadc_fe_pulser_waveform[lp1] = waveform_avg[lp1];
@@ -246,7 +248,7 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
        move down until the first sample with a value less than the half-maximum amplitude is found.
        Save that position. If no value if found to meet this condition save the minimum position=1.*/
            pos = 1;
-           for(lp1=*fadc_fe_pulser_position;lp1<0;lp1--)
+           for(lp1=*fadc_fe_pulser_position;lp1>=0;lp1--)
              {
               if(waveform_avg[lp1] < half_max) pos = lp1;
              }

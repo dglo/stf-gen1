@@ -34,11 +34,6 @@
     <unsignedLong default="100" minValue="0" maxValue="1000000"/>
   </inputParameter>
 
-  <inputParameter>
-    <description>Fill the auput array with waveform.True=do-not-fill, False=fill-array.</description>
-    <name>fill_output_arrays</name>
-    <boolean default="True"/>
-  </inputParameter>
 
   <outputParameter>
     <description>Mean of the fadc baseline values</description>

@@ -19,7 +19,7 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
                     unsigned fadc_reference_dac,
                     unsigned atwd_pedestal_dac,
                     unsigned long loop_count,
-                    BOOLEAN fill_output_arrays,
+
                     unsigned *fadc_baseline_mean,
                     unsigned *fadc_baseline_rms,
                     unsigned *fadc_baseline_min,
@@ -30,6 +30,8 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   unsigned baseline_max,baseline_min;
   unsigned baseline_sum,baseline_sqr;
   unsigned baseline_mean,baseline_rms;
+  unsigned sample_max,sample_min,sample_sum;
+  int sample_rms,sample_diff,sample_sqrs;
   unsigned count;
   unsigned lp1,lp2;
   int temp;
@@ -38,7 +40,7 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   short *histogram = (short *) calloc(1024, sizeof(short));
   /*  unsigned waveform[256];
       unsigned histogram[1024];*/
-  loop_count = 200;
+
   /*  A.Pretest checks:*/ 
   /*    1.The two input DAC settings are programmed.*/
   halWriteDAC(DOM_HAL_DAC_FAST_ADC_REF,fadc_reference_dac);
@@ -57,6 +59,7 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   baseline_min=1024;
 
   /*printf("setup done\n\r");*/
+  baseline_rms=0;
   for(lp1=0;lp1<loop_count;lp1++)
     {
       histogram[lp1]=0;
@@ -67,38 +70,52 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
            hal_FPGA_TEST_readout(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,waveform,256,HAL_FPGA_TEST_TRIGGER_FADC);
   /*    2.Calculate the mean of all the 256 samples values (integers ok, range [0-1023]):
           this is the baseline for this waveform.*/
-	   count=0;	   
+	   sample_sum=0;
+	   sample_min=0xFFFFFFFF;
+	   sample_max=0;	   
 	   for(lp1=0;lp1<256;lp1++)
 	   {
 	     /*printf("%d",waveform[lp1]);*/
-	       count+=(unsigned int)waveform[lp1];
+	       sample_sum+=(unsigned int)waveform[lp1];
+	       if(waveform[lp1]>sample_max) sample_max = waveform[lp1];
+               if(waveform[lp1]<sample_min) sample_min = waveform[lp1];
            } 
 	   /*printf("\n\r"); */
-	   baseline=count/256;
+	   baseline=sample_sum/256;
+	   sample_sqrs=0;
+           for(lp1=0;lp1<256;lp1++) 
+	   {  
+	     sample_sqrs += (waveform[lp1]-baseline)*(waveform[lp1]-baseline);
+	   }
+	   baseline_rms+=sqrt(sample_sqrs/256);
+
   /*    3.Keep a sum of all baselines, and a sum of the squares for RMS calculation.
           Also keep the minimum and maximum baselines.*/
            baseline_sum+=baseline;
            baseline_sqr+=(baseline * baseline);
-	   if(baseline>baseline_max) baseline_max = baseline;
-           if(baseline<baseline_min) baseline_min = baseline;
+	   if(sample_max>baseline_max) baseline_max = sample_max;
+           if(sample_min<baseline_min) baseline_min = sample_min;
+	   /*           if(baseline>baseline_max) baseline_max = baseline; 
+			if(baseline<baseline_min) baseline_min = baseline; */
+
   /*    4.Repeat from step 1, LOOP_COUNT times, keeping a histogram
 	(it is a 1024-bins histogram) of the baselines obtained.*/
 	   if(baseline>=0 && baseline<1024) histogram[baseline]+=1;
     }
   /*printf("loops complete\n");  */
-/*    5.If FILL_OUTPUT_ARRAYS=1, fill the output array FADC_BASELINE_HISTOGRAM with the baseline distribution.*/
-  if(fill_output_arrays)
-    {
+/*    5.Fill the output array FADC_BASELINE_HISTOGRAM with the baseline distribution.*/
       /*printf("filling output arrays\n");*/
       for(lp1=0;lp1<256;lp1++)
       {
 	fadc_baseline_histogram[lp1] = (unsigned int)histogram[lp1];
       }
-    }
+
   /*    6.Compute the mean and the RMS using the running sums (integer arithmetic is ok).*/
   baseline_mean = baseline_sum / loop_count;
-  baseline_rms = sqrt(baseline_sqr);
-  /*    7.Fill output variables FADC_BASELINE_MEAN, FADC_BASELINE_RMS, FADC_BASELINE_MIN, FADC_BASELINE_MAX*/
+  /*baseline_rms = sqrt(1.0/((double)loop_count-1.0)* (double)baseline_sqr );*/
+  baseline_rms/=loop_count;
+
+ /*    7.Fill output variables FADC_BASELINE_MEAN, FADC_BASELINE_RMS, FADC_BASELINE_MIN, FADC_BASELINE_MAX*/
   *fadc_baseline_mean = baseline_mean; 
   *fadc_baseline_rms = baseline_rms;
   *fadc_baseline_min = baseline_min;
