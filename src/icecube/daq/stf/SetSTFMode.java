@@ -22,7 +22,7 @@ public class SetSTFMode {
 	  * need to power on...
 	  */
 	 if (dhc.getDOMStatusList().getDOMCount()==0) {
-	    dhc.powerOnAllChannels();
+	    dhc.powerUpAllChannels();
 	 }
 	 
 	 DOMStatusList dsl = dhc.getDOMStatusList();
