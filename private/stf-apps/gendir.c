@@ -388,8 +388,8 @@ int main(int argc, char *argv[]) {
 	       fprintf(cptr, 
 		       "/* %s, skeleton file created by gendir\n */\n"
 		       "#include \"stf/stf.h\"\n"
-		       "#include \"stfDirectory.h\"\n\n",
-		       fname);
+		       "#include \"stf-apps/%s.h\"\n\n", 
+		       fname, tdn->desc.name);
 	    }
 	 }
 	 
