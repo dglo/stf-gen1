@@ -1,4 +1,5 @@
 #
+#
 # stftotab.awk a simple script to convert the
 # xml definition file to a tab delimited file
 # of parameter information...
@@ -9,6 +10,7 @@
 BEGIN {
     depth = 0;
     inName = 0;
+    inDesc = 0;
 }
 
 /^\(/ { depth++; }
@@ -23,16 +25,19 @@ BEGIN {
     maxValue = "";
 }
 
+/^\(description$/ { inDesc++; }
+/^\)description$/ { inDesc--; }
+
 /^\)inputParameter$/  { 
-    printf "%s\t%s\tinput\t%s\t%s\t%s\t%s\n", 
-	toplevel, name, type, 
+    printf "%s\t%s\t%s\tinput\t%s\t%s\t%s\t%s\n", 
+	toplevel, name, desc, type, 
 	default, minValue, maxValue;
 }
 
 /^\(outputParameter$/ { }
 /^\)outputParameter$/  { 
-    printf "%s\t%s\toutput\t%s\n", 
-	toplevel, name, type;
+    printf "%s\t%s\t%s\toutput\t%s\n", 
+	toplevel, name, desc, type;
 }
 
 /^\(unsignedInt$/ { type = "unsignedInt" }
@@ -52,5 +57,8 @@ BEGIN {
 	else if ( depth == 3 ) {
 	    name = substr($0, 2)
 	}
+    }
+    else if ( description && inDesc ) {
+	desc = substr($0, 2);
     }
 }
