@@ -376,3 +376,27 @@ int test_thorsten0f(ui32 *bp, ui32 *unused, ui32 count) {
    return err;
 }
 
+int test_thorsten16(ui32 *bp, ui32 *unused, ui32 count) {
+   ui32 i;
+   ui32 *save = bp;
+   int err = 0;
+   
+   for (i=0; i<count; i++, bp++) {
+      const unsigned addr = (unsigned) bp;
+      *bp = ((addr>>5)&1 ? 0xffffffff : 0)&0xffff;
+   }
+   
+   bp = save;
+   for (i=0; i<count; i++, bp++) {
+      const unsigned addr = (unsigned) bp;
+      const ui32 ev = ((addr>>5)&1 ? 0xffffffff : 0)&0xffff;
+      if ( *bp != ev) {
+	 printf("FAILURE: offset %d: expected: %08x, got: %08x\r\n",
+		i, ev, *bp);
+	 err = ERROR;
+      }
+   }
+
+   return err;
+}
+
