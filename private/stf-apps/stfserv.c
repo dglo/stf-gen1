@@ -2,9 +2,11 @@
  * test results back and forth between server (arm board) and 
  * client (PC)...
  *
- * protocol:
+ * protocol (start in state 0):
  *
  *    Server (ARM)                      Client (PC)
+ *
+ * 0  skip server OK\r\n in state 1
  *
  * 1  OK\r\n
  *                                      SEND nbytes\r\n
@@ -22,6 +24,9 @@
  *                                      OK\r\n
  *    (goto state 1)
  * 5  [nbytes of 8 bit data]
+ *                                      OK\r\n
+ *    goto state 1
+ *
  *                                      OK\r\n
  *    goto state 1
  *
@@ -50,7 +55,8 @@
 static STF_DESCRIPTOR *desc = NULL;
 static STF_PARAM *param = NULL;
 static const char *xmlTag = NULL;
-static char *parmType = NULL;
+
+/*static char *parmType = NULL;*/
 
 /* when we get a new element...
  */
@@ -62,7 +68,8 @@ static void startElement(void *userData, const char *name, const char **atts) {
   switch (*depth) {
   case 0:
      if (strcmp(xmlTag, "stf:setup")) {
-	fprintf(stdout, "invalid top level object '%s', expecting 'stf:setup'\r\n",
+	fprintf(stdout, 
+		"invalid top level object '%s', expecting 'stf:setup'\r\n",
 		xmlTag);
      }
      break;
@@ -267,7 +274,7 @@ int main() {
    int  nbytes, needAck = 0;
    char *buf = NULL;
    int buflen = 0;
-   int state = 1;
+   int state = 0;
    int depth = 0;
 
    setvbuf(stdout, (char *)NULL, _IOLBF, 0);
@@ -287,8 +294,8 @@ int main() {
 	 needAck = 0;
        }
 
-      if (state==1) {
-	 fprintf(stdout, "OK\r\n");
+      if (state==0 || state==1) {
+	 if (state==1) fprintf(stdout, "OK\r\n");
 
 	 if (getLine(line, sizeof(line))) {
 	    strcpy(msg, "unable to read line!");
