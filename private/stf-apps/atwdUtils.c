@@ -131,7 +131,32 @@ float mpeDACToUVolt(int dac, int pedestal_dac) {
    return 1/9.6 * (5e6*dac/1024 - pedestal_dac*5e6/4096);
 }
 
-/* find a reasonable value of the spe threshold dac... */
+int upper_extreme_rate(int spe_dac_nominal) {
+      /* set spe threshold dac */
+      halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH, spe_dac_nominal*1.05+1);
+      halUSleep(1000); /* let dac settle */
+
+      /* wait for counts to show up */
+      halUSleep(2 * 10 * 1000);
+      /* readout the counts... */
+      return (int)
+        (hal_FPGA_TEST_get_spe_rate());
+}
+
+int lower_extreme_rate(int spe_dac_nominal) {
+      /* set spe threshold dac */
+      halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH, spe_dac_nominal*0.95-1);
+      halUSleep(1000); /* let dac settle */
+
+      /* wait for counts to show up */
+      halUSleep(2 * 10 * 1000);
+      /* readout the counts... */
+      return (int)
+        (hal_FPGA_TEST_get_spe_rate());
+}
+
+
+/* find a reasonable value of the spe threshold dac for pulse ... */
 int scanSPE(int atwd_pedestal_dac, unsigned *ret) {
    DOM_HAL_FPGA_PULSER_RATES rate;
    int retv=0, i;
@@ -199,5 +224,56 @@ int scanSPE(int atwd_pedestal_dac, unsigned *ret) {
 }
 
 
+/* find a reasonable value of the spe threshold dac for pmt... */
+int pmt_scanSPE(int atwd_pedestal_dac, unsigned *ret) {
+   int retv=0, i;
+   const int spe_dac_nominal = (int) 
+      (atwd_pedestal_dac*(5000.0/4096.0)*(1024.0/5000.0));
 
+   hal_FPGA_TEST_set_scalar_period(DOM_HAL_FPGA_SCALAR_10MS);
+   *ret = spe_dac_nominal*1.05;  /* assume all zeros... */
+   if (upper_extreme_rate(spe_dac_nominal)==0 && lower_extreme_rate(spe_dac_nominal)==0) {
+      for (i=(int) (spe_dac_nominal*1.05); i>=(int) (spe_dac_nominal*0.95); i--) {
+      unsigned rate;
+      
+      /* set spe threshold dac */
+      halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH, i);
+      halUSleep(1000); /* let dac settle */
 
+      /* wait for counts to show up */
+      halUSleep(2 * 10 * 1000);
+
+      /* readout the counts... */
+      if ((rate=hal_FPGA_TEST_get_spe_rate())>0) {
+         if (i== (int) (spe_dac_nominal*1.05)) {
+            /* no zero transition found... */
+            /* printf("scanSPE: err: dac=%d, rate=%u\r\n", i, rate); */
+            *ret = spe_dac_nominal*1.05;
+            retv=1;
+            break;
+         }
+         else if (i== (int) (spe_dac_nominal*0.95)) {
+            *ret = spe_dac_nominal*0.95;
+            retv=1;
+            break;
+         }
+         else {
+            /* printf("scanSPE: ok: dac=%d, rate=%u\r\n", i, rate); */
+            *ret = i + 2;
+            break;
+         }
+      }
+      /* printf("scanSPE: dac=%d, rate=%u\r\n", i, rate); */
+      }
+   }
+   else if (lower_extreme_rate(spe_dac_nominal)==0) {
+     *ret = spe_dac_nominal*0.95-1;
+     retv=1;
+   }
+   else if (upper_extreme_rate(spe_dac_nominal)==0) {
+     *ret = spe_dac_nominal*1.05+1;
+     retv=1;
+   }
+
+   return retv;
+}
