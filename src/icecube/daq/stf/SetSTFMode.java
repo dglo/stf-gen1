@@ -7,13 +7,16 @@ import java.util.Iterator;
 
 public class SetSTFMode {
    public static void main(String [] args) {
-      if (args.length!=1) {
-	 System.out.println("usage: SetSTFMode domhub_host");
+      if (args.length<1 || args.length>2) {
+	 System.out.println("usage: SetSTFMode domhub_host [card]");
 	 return;
       }
 
       String rmiHost = args[0];
       String dhUrl = "rmi://" + rmiHost + "/domhubapp";
+
+      int card = -1;
+      if (args.length==2) card = Integer.valueOf(args[1]).intValue();
       
       try {
 	 DOMHubCom dhc = (DOMHubCom)Naming.lookup(dhUrl);
@@ -31,6 +34,7 @@ public class SetSTFMode {
 	    DOMStatus ds = dsl.getDOMStatus(i);
 
 	    /* System.out.println(ds); */
+	    if ( card!=-1 && ds.getCard() != card ) continue;
 
 	    ds = dhc.reserveDOM(ds.getDOMID(),
 				DOMReservations.STF_CLIENT);
