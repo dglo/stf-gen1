@@ -36,6 +36,9 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
    int trigger_mask = (atwd_chip_a_or_b) ? 
       HAL_FPGA_TEST_TRIGGER_ATWD0 : HAL_FPGA_TEST_TRIGGER_ATWD1;
 
+   /* clear the pattern... */
+   memset(atwd_pedestal_pattern, 0, sizeof(unsigned)*128);
+
    /* A. all five atwd dac settings are programmed...
     */
    halWriteDAC(ch, atwd_sampling_speed_dac);
