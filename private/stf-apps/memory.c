@@ -12,13 +12,16 @@
 #include "stf/stf.h"
 #include "stf/memtests.h"
 
+#include "stfDirectory.h"
+
 BOOLEAN memoryInit(STF_DESCRIPTOR *d) {
    return TRUE;
 }
 
-BOOLEAN memoryEntry(STF_DESCRIPTOR *d) {
-   STF_PARAM *p = getParamByName(d, "bufferSize");
-   const int bsz = p->value.intValue;
+BOOLEAN memoryEntry(STF_DESCRIPTOR *d,
+                    unsigned loopCount,
+                    unsigned bufferSize) {
+   const int bsz = bufferSize;
    ui32 *buf = (ui32 *) malloc(bsz);
    int ret = test_stuck_address(buf, buf, bsz);
    free(buf);
