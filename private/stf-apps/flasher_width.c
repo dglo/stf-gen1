@@ -113,10 +113,7 @@ BOOLEAN flasher_widthEntry(STF_DESCRIPTOR *desc,
     #endif
 
     /* Read the flasherboard ID */
-    /* Not malloc'ed by STF */
-    static char id[20];
-    strcpy(id, hal_FB_get_serial());
-    *flasher_id = id;
+    hal_FB_get_serial(flasher_id);
 
     #ifdef VERBOSE
     printf("Flasher board ID = %s\n", *flasher_id);
