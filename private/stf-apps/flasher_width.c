@@ -144,6 +144,9 @@ BOOLEAN flasher_widthEntry(STF_DESCRIPTOR *desc,
 
         /* CPU-trigger the ATWD */
         hal_FPGA_TEST_trigger_forced(trigger_mask);
+
+        /* Wait for done */
+        while (!hal_FPGA_TEST_readout_done(trigger_mask));
         
         /* Read out one waveform for channel 3 */        
         hal_FPGA_TEST_readout(channels[0], channels[1], channels[2], channels[3], 
@@ -211,7 +214,10 @@ BOOLEAN flasher_widthEntry(STF_DESCRIPTOR *desc,
                 
                 /* LED-trigger the ATWD */
                 hal_FPGA_TEST_trigger_LED(trigger_mask);
-                
+
+                /* Wait for done */
+                while (!hal_FPGA_TEST_readout_done(trigger_mask));                
+
                 /* Read out one waveform of channel 3 */
                 hal_FPGA_TEST_readout(channels[0], channels[1], channels[2], channels[3], 
                                       channels[0], channels[1], channels[2], channels[3],
