@@ -26,14 +26,12 @@ BOOLEAN disc_scanEntry(STF_DESCRIPTOR *d,
 		       unsigned *disc_scan_noise_band,
 		       unsigned *disc_scan_noise_uvolt,
 		       unsigned *disc_sum_waveform) {
-   int zero_dac = speUVoltToDAC(0, atwd_pedestal_dac);
-   int window_dac = speUVoltToDAC(disc_scan_window_uvolts, 0);
+   int zero_dac, window_dac;
    int dac = (disc_spe_or_mpe) ? DOM_HAL_DAC_MULTIPLE_SPE_THRESH :
       DOM_HAL_DAC_SINGLE_SPE_THRESH;
    int i;
    DOM_HAL_FPGA_PULSER_RATES rate;
    static const unsigned nominalRate = (1000*78)/100;
-   unsigned sum;
 
    /* set pulser amplitude... */
    halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER,
@@ -42,15 +40,18 @@ BOOLEAN disc_scanEntry(STF_DESCRIPTOR *d,
    /* pretest 4) turn on fe pulser */
    lookupPulserRate(78e3, &rate, NULL);
    hal_FPGA_TEST_set_pulser_rate(rate);
+   hal_FPGA_TEST_set_scalar_period(DOM_HAL_FPGA_SCALAR_10MS);
    hal_FPGA_TEST_enable_pulser();
 
    /* 5. calculate discriminator level value */
    /* 6. program spe/mpe dac */
    if (disc_spe_or_mpe) {
       zero_dac = mpeUVoltToDAC(0, atwd_pedestal_dac);
+      window_dac = mpeUVoltToDAC(disc_scan_window_uvolts, 0);
    }
    else {
       zero_dac = speUVoltToDAC(0, atwd_pedestal_dac);
+      window_dac = speUVoltToDAC(disc_scan_window_uvolts, 0);
    }
 
    /* clear waveform */
@@ -58,18 +59,21 @@ BOOLEAN disc_scanEntry(STF_DESCRIPTOR *d,
 
    /* create waveform */
    for (i=0; i<loop_count; i++) {
-      int j, n;
+      int j, n = 0;
       for (j=zero_dac-window_dac; j<=zero_dac+window_dac; j++, n++) {
          /* set the new dac value... */
          halWriteDAC(dac, j);
          
-         /* wait 200ms for counts to show up */
-         halUSleep(200*1000);
+         /* wait 20ms for counts to show up */
+         halUSleep(20*1000);
 
          /* readout the rate... */
          disc_sum_waveform[n] = hal_FPGA_TEST_get_spe_rate();
       }
-  }
+   }
+
+   /* turn off the pulser... */
+   hal_FPGA_TEST_disable_pulser();
 
    /* average... */
    for (i=0; i<4096; i++) disc_sum_waveform[i] /= loop_count;
@@ -122,12 +126,16 @@ BOOLEAN disc_scanEntry(STF_DESCRIPTOR *d,
       }
    }
 
+
    /* now calculate the average rate... */
-   for (i=*disc_scan_begin_flat_range; i<=*disc_scan_end_flat_range; i++) {
-      sum += disc_sum_waveform[i];
+   {  unsigned sum = 0;
+      for (i=*disc_scan_begin_flat_range; i<=*disc_scan_end_flat_range; i++) {
+         sum += disc_sum_waveform[i - (zero_dac - window_dac)];
+      }
+   
+      sum /= *disc_scan_end_flat_range - *disc_scan_begin_flat_range + 1;
+      *disc_scan_flat_range_rate = sum;
    }
-   sum /= *disc_scan_end_flat_range - *disc_scan_begin_flat_range + 1;
-   *disc_scan_flat_range_rate = sum;
 
    /* maximum is noise band */
    {  unsigned max = disc_sum_waveform[0];
@@ -140,7 +148,7 @@ BOOLEAN disc_scanEntry(STF_DESCRIPTOR *d,
       }
       *disc_scan_noise_band = zero_dac - window_dac + maxi;
    }
-   
+
    /* get the 95% -> 50% delta uVolt */
    {  int start=*disc_scan_edge_pos - (zero_dac - window_dac);
       i = start;
