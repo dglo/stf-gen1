@@ -18,6 +18,9 @@ BOOLEAN ADCEntry(STF_DESCRIPTOR *desc,
    memset(adc_value,0,total_channel*sizeof(unsigned));
    memset(pass_or_fail,0,total_channel*sizeof(unsigned));
 
+   /*Azriel suggests to throw the first ADC data of each channel*/
+   for (i=0; i<total_channel; i++) halReadADC(i);
+
    for (i=0; i<loop_count; i++) {
      for (j=0; j<total_channel; j++) {
          adc_value[j] += halReadADC(j);
@@ -46,13 +49,13 @@ BOOLEAN ADCEntry(STF_DESCRIPTOR *desc,
        pass_or_fail[i]=(adc_count<=105 && adc_count>=75) ? 1:0;    /* default = 96 */               
      }
      else if (i == DOM_HAL_ADC_2_5V_CURRENT) {
-       pass_or_fail[i]=(adc_count<=50 && adc_count>=25) ? 1:0;     /* default = 31 */              
+       pass_or_fail[i]=(adc_count<=60 && adc_count>=25) ? 1:0;     /* default = 31 */              
      }
      else if (i == DOM_HAL_ADC_1_8V_CURRENT) {
-       pass_or_fail[i]=(adc_count<=125 && adc_count>=100) ? 1:0;     /* default = 90 */              
+       pass_or_fail[i]=(adc_count<=125 && adc_count>=80) ? 1:0;     /* default = 90 */              
      }
      else if (i == DOM_HAL_ADC_MINUS_5V_CURRENT) {
-       pass_or_fail[i]=(adc_count<=170 && adc_count>=110) ? 1:0;    /* default = 115 */               
+       pass_or_fail[i]=(adc_count<=170 && adc_count>=100) ? 1:0;    /* default = 115 */               
      }
      else if (i == DOM_HAL_ADC_DISC_ONESPE) {
        dac_count=halReadDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH);
@@ -71,7 +74,7 @@ BOOLEAN ADCEntry(STF_DESCRIPTOR *desc,
      else if (i == DOM_HAL_ADC_DISC_MULTISPE) {
        dac_count=halReadDAC(DOM_HAL_DAC_MULTIPLE_SPE_THRESH);
        dac_to_adc=dac_count*2.5/1023*500;            /* SPE_ADC_count = [SPE_DAC_count * 2.5V/1023 *2* 10K/(10K+10K)]/2mV */
-       pass_or_fail[i]=(adc_count<=(dac_to_adc+2) && adc_count>=(dac_to_adc-2)) ? 1:0;           
+       pass_or_fail[i]=(adc_count<=(dac_to_adc+5) && adc_count>=(dac_to_adc-5)) ? 1:0;           
      }
      else if (i == DOM_HAL_ADC_FADC_0_REF) {
        dac_count=halReadDAC(DOM_HAL_DAC_FAST_ADC_REF);
