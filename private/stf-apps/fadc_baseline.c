@@ -24,7 +24,7 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
                     unsigned *fadc_baseline_rms,
                     unsigned *fadc_baseline_min,
                     unsigned *fadc_baseline_max,
-                    unsigned * fadc_baseline_histogram) {
+                    unsigned *fadc_baseline_histogram) {
 
   unsigned baseline;
   unsigned baseline_max,baseline_min;
