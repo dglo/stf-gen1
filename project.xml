@@ -5,6 +5,7 @@
 	</packages>
 	<uses>
 		<libs>domhub-common.jar</libs>
+		<libs>daq-db</libs>
 		<tools>log4j.jar</tools>
 	</uses>
 	<test>
