@@ -118,9 +118,12 @@ BOOLEAN atwd_clock1x_forcedEntry(STF_DESCRIPTOR *d,
 
    /* 2) select clock1x on analog_mux...
     */
-   halSelectAnalogMuxInput(DOM_HAL_MUX_OSC_OUTPUT);
 
    prescanATWD(trigger_mask);
+   
+   halSelectAnalogMuxInput(DOM_HAL_MUX_OSC_OUTPUT);
+
+   halUSleep(100);
    
    /* test algorithm... */
    getSummedWaveform(loop_count, trigger_mask, 3, atwd_clock1x_waveform);
