@@ -124,7 +124,7 @@ int mpeUVoltToDAC(float uv, int pedestal_dac) {
 }
 
 float speDACToUVolt(int dac, int pedestal_dac) {
-   return 249/(9.6*(2200+249)) * ( (pedestal_dac * 5e6 / 1024) - dac*5e6/1024);
+   return 249/(9.6*(2200+249)) * (5e6*dac/1024 - pedestal_dac*5e6/4096);
 }
 
 float mpeDACToUVolt(int dac, int pedestal_dac) {
