@@ -41,13 +41,13 @@ html: run-tests.html $(HTMLFILES) $(TABS) all.tab
 
 html-dirs:
 	(cd /var/www/stf/xml; mkdir -p $(HTMLDIRS); chmod g+w $(HTMLDIRS))
-	(cd /var/www/stf/xml; mkdir -p all-tests; chmod g+w all-tests)
+	(cd /var/www/stf/xml; mkdir -p std-tests; chmod g+w std-tests)
+	(cd /var/www/stf/xml; mkdir -p std-results; chmod g+w std-results)
 
 html-install: run-tests.html index.html cgi-install html html-dirs
 	cp *.html /var/www/stf
 	cp all.tab /var/www/stf/xml
 	cp servers /var/www/stf/xml
-	cp all-tests /var/www/stf/xml
 
 CGIS = run-test view-results view-summary validate-param pick-server \
 	plot-array pick-dhserver alloff
