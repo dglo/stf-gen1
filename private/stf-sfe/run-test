@@ -124,7 +124,7 @@ echo ${tm} ${summary} ${fname} >> ${xmlpath}/summary
 # 6) display results...
 #
 tabth=/usr/lib/cgi-bin/stf/xml/bin/tabtohtml.awk
-xmlv ${fullrxml} | awk -f ${restt} | awk -f ${tabth}
+xmlv ${fullrxml} | awk -f ${restt} | awk -v xml=${fullrxml} -f ${tabth}
 
 
 

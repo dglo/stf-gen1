@@ -11,22 +11,19 @@ vpath %.xml ../stf-apps
 #
 # add tests to each here...
 #
-TABS      = ADC.tab memory.tab StfEg.tab atwd_pedestal.tab atwd_baseline.tab \
-		pmt_hv_ramp.tab pmt_hv_stability.tab pressure.tab
-HTMLFILES = ADC.html memory.html StfEg.html atwd_pedestal.html \
-		atwd_baseline.html pmt_hv_ramp.html pmt_hv_stability.html \
-		pressure.html
-HTMLDIRS  = ADC memory StfEg atwd_pedestal atwd_baseline pmt_hv_ramp \
+TESTS = ADC memory StfEg atwd_pedestal atwd_baseline pmt_hv_ramp \
 		pmt_hv_stability pressure
+
+TABS      = $(TESTS:%=%.tab)
+HTMLFILES = $(TESTS:%=%.html)
+HTMLDIRS  = $(TESTS)
 
 all: html cgi stftcp chkpt
 
 clean:
 	rm -f *.o *.i *.bin *.elf *.srec \
-		run-tests.html gendir stfDirectory.[ch] \
+		run-tests.html \
 		$(HTMLFILES) $(TABS) all.tab \
-		memory.h atwd_pedestal.h adwd_baseline.h \
-		StfEg.h \
 		chkpt stftcp mk-name
 
 test-cgi: test-cgi.c
@@ -48,10 +45,11 @@ html-install: run-tests.html index.html cgi-install html html-dirs
 	cp servers /var/www/stf/xml
 
 
-CGIS = run-test view-results view-summary validate-param pick-server
+CGIS = run-test view-results view-summary validate-param pick-server \
+	plot-array
 CGIHELPERS = mk-name chkpt stftcp sumtotable.awk common.sh qrytoxml.awk \
 	restotab.awk tabtosum.awk tabtohtml.awk validate-qry.awk \
-	servertab.awk
+	servertab.awk getarray.awk
 
 cgi: $(CGIS) $(CGIHELPERS)
 
