@@ -134,10 +134,10 @@ float mpeDACToUVolt(int dac, int pedestal_dac) {
 int upper_extreme_rate(int spe_dac_nominal) {
       /* set spe threshold dac */
       halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH, spe_dac_nominal*1.05+1);
-      halUSleep(1000); /* let dac settle */
+      halUSleep(100000); /* let dac settle */
 
       /* wait for counts to show up */
-      halUSleep(2 * 10 * 1000);
+      halUSleep(2 * 100 * 1000);
       /* readout the counts... */
       return (int)
         (hal_FPGA_TEST_get_spe_rate());
@@ -146,10 +146,10 @@ int upper_extreme_rate(int spe_dac_nominal) {
 int lower_extreme_rate(int spe_dac_nominal) {
       /* set spe threshold dac */
       halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH, spe_dac_nominal*0.95-1);
-      halUSleep(1000); /* let dac settle */
+      halUSleep(100000); /* let dac settle */
 
       /* wait for counts to show up */
-      halUSleep(2 * 10 * 1000);
+      halUSleep(2 * 100 * 1000);
       /* readout the counts... */
       return (int)
         (hal_FPGA_TEST_get_spe_rate());
