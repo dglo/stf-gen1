@@ -55,7 +55,7 @@ BOOLEAN disc_scanEntry(STF_DESCRIPTOR *d,
    }
 
    /* clear waveform */
-   memset(disc_sum_waveform, 0, sizeof(unsigned)*4096);
+   memset(disc_sum_waveform, 0, sizeof(unsigned)*1024);
 
    /* create waveform */
    for (i=0; i<loop_count; i++) {
@@ -76,7 +76,7 @@ BOOLEAN disc_scanEntry(STF_DESCRIPTOR *d,
    hal_FPGA_TEST_disable_pulser();
 
    /* average... */
-   for (i=0; i<4096; i++) disc_sum_waveform[i] /= loop_count;
+   for (i=0; i<1024; i++) disc_sum_waveform[i] /= loop_count;
 
    /* find first dac value at >50% of nominal (save position) */
    for (i=4095; i>0; i--) 
@@ -91,7 +91,7 @@ BOOLEAN disc_scanEntry(STF_DESCRIPTOR *d,
    {  int bfr = 0, efr = 0;
       int j, active = 0;
 
-      for (j=0; j<4096; j++) {
+      for (j=0; j<1024; j++) {
          const unsigned top = (unsigned) (1.05 * nominalRate);
          const unsigned bot = (unsigned) (0.95 * nominalRate);
          
@@ -140,7 +140,7 @@ BOOLEAN disc_scanEntry(STF_DESCRIPTOR *d,
    /* maximum is noise band */
    {  unsigned max = disc_sum_waveform[0];
       int maxi = 0;
-      for (i=1; i<4096; i++) {
+      for (i=1; i<1024; i++) {
          if (disc_sum_waveform[i]>max) {
             max = disc_sum_waveform[i];
             maxi = i;
