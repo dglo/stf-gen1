@@ -19,15 +19,22 @@
 void stfInitTest(STF_DESCRIPTOR *sd) {
    if (!sd->isInit) {
       int i;
-
+      int vermm;
+      
       /* make sure dependencies are valid...
-       *
-       * FIXME: we only have ICEBOOT fpga, change
-       * this to STF when we actually have one!
        */
-      sd->testRunnable = 
-	 sd->initPt(sd) && hal_FPGA_query_versions(DOM_HAL_FPGA_TYPE_ICEBOOT,
-						   sd->fpgaDependencies)==0;
+      vermm = hal_FPGA_query_versions(DOM_HAL_FPGA_TYPE_ICEBOOT,
+				      sd->fpgaDependencies)!=0;
+      if (vermm) {
+	 vermm = hal_FPGA_query_versions(DOM_HAL_FPGA_TYPE_STF_COM,
+					 sd->fpgaDependencies)!=0;
+	 if (vermm) {
+	    vermm = hal_FPGA_query_versions(DOM_HAL_FPGA_TYPE_STF_NOCOM,
+					    sd->fpgaDependencies)!=0;
+	 }
+      }
+
+      sd->testRunnable = sd->initPt(sd) && !vermm;
       sd->isInit = 1;
       
       for (i=0; i<sd->nParams; i++) {
