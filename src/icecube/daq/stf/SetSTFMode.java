@@ -21,7 +21,7 @@ public class SetSTFMode {
 	 /* assume that, if there are no doms, we
 	  * need to power on...
 	  */
-	 if (dhc.getDOMStatusList().getDOMCount()>0) {
+	 if (dhc.getDOMStatusList().getDOMCount()==0) {
 	    dhc.powerOnAllChannels();
 	 }
 	 
