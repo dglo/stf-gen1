@@ -36,7 +36,8 @@ SYSLIBS = /usr/local/arm-elf/arm-elf/lib/libc.a \
 all: stfserv.elf
 
 clean:
-	rm -f *.o *.i *.bin *.elf *.srec gendir genqry stfDirectory.c
+	rm -f *.o *.i *.bin *.elf *.srec \
+		run-tests.html gendir genqry stfDirectory.c
 
 TESTOBJS = memory.o StfEg.o
 STFOBJS = $(TESTOBJS) stfserv.o ../stf/stf.o stfDirectory.o
