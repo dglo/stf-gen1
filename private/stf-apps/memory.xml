@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<test xmlns:stf="http://glacier.lbl.gov/icecube/daq/stf">
+<stf:test xmlns:stf="http://glacier.lbl.gov/icecube/daq/stf">
   <name>memory</name>
   <description>Memory Tests</description>
   <version major="1" minor="0"/>
@@ -11,4 +11,4 @@
     <name>fluffy</name>
     <unsignedInt default="10" maxValue="1000" minValue="1"/>
   </inputParameter>
-</test>
+</stf:test>
