@@ -8,7 +8,15 @@
     <unsignedInt default="10" maxValue="1000" minValue="1"/>
   </inputParameter>
   <inputParameter>
-    <name>bufferSize</name>
-    <unsignedInt default="4" maxValue="4096" minValue="1"/>
+    <name>count</name>
+    <unsignedInt default="1024" maxValue="2097152" minValue="1"/>
+  </inputParameter>
+  <inputParameter>
+    <name>address</name>
+    <unsignedInt default="0" maxValue="2097152" minValue="0"/>
+  </inputParameter>
+  <inputParameter>
+    <name>testName</name>
+    <string/>
   </inputParameter>
 </stf:test>

@@ -1,4 +1,5 @@
 BEGIN {
+   FS="\t";
    print "<html>";
    print "<head>";
    print "<title>Results: " "</title>";

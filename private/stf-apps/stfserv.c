@@ -55,6 +55,20 @@
 static STF_DESCRIPTOR *desc = NULL;
 static STF_PARAM *param = NULL;
 static const char *xmlTag = NULL;
+static const char *errorMessage = NULL;
+
+static void clearError(void) {
+   if (errorMessage==NULL) {
+      free((char *)errorMessage);
+      errorMessage = NULL;
+   }
+}
+
+void stfError(const char *err) {
+   char *t = strdup(err);
+   clearError();
+   errorMessage = t;
+}
 
 /*static char *parmType = NULL;*/
 
@@ -64,6 +78,8 @@ static void startElement(void *userData, const char *name, const char **atts) {
   int *depth = userData;
 
   xmlTag = name;
+
+  /* printf("startElement: depth: %d, name: %s, atts: %p\n", *depth, name, atts); */
 
   switch (*depth) {
   case 0:
@@ -88,15 +104,19 @@ static void startElement(void *userData, const char *name, const char **atts) {
 	/* FIXME: what do we do now?!?!
 	 */
      } else if (strcmp(xmlTag, "parameters")==0) {
+	/* printf("parameters!\n"); */
      }
      break;
   case 3:
      if ((param = getParamByName(desc, xmlTag))==NULL) {
 	fprintf(stderr, "can't get param name '%s'\r\n", xmlTag);
      }
+     /* printf("startElement: param: %p\n", param); */
+
      break;
   default:
      fprintf(stderr, "element nesting too deep.\r\n");
+     printf("tag is: '%s'\r\n", name);
      break;
   }
   *depth = *depth + 1;
@@ -108,13 +128,15 @@ static void startElement(void *userData, const char *name, const char **atts) {
 static void endElement(void *userData, const char *name) {
   int *depthPtr = userData;
   *depthPtr = *depthPtr - 1;
+  /* printf("endElement: param==NULL\n"); */
   param = NULL;
 }
 
 /* s is not 0 terminated. */
 static void characterData(void *userData, const XML_Char *s, int len) {
+   int *depthPtr = (int *) userData;
    char str[64];
-   
+
    memcpy(str, s, len);
    str[len] = 0;
 
@@ -128,10 +150,15 @@ static void characterData(void *userData, const XML_Char *s, int len) {
 
    if (len==0) return;
 
-#if 0   
+#if 0
    fprintf(stdout, "xmlTag = %s, desc = %p, param = %p, depth = %d, s = '%s'\r\n",
 	  (xmlTag==NULL) ? "NULL" : xmlTag, desc, param, *depth, str);
+
+   printf("param: %p (%s) [%s], depth: %d, str: '%s'\r\n", param, 
+	  param!=NULL ? param->type : "?", 
+	  param!=NULL ? param->name : "?", *depthPtr, str);
 #endif
+
 
    if (NULL != param) {
       if (strcmp(param->type, CHAR_TYPE)==0) {
@@ -213,6 +240,12 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
 		  stf->testRunnable ? BOOLEAN_TRUE : BOOLEAN_FALSE);   
    idx += sprintf(buf+idx, "   <boardID>%s</boardID>\r\n", halGetBoardID());
    
+   if (errorMessage!=NULL) {
+      idx+= sprintf(buf+idx, "    <errorMessage>%s</errorMessage>\r\n",
+		    errorMessage);
+      clearError();
+   }
+
    idx += sprintf(buf+idx, "  </parameters>\r\n");
    idx += sprintf(buf+idx, " </%s>\r\n", stf->name);
    idx += sprintf(buf+idx, "</stf:result>\r\n");
@@ -352,7 +385,8 @@ int main() {
 	    XML_Parser parser = XML_ParserCreate(NULL);
 
 	    buf[nbytes] = 0;
-	    fprintf(stdout, "parse: '%s'\r\n", buf);
+
+	    /* fprintf(stdout, "parse: '%s'\r\n", buf); */
 	    
 	    /* now parse data...
 	     */
@@ -397,6 +431,7 @@ int main() {
 	       state = 6;
 	    }
 	    else {
+	       clearError();
 	       sd->passed = sd->entryPt(sd);
 	       state = 1;
 	    }

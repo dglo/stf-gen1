@@ -17,6 +17,7 @@
 #include "stf/stf.h"
 
 static int fdSer = -1;
+static int verbose = 0;
 
 static int getLine(char *buf, int max) {
   int idx = 0;
@@ -39,7 +40,7 @@ static int getLine(char *buf, int max) {
 
     if ((t=strstr(buf, "\r\n"))!=NULL) {
       *t = 0;
-      /* printf("getLine: '%s'\r\n", buf); */
+      if (verbose) printf("getLine: '%s'\r\n", buf);
       return 0;
     }
 
@@ -50,7 +51,7 @@ static int getLine(char *buf, int max) {
 }
 
 static int waitAck(void) {
-  char buf[512];
+  char buf[2048];
   /* printf("waitAck!\n"); */
   while (1) {
     if (getLine(buf, sizeof(buf))) {
@@ -58,6 +59,9 @@ static int waitAck(void) {
       return 1;
     }
     if (strcmp(buf, "OK")==0) return 0;
+    else {
+       if (verbose) printf("unexpected line: '%s'\n", buf);
+    }
   }
   return 0;
 }
@@ -118,7 +122,7 @@ static int connectTCP(const char *hostname, short port) {
 static void usage(void) {
    fprintf(stderr,
 	   "usage: stftcp host port\n"
-	   "  [-send file | -go testname | -rcv test file]\n");
+	   "  [-verbose | -send file | -go testname | -rcv test file]\n");
 }
 
 /* serial input/output control...
@@ -275,6 +279,9 @@ int main(int argc, char *argv[]) {
       waitAck();
 
       ai+=2;
+    }
+    else if (strcmp(argv[ai], "-verbose")==0) {
+       verbose = 1;
     }
     else {
        usage();
