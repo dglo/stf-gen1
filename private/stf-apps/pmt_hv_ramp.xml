@@ -23,6 +23,12 @@
     <name>hv_step_volt</name>
     <unsignedInt default="50" maxValue="300" minValue="10"/>
   </inputParameter>
+
+  <outputParameter>
+    <description>HV Board ID</description>
+    <name>hv_id</name>
+    <string/>
+  </outputParameter>
   
   <outputParameter>
     <description>Requested HV level with the greatest error (mV)</description>

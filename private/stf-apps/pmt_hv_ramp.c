@@ -32,6 +32,7 @@ BOOLEAN pmt_hv_rampEntry(STF_DESCRIPTOR *desc,
                          unsigned int hv_min_volt,
                          unsigned int hv_max_volt,
                          unsigned int hv_step_volt,
+                         char **hv_id,
                          unsigned int * hv_worst_set_mvolt,
                          unsigned int * hv_worst_read_mvolt) {
 
@@ -71,6 +72,12 @@ BOOLEAN pmt_hv_rampEntry(STF_DESCRIPTOR *desc,
 
     #ifdef VERBOSE
     printf("DEBUG: Enabling PMT at %d\r\n", hv_set_level);
+    #endif
+
+    /* Read the HV base ID */
+    strcpy(*hv_id, halHVSerial());
+    #ifdef VERBOSE
+    printf("DEBUG: HV ID is %s\r\n", *hv_id);
     #endif
 
     /* Ramp the HV up and check the value each time */

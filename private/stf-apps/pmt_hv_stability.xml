@@ -28,6 +28,12 @@
     <name>init_wait_sec</name>
     <unsignedInt default="15" maxValue="600" minValue="0"/>
   </inputParameter>
+
+  <outputParameter>
+    <description>HV Board ID</description>
+    <name>hv_id</name>
+    <string/>
+  </outputParameter>
   
   <outputParameter>
     <description>HV Read Level Mean (mV)</description>

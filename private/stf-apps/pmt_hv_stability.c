@@ -30,6 +30,7 @@ BOOLEAN pmt_hv_stabilityEntry(STF_DESCRIPTOR *desc,
                               unsigned int run_time_sec,
                               unsigned int sample_time_ms,
                               unsigned int init_wait_sec,
+                              char **hv_id,
                               unsigned int* hv_read_mean_mvolt,
                               unsigned int* hv_read_min_mvolt,
                               unsigned int* hv_read_max_mvolt,
@@ -57,6 +58,12 @@ BOOLEAN pmt_hv_stabilityEntry(STF_DESCRIPTOR *desc,
     halPowerUpBase();
     halEnableBaseHV();
     halWriteActiveBaseDAC(hv_set_volt * 2);
+
+    /* Read the HV base ID */
+    strcpy(*hv_id, halHVSerial());
+    #ifdef VERBOSE
+    printf("DEBUG: HV ID is %s\r\n", *hv_id);
+    #endif
 
     /* If requested, wait a while before starting data collection */
     /* halUSleep() doesn't seem to like really large values (not sure */
