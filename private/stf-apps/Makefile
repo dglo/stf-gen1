@@ -1,20 +1,20 @@
-AFLAGS = -mcpu=arm920t
-CFLAGS = -mlittle-endian -mcpu=arm920 -Wall \
-	-nostdinc -I/usr/arm-elf/arm-elf/include \
-	-I/usr/arm-elf/lib/gcc-lib/arm-elf/3.2/include \
-	-I../expat -I../../public -I../../../hal/public \
-	-I ../../../epxa10/build/stf/private
+#AFLAGS = -mcpu=arm920t
+#CFLAGS = -mlittle-endian -mcpu=arm920 -Wall \
+#	-nostdinc -I/usr/arm-elf/arm-elf/include \
+#	-I/usr/arm-elf/lib/gcc-lib/arm-elf/3.2/include \
+#	-I../expat -I../../public -I../../../hal/public \
+#	-I ../../../epxa10/build/stf/private
+#
+#CPP = arm-elf-cpp
+#CC = arm-elf-gcc
+#AS = arm-elf-as
+#AS = arm-elf-ar
+#LD = arm-elf-ld -N
+#OBJCOPY = arm-elf-objcopy
 
-CPP = arm-elf-cpp
-CC = arm-elf-gcc
-AS = arm-elf-as
-AS = arm-elf-ar
-LD = arm-elf-ld -N
-OBJCOPY = arm-elf-objcopy
-
-SYSLIBS = /usr/arm-elf/arm-elf/lib/libc.a \
-	/usr/arm-elf/arm-elf/lib/libm.a \
-	/usr/arm-elf/lib/gcc-lib/arm-elf/3.2/libgcc.a
+#SYSLIBS = /usr/arm-elf/arm-elf/lib/libc.a \
+#	/usr/arm-elf/arm-elf/lib/libm.a \
+#	/usr/arm-elf/lib/gcc-lib/arm-elf/3.2/libgcc.a
 
 .SUFFIXES: .c .o .S .elf .srec .xml .html .tab
 
@@ -57,6 +57,8 @@ clean:
 	rm -f *.o *.i *.bin *.elf *.srec \
 		run-tests.html gendir stfDirectory.[ch] \
 		$(HTMLFILES) $(TABS) all.tab \
+		memory.h atwd_pedestal.h adwd_baseline.h \
+		StfEg.h \
 		stftcp mk-name
 
 STFOBJS = $(TESTOBJS) ../stf/stf.o stfDirectory.o memtests.o stfUtils.o
@@ -64,9 +66,7 @@ STFOBJS = $(TESTOBJS) ../stf/stf.o stfDirectory.o memtests.o stfUtils.o
 stfserv.elf: $(STFOBJS) stfserv.o
 	$(LD) -r -o stfserv.elf \
 		$(STFOBJS) stfserv.o \
-		../expat/xmlparse/libexpat.a \
-		../../../epxa10/lib/libhal.a \
-		$(SYSLIBS)
+		$(LIBEXPAT) $(LIBHAL) $(SYSLIBS)
 
 menu.elf: $(STFOBJS) menu.o
 	$(LD) -r -o menu.elf \
@@ -74,8 +74,8 @@ menu.elf: $(STFOBJS) menu.o
 		../../../epxa10/lib/libhal.a \
 		$(SYSLIBS)
 
-gendir: gendir.c ../../public/stf/stf.h
-	gcc -o gendir -I../../public -I../../../hal/public \
+gendir: gendir.c ../public/stf/stf.h
+	gcc -o gendir -I../public \
 		-I/usr/include/libxml2 gendir.c -Wall -g -lxml2
 
 #genqry: genqry.c
@@ -87,9 +87,23 @@ stfDirectory.c: $(XMLFILES) gendir
 stfDirectory.h: $(XMLFILES) gendir
 	./gendir -skeleton $(XMLFILES)
 
-StfEg.c: stfDirectory.h
-memory.c: stfDirectory.h
+StfEg.c: stfDirectory.h StfEg.h
+memory.c: stfDirectory.h memory.h
 ADC.c: stfDirectory.h
+atwd_pedestal.c: stfDirectory.h atwd_pedestal.h
+atwd_baseline.c: stfDirectory.h atwd_baseline.h
+
+memory.h:
+	ln -s stfDirectory.h memory.h
+
+atwd_pedestal.h:
+	ln -s stfDirectory.h atwd_pedestal.h
+
+atwd_baseline.h:
+	ln -s stfDirectory.h atwd_baseline.h
+
+StfEg.h:
+	ln -s stfDirectory.h StfEg.h
 
 test-cgi: test-cgi.c
 	gcc -Wall -o test-cgi test-cgi.c
