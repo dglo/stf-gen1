@@ -87,7 +87,8 @@ static void fillParam(STF_PARAM *param, xmlDocPtr doc,
 	 }
 	 else if (strcmp(param->type, BOOLEAN_TYPE)==0) {
 	    param->value.boolValue = 
-	       (param->defValue==NULL) ? 0 : atoi(param->defValue);
+	       (param->defValue==NULL) ? 0 : 
+	         ((strcmp(param->defValue, BOOLEAN_TRUE)==0) ? 1 : 0);
 	 }
       }
    }

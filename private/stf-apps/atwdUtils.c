@@ -1,7 +1,20 @@
+#include <stddef.h>
+
 #include "hal/DOM_MB_hal.h"
 #include "hal/DOM_MB_fpga.h"
 
 #include "stf-apps/atwdUtils.h"
+
+/* reverse an atwd waveform in time...
+ */
+void swapWaveform(short *p) {
+   int i;
+   for (i=0; i<128/2; i++) {
+      const short t = p[i];
+      p[i] = p[127-i];
+      p[127-i] = t;
+   }
+}
 
 void prescanATWD(unsigned trigger_mask) {
    int i;
@@ -18,3 +31,38 @@ void prescanATWD(unsigned trigger_mask) {
       halUSleep(1000);
    }
 }
+
+void lookupPulserRate(int repetition_rate, DOM_HAL_FPGA_PULSER_RATES *rate, 
+		      unsigned *hz) {  
+   const struct {
+      DOM_HAL_FPGA_PULSER_RATES val;
+      float rate;
+   } rates[] = {
+      { .val = DOM_HAL_FPGA_PULSER_RATE_78k, .rate = 78e3 },
+      { .val = DOM_HAL_FPGA_PULSER_RATE_39k, .rate = 39e3 },
+      { .val = DOM_HAL_FPGA_PULSER_RATE_19_5k, .rate = 19.5e3 },
+      { .val = DOM_HAL_FPGA_PULSER_RATE_9_7k, .rate = 9.7e3 },
+      { .val = DOM_HAL_FPGA_PULSER_RATE_4_8k, .rate = 4.8e3 },
+      { .val = DOM_HAL_FPGA_PULSER_RATE_2_4k, .rate = 2.4e3 },
+      { .val = DOM_HAL_FPGA_PULSER_RATE_1_2k, .rate = 1.2e3 },
+      { .val = DOM_HAL_FPGA_PULSER_RATE_0_6k, .rate = 0.6e3 }
+   };
+   const int nrates = sizeof(rates)/sizeof(rates[0]);
+   int i, idx = 0;
+   float dist = 
+      (rates[idx].rate-repetition_rate) * (rates[idx].rate-repetition_rate);
+   
+   for (i=1; i<nrates; i++) {
+      const float d = 
+	 (rates[i].rate-repetition_rate) * (rates[i].rate-repetition_rate);
+      
+      if (d<dist) {
+	 idx = i;
+	 dist = d;
+      }
+   }
+   if (rate!=NULL) *rate = rates[idx].val;
+   if (hz!=NULL) *hz = (int) rates[idx].rate;
+}
+
+

@@ -59,6 +59,7 @@ BOOLEAN atwd_pedestal_sweep_forcedEntry(STF_DESCRIPTOR *d,
       unsigned sum = 0;
 
       /* 1) set pedestal dac */
+      halWriteDAC(DOM_HAL_DAC_PMT_FE_PEDESTAL, i);
       
       /* 2) take a waveform with forced cpu... */
       hal_FPGA_TEST_trigger_forced(trigger_mask);
