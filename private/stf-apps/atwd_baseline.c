@@ -1,17 +1,13 @@
-/* atwd_baseline.c, skeleton file created by gendir and modified by George
+/* atwd_baseline.c, skeleton file created by gendir
  */
 #include <stddef.h>
 #include <stdlib.h>
 #include <math.h>
-#include <string.h>
-
 #include "stf/stf.h"
 #include "stf-apps/atwd_baseline.h"
 
 #include "hal/DOM_MB_hal.h"
 #include "hal/DOM_MB_fpga.h"
-
-#include "stf-apps/atwdUtils.h"
 
 BOOLEAN atwd_baselineInit(STF_DESCRIPTOR *d) {
    return TRUE;
@@ -28,23 +24,24 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
                     unsigned atwd_trig_forced_or_spe,
                     unsigned spe_discriminator_uvolt,
                     unsigned loop_count,
+                    BOOLEAN fill_output_arrays,
                     unsigned *atwd_baseline_mean,
                     unsigned *atwd_baseline_rms,
                     unsigned *atwd_baseline_min,
                     unsigned *atwd_baseline_max,
                     unsigned *atwd_baseline_histogram,
                     unsigned *atwd_disc_threshold_dac) {
+
    const int ch = 
       (atwd_chip_a_or_b) ? 
-      DOM_HAL_DAC_ATWD0_TRIGGER_BIAS : DOM_HAL_DAC_ATWD1_TRIGGER_BIAS;
+      DOM_HAL_DAC_ATWD1_TRIGGER_BIAS : DOM_HAL_DAC_ATWD0_TRIGGER_BIAS;
    int i;
-   double minv, maxv;
-   double sm=0, sm2=0;
+   unsigned minv, maxv;
    const int cnt = 128;
    short *buffer = (short *) calloc(cnt, sizeof(short));
    short *channels[4] = { NULL, NULL, NULL, NULL };
-   double *values = (double *) calloc(loop_count, sizeof(double));
-   double prob, good_rms, sigma, valid_max, valid_min;
+   unsigned *values = (unsigned *) calloc(loop_count, sizeof(unsigned));
+   unsigned sm = 0, sm2 = 0;
    const int trigger_mask = (atwd_chip_a_or_b) ?
       HAL_FPGA_TEST_TRIGGER_ATWD0 : HAL_FPGA_TEST_TRIGGER_ATWD1;
 
@@ -60,22 +57,19 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
     * corresponds to SPE_DISCRIMINATOR_UVOLT and program it...
     */
    if (atwd_trig_forced_or_spe==1) {
-      *atwd_disc_threshold_dac = speUVoltToDAC(spe_discriminator_uvolt,
-                                               atwd_pedestal_dac);
-      
+      *atwd_disc_threshold_dac = (unsigned) 
+	 ((spe_discriminator_uvolt * 9.6 * (2200+1000)/1000 + 
+	   atwd_pedestal_dac * 5000000 / 4096)*1024/5000000);
       halWriteDAC(DOM_HAL_DAC_MULTIPLE_SPE_THRESH, *atwd_disc_threshold_dac);
    }
 
-   prescanATWD(trigger_mask);
-   prescanATWD(trigger_mask);
-
-   /* clear histogram...
+   /* Thorsten recommends we wait a bit...
     */
-   memset(atwd_baseline_histogram, 0, 1024*sizeof(unsigned));
-   
+   halUSleep(1000);
+
    for (i=0; i<(int)loop_count; i++) {
       int j;
-      double sum = 0;
+      unsigned sum = 0;
 
       /* B. The ATWD trigger mask is written according to 
        * ATWD_TRIG_FORCED_OR_SPE
@@ -93,17 +87,14 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
        */
       channels[atwd_channel] = buffer;
       hal_FPGA_TEST_readout(channels[0], channels[1], channels[2], channels[3],
-			    channels[0], channels[1], channels[2], channels[3],
-			    cnt, NULL, 0, trigger_mask);
+			    NULL, NULL, NULL, NULL,
+			    cnt, NULL, 0, atwd_chip_a_or_b);
 
-      /* sum it ... */
+      /* sum it... */
       for (j=0; j<cnt; j++) sum+=buffer[j];
 
-      /* average and record it... */
-      values[i] = sum/(cnt*1.0);
-
-      /* histogram it... */
-      atwd_baseline_histogram[((int) values[i])&0x3ff ] ++;
+      /* record it... */
+      values[i] = sum/cnt;
 
       /* E. repeat...
        */
@@ -119,39 +110,18 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
    sm /= loop_count;
 
    for (i=0; i<loop_count; i++) {
-      const double diff = values[i] - sm;
+      const int diff = (int) values[i] - sm;
       sm2 += diff*diff;
    }
-   good_rms = sqrt( (1.0/(loop_count-1)) * sm2 );
 
    *atwd_baseline_mean = sm;
-   *atwd_baseline_rms = good_rms;
+   *atwd_baseline_rms = (int) sqrt( (1.0/(loop_count-1)) * sm2 );
    *atwd_baseline_min = minv;
    *atwd_baseline_max = maxv;
-
-   prob = 0.01/loop_count;
-
-   if(prob>=1e-5 && prob<=1e-4)       sigma=5.4;
-   else if (prob>=1e-6 && prob<1e-5)  sigma=5.9;
-   else if (prob>=1e-7 && prob<1e-6)  sigma=6.35;
-   else if (prob>=1e-8 && prob<1e-7)  sigma=6.75;
-   else if (prob>=1e-9 && prob<1e-8)  sigma=7.15;
-   else sigma=0;
-
-   valid_max = sm + sigma*(good_rms)+1.0;
-   valid_min = sm - sigma*(good_rms)-1.0;
-
-   /* printf("sigma: %f valid_max: %f valid_min: %f good_rms: %f sm: %f maxv: %f minv: %f\r\n", sigma, valid_max, valid_min, good_rms, sm, maxv, minv);*/
+   *atwd_baseline_histogram = 0;
 
    free(buffer);
-   free(values);   
-
-   if(*atwd_baseline_mean >200 || *atwd_baseline_mean <100)
-     return FALSE;
-   if(maxv >valid_max || minv <valid_min)
-     return FALSE;
-   if(*atwd_baseline_rms >2)
-     return FALSE;
-
+   free(values);
+   
    return TRUE;
 }

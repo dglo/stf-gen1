@@ -33,9 +33,6 @@
  * 6  ERR msg\r\n
  *    (goto 1)
  *
- * 7  DOMID domid\r\n
- *    (goto 1)
- *
  *
  * FIXME: loop count input and output!!!!
  *   factor out 
@@ -85,7 +82,6 @@ static void startElement(void *userData, const char *name, const char **atts) {
      break;
   case 2:
      if (strcmp(xmlTag, "version")==0) {
-#if 0
 	const int major = atoi(atts[0]);
 	const int minor = atoi(atts[1]);
 	const int err = 
@@ -93,7 +89,6 @@ static void startElement(void *userData, const char *name, const char **atts) {
 	
 	/* FIXME: what do we do now?!?!
 	 */
-#endif
      } else if (strcmp(xmlTag, "parameters")==0) {
 	/* printf("parameters!\n"); */
      }
@@ -125,6 +120,7 @@ static void endElement(void *userData, const char *name) {
 
 /* s is not 0 terminated. */
 static void characterData(void *userData, const XML_Char *s, int len) {
+   int *depthPtr = (int *) userData;
    char str[64];
 
    memcpy(str, s, len);
@@ -207,14 +203,14 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
       }
       else if (strcmp(stf->params[i].type, UINT_ARRAY_TYPE)==0) {
 	 for (j=0; j<stf->params[i].arrayLength; j++) {
-	    idx += sprintf(buf+idx, "%u ", 
-			   stf->params[i].value.intArrayValue[j]);
+	    idx += sprintf(buf+idx, "%u", 
+			   stf->params[i].value.intArrayPtr[j]);
 	 }
       }
       else if (strcmp(stf->params[i].type, ULONG_ARRAY_TYPE)==0) {
 	 for (j=0; j<stf->params[i].arrayLength; j++) {
-	    idx += sprintf(buf+idx, "%lu ", 
-			   stf->params[i].value.longArrayValue[j]);
+	    idx += sprintf(buf+idx, "%lu", 
+			   stf->params[i].value.longArrayPtr[j]);
 	 }
       }
       else {
@@ -324,8 +320,9 @@ int main() {
 	    state = 6;
 	 }
 	 else {
-	    if (strcmp(line, "REBOOT")==0) {
-	       halBoardReboot();
+	    if (strcmp(line, "EXIT")==0) {
+	       fprintf(stdout, "exiting...\r\n");
+	       return 0;
 	    }
 	    else if (sscanf(line, "SEND %d", &nbytes)==1) {
 	       state = 2;
@@ -339,9 +336,6 @@ int main() {
 	    else if (strcmp(line, "OK")==0) {
 	       state = 1;
 	    }
-	    else if (strcmp(line, "DOMID")==0) {
-               state = 7;
-            }
 	    else {
 	       sprintf(msg, "invalid state 1 command!: '%s'", line);
 	       state = 6;
@@ -412,7 +406,10 @@ int main() {
 	    state = 6;
 	 }
 	 else {
-	    stfInitTest(sd);
+	    if (!sd->isInit) {
+	       sd->testRunnable = sd->initPt(sd);
+	       sd->isInit = 1;
+	    }
 	    
 	    if (sd->testRunnable==0) {
 	       sprintf(msg, "test '%s' is not runnable", name);
@@ -474,13 +471,6 @@ int main() {
 	 strcpy(msg, "");
 	 state = 1;
       }
-      else if (state==7) {
-	 char msg[128];
-	 snprintf(msg, sizeof(msg), "DOMID %s\r\n",
-		 halGetBoardID());
-         write(1, msg, strlen(msg));
-    	 state = 1;
-      } 
    }
 
    return 0;

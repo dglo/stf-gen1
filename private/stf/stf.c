@@ -5,123 +5,60 @@
  *
  */
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include "stf/stf.h"
-#include "hal/DOM_MB_fpga.h"
-#include "hal/DOM_MB_pld.h"
 
 /* Prototypes
  */
 
-/* this is called before every GO of a test...
+/* Module level variables
  */
-void stfInitTest(STF_DESCRIPTOR *sd) {
-   if (!sd->isInit) {
-      int i;
-
-      sd->testRunnable = sd->initPt(sd) &&
-         hal_FPGA_query_versions(DOM_HAL_FPGA_TYPE_STF_COM,
-                                 sd->fpgaDependencies)==0;
-      sd->isInit = 1;
-      
-      for (i=0; i<sd->nParams; i++) {
-	 if (strcmp(sd->params[i].type, UINT_ARRAY_TYPE)==0) {
-	    sd->params[i].value.intArrayValue = 
-	       (unsigned *) malloc(sd->params[i].arrayLength*sizeof(unsigned));
-	 }
-	 if (strcmp(sd->params[i].type, ULONG_ARRAY_TYPE)==0) {
-	    sd->params[i].value.longArrayValue = 
-	       (unsigned long *) malloc(sd->params[i].arrayLength*
-                                        sizeof(unsigned long));
-	 }
-      }
-   }
-   
-   /* always zero outputs... 
-    */
-   {
-      int i;
-      
-      for (i=0; i<sd->nParams; i++) {
-         /* only process output variables... */
-         if (strcmp(sd->params[i].class, OUTPUT_PARAM)!=0) continue;
-
-         if (strcmp(sd->params[i].type, CHAR_TYPE)==0) {
-            sd->params[i].value.charValue = NULL;
-         }
-         else if (strcmp(sd->params[i].type, UINT_TYPE)==0) {
-            sd->params[i].value.intValue = 0;
-         }
-         else if (strcmp(sd->params[i].type, ULONG_TYPE)==0) {
-            sd->params[i].value.longValue = 0UL;
-         }
-         else if (strcmp(sd->params[i].type, BOOLEAN_TYPE)==0) {
-            sd->params[i].value.boolValue = FALSE;
-         }
-         else if (strcmp(sd->params[i].type, UINT_ARRAY_TYPE)==0) {
-            memset(sd->params[i].value.intArrayValue, 0,
-                   sd->params[i].arrayLength*sizeof(unsigned));
-         }
-         else if (strcmp(sd->params[i].type, ULONG_ARRAY_TYPE)==0) {
-            memset(sd->params[i].value.longArrayValue, 0,
-                   sd->params[i].arrayLength*sizeof(unsigned long));
-         }
-      }
-   }
-   
-   /* always clear pld and fpga state...
-    */
-   {  const int xxx = 0;
-      
-   /* make sure atwd mux is on led */
-   halSelectAnalogMuxInput(DOM_HAL_MUX_PMT_LED_CURRENT);
-   
-   halDisableBarometer();
-   halDisableFlasher();
-   halDisableLEDPS();
-   halPowerDownBase();
-   
-   halWriteDAC(DOM_HAL_DAC_ATWD0_TRIGGER_BIAS, 850 );
-   halWriteDAC(DOM_HAL_DAC_ATWD0_RAMP_TOP, 2097 );
-   halWriteDAC(DOM_HAL_DAC_ATWD0_RAMP_RATE , 600 );
-   halWriteDAC(DOM_HAL_DAC_ATWD_ANALOG_REF , 2048 );
-   halWriteDAC(DOM_HAL_DAC_ATWD1_TRIGGER_BIAS , 850 );
-   halWriteDAC(DOM_HAL_DAC_ATWD1_RAMP_TOP , 2097 );
-   halWriteDAC(DOM_HAL_DAC_ATWD1_RAMP_RATE , 600 );
-   halWriteDAC(DOM_HAL_DAC_PMT_FE_PEDESTAL , 1925 );
-   halWriteDAC(DOM_HAL_DAC_MULTIPLE_SPE_THRESH , xxx );
-   halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH , 500 );
-   halWriteDAC(DOM_HAL_DAC_LED_BRIGHTNESS , xxx );
-   halWriteDAC(DOM_HAL_DAC_FAST_ADC_REF , xxx );
-   halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER , 0 );
-   halWriteDAC(DOM_HAL_DAC_FE_AMP_LOWER_CLAMP , xxx );
-   }
-   
-   /* Thorsten recommends we wait a bit for these things to
-    * settle...
-    */
-   halUSleep(1000);
-   
-   /* fpga routines...
-    */
-   hal_FPGA_TEST_disable_ping_pong();
-   hal_FPGA_TEST_disable_pulser();
-   hal_FPGA_TEST_clear_trigger();
-   hal_FPGA_TEST_init_state();
-}
 
 /*------------------------------------------------------------
  */
 void stfInitAllTests()
 {
     STF_DESCRIPTOR *d=NULL;
+    STF_PARAM *newParam;
+    unsigned int i;
+    unsigned long l;
 
     d=findNextTest(d);
     while(d!=NULL) {
-       stfInitTest(d);
-       d=findNextTest(d);
+	d->testRunnable = (d->initPt)(d);
+	
+        // init all params for this test to their default values
+        newParam=d->params;
+        while(strcmp(newParam->name,"")) {
+	    if(!strcmp(newParam->type,CHAR_TYPE)) {
+	        strcpy(newParam->value.charValue,newParam->defValue);
+	    }
+	    if(!strcmp(newParam->type,UINT_TYPE)) {
+	        sscanf(newParam->defValue,"%u",&i);
+	        newParam->value.intValue=i;
+	    }
+	    if(!strcmp(newParam->type,ULONG_TYPE)) {
+	        sscanf(newParam->defValue,"%lu",&l);
+	        newParam->value.intValue=l;
+	    }
+	    if(!strcmp(newParam->type,BOOLEAN_TYPE)) {
+	        if(!strcmp(newParam->defValue,BOOLEAN_TRUE)) {
+		    newParam->value.boolValue=TRUE;
+	        }
+	        else {
+		    newParam->value.boolValue=FALSE;
+	        }
+	    }
+
+	    // add code to init arrayLength field from arraySize
+	    // if any inconsistencies, tag test as unrunnable and don't
+	    // bother calling test's init fcn.
+
+	    newParam++;
+        }
+        // go to next test
+        d=findNextTest(d);
     }
 }
 
@@ -304,14 +241,3 @@ BOOLEAN getParamValueAsBool(STF_PARAM *p)
 {
     return p->value.boolValue;
 }
-
-
-
-
-
-
-
-
-
-
-

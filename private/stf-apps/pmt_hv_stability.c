@@ -13,16 +13,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <math.h>
 
 #include "stf/stf.h"
 #include "hal/DOM_MB_hal.h"
 
+/* Lots of information on stdout; for use with menu.c */
+#define VERBOSE
+
 /* PASS/FAIL criteria */
 #define HV_MAX_RMS_MVOLT      1000  /* Maximum RMS, in millivolts */
-#define HV_MEAN_ERR_MVOLT    15000  /* Maximum difference of the mean from the set value, mV */
-#define HV_MAX_MIN_ERR_MVOLT 15000  /* Maximum difference of min/max values from the mean, mV */
+#define HV_MEAN_ERR_MVOLT     5000  /* Maximum difference of the mean from the set value, mV */
+#define HV_MAX_MIN_ERR_MVOLT  5000  /* Maximum difference of min/max values from the mean, mV */
 
 BOOLEAN pmt_hv_stabilityInit(STF_DESCRIPTOR *desc) { return TRUE; }
 
@@ -31,7 +33,6 @@ BOOLEAN pmt_hv_stabilityEntry(STF_DESCRIPTOR *desc,
                               unsigned int run_time_sec,
                               unsigned int sample_time_ms,
                               unsigned int init_wait_sec,
-                              char **hv_id,
                               unsigned int* hv_read_mean_mvolt,
                               unsigned int* hv_read_min_mvolt,
                               unsigned int* hv_read_max_mvolt,
@@ -48,7 +49,7 @@ BOOLEAN pmt_hv_stabilityEntry(STF_DESCRIPTOR *desc,
     unsigned int *sample_arr;
 
     /* Start with the PMT HV disabled */
-    halPowerDownBase();
+    halDisablePMT_HV();
 
     #ifdef VERBOSE
     printf("DEBUG: Enabling PMT at %d V\r\n", hv_set_volt);
@@ -56,15 +57,8 @@ BOOLEAN pmt_hv_stabilityEntry(STF_DESCRIPTOR *desc,
 
     /* Enable the HV and set the level (in that order) */
     /* DAC value is 2xVoltage */
-    halPowerUpBase();
-    halEnableBaseHV();
+    halEnablePMT_HV();
     halWriteActiveBaseDAC(hv_set_volt * 2);
-
-    /* Read the HV base ID */
-    *hv_id = (char *) halHVSerial();
-    #ifdef VERBOSE
-    printf("DEBUG: HV ID is %s\r\n", *hv_id);
-    #endif
 
     /* If requested, wait a while before starting data collection */
     /* halUSleep() doesn't seem to like really large values (not sure */
@@ -131,7 +125,7 @@ BOOLEAN pmt_hv_stabilityEntry(STF_DESCRIPTOR *desc,
     *hv_read_rms_mvolt  = (int)(rms * 1000 / 2);
 
     /* Turn the HV off */
-    halPowerDownBase();
+    halDisablePMT_HV();
 
     /* Check for failure */
     if (*hv_read_rms_mvolt > HV_MAX_RMS_MVOLT) 

@@ -6,37 +6,37 @@
   <inputParameter>
     <description>DAC setting (of a 12 Bit device) for ATWD sampling speed</description>
     <name>atwd_sampling_speed_dac</name>
-    <unsignedInt default="850" maxValue="4095" minValue="0"/>
+    <unsignedInt default="2000" maxValue="4095" minValue="0"/>
   </inputParameter>
 
   <inputParameter>
     <description>DAC setting (of a 12 Bit device) for ATWD Ramp Top Voltage</description>
     <name>atwd_ramp_top_dac</name>
-    <unsignedInt default="2097" maxValue="4095" minValue="0"/>
+    <unsignedInt default="2400" maxValue="4095" minValue="0"/>
   </inputParameter>
 
   <inputParameter>
     <description>DAC setting (of a 12 Bit device) for ATWD Ramp Bias current </description>
     <name>atwd_ramp_bias_dac</name>
-    <unsignedInt default="3000" maxValue="4095" minValue="0"/>
+    <unsignedInt default="350" maxValue="4095" minValue="0"/>
   </inputParameter>
 
   <inputParameter>
     <description>ATWD Analog Reference Voltage Input</description>
     <name>atwd_analog_ref_dac</name>
-    <unsignedInt default="2048" maxValue="4095" minValue="0"/>
+    <unsignedInt default="2300" maxValue="4095" minValue="0"/>
   </inputParameter>
 
   <inputParameter>
     <description>DAC setting (of a 12 Bit device) for ATWD Pedestal Voltage</description>
     <name>atwd_pedestal_dac</name>
-    <unsignedInt default="1925" maxValue="4095" minValue="0"/>
+    <unsignedInt default="2200" maxValue="4095" minValue="0"/>
   </inputParameter>
 
   <inputParameter>
     <description>Selects one of two chips (A or B) on the board:0=ATWD-A and 1=ATWD-B </description>
     <name>atwd_chip_a_or_b</name>
-    <unsignedInt default="1" maxValue="1" minValue="0"/>
+    <unsignedInt default="0" maxValue="1" minValue="0"/>
   </inputParameter>
 
   <inputParameter>
@@ -61,6 +61,12 @@
     <description>Number of waveforms for baseline histogram and to compute mean, rms, etc</description>
     <name>loop_count</name>
     <unsignedInt default="1000" maxValue="100000" minValue="2"/>
+  </inputParameter>
+
+  <inputParameter>
+    <description>Fill up the output array with histogram of baseline. 0=do-not-fill, 1=fill-array</description>
+    <name>fill_output_arrays</name>
+    <boolean default="false"/>
   </inputParameter>
 
   <outputParameter>
@@ -90,7 +96,7 @@
   <outputParameter>
     <description>Histogram of waveform baseline values in ATWD counts units.</description>
     <name>atwd_baseline_histogram</name>
-    <unsignedIntArray length="1024" />
+    <unsignedInt/>
   </outputParameter>
 
   <outputParameter>

@@ -18,10 +18,11 @@ static void getstr(char *str) {
 	    *str = 0;
 	    return;
 	 }
-	 else if (*str != '\n') {
+	 else {
 	    write(1, str, 1);
 	    str++;
-	 }            
+	 }
+	 
       }
    }
 }
@@ -102,7 +103,10 @@ int  main()
 	   
 	   printf("\r\n\r\ntesting\r\n");
 
-	   stfInitTest(d);
+	   if (!d->isInit) {
+	      d->testRunnable = d->initPt(d);
+	      d->isInit = 1;
+	   }
 	   
 	   if (d->testRunnable==0) {
 	      printf("\r\ntest '%s' is not runnable", d->name);
