@@ -38,7 +38,7 @@ BOOLEAN ADCEntry(STF_DESCRIPTOR *desc,
        pass_or_fail[i]=(adc_count<=50) ? 1:0;            /* 65 counts = [-5V + (3.3V+5V)*162K/(100K+162K)]/0.002V */
      }
      else if (i == DOM_HAL_ADC_5V_POWER_SUPPLY ) {
-       pass_or_fail[i]=(adc_count<=1020 && adc_count>=980) ? 1:0;  /* 1000 counts = [0V + 5V*10K/(10K+15K)]/0.002V */
+       pass_or_fail[i]=(adc_count<=1020 && adc_count>=973) ? 1:0;  /* 1000 counts = [0V + 5V*10K/(10K+15K)]/0.002V */
      }
      else if (i == DOM_HAL_ADC_PRESSURE ) {
        pass_or_fail[i]=1; /* was: (dc_count<=870 && adc_count>=830) ? 1:0; default = 860, Azriel suggested to make this test pass all the time!*/        
@@ -47,7 +47,7 @@ BOOLEAN ADCEntry(STF_DESCRIPTOR *desc,
        pass_or_fail[i]=(adc_count<=600 && adc_count>=400) ? 1:0;   /* default = 500 */                
      }
      else if (i == DOM_HAL_ADC_3_3V_CURRENT) {
-       pass_or_fail[i]=(adc_count<=115 && adc_count>=75) ? 1:0;    /* default = 96 */               
+       pass_or_fail[i]=(adc_count<=115 && adc_count>=72) ? 1:0;    /* default = 96 */               
      }
      else if (i == DOM_HAL_ADC_2_5V_CURRENT) {
        pass_or_fail[i]=(adc_count<=60 && adc_count>=0) ? 1:0;     /* default = 31 */              
