@@ -96,10 +96,6 @@ BOOLEAN pmt_pv_ratioEntry(STF_DESCRIPTOR *desc,
     int   *atwd_pedestal = (int *) malloc(cnt*sizeof(int));
     short *channels[4] = { NULL, NULL, NULL, NULL };
     short *maxima = (short *) calloc(pv_trig_cnt, sizeof(short));
-    
-    #ifdef VERBOSE
-    printf("DEBUG: Disabling PMT HV\r\n");
-    #endif
 
     /*---------------------------------------------------------------------------------*/
 
