@@ -30,17 +30,28 @@ fname=`mk-name`
 #
 testname=`echo $QUERY_STRING | qryParam test`
 
-if [ ${#testname} == 0 ]; then
+if [[ ${#testname} == 0 ]]; then
   echo "<h2>Error! no test specified</h2>"
   exit 0
 fi
 
-
 #
 # make sure testname exists!
 #
-if [ ! -d ${xmlpath}/${testname} ]; then 
+if [[ ! -d ${xmlpath}/${testname} ]]; then 
     echo "<h2>Error\!  Test ${testname} not found</h2>"
+    exit 0
+fi
+
+#
+# validate query string...
+#
+msg=""
+msg=`echo $QUERY_STRING | splitParams | \
+    awk -v test=${testname} -f /usr/lib/cgi-bin/stf/xml/bin/validate-qry.awk`
+
+if [[ $msg != "" ]]; then
+    echo "<h2>Error: ${testname}: $msg</h2>"
     exit 0
 fi
 

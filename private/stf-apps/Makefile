@@ -110,9 +110,9 @@ html-install: run-tests.html index.html cgi-install html html-dirs
 	cp *.html /var/www/stf
 	cp all.tab /var/www/stf/xml
 
-CGIS = run-test view-results view-summary
+CGIS = run-test view-results view-summary validate-param
 CGIHELPERS = mk-name stftcp sumtotable.awk common.sh qrytoxml.awk \
-	restotab.awk tabtosum.awk tabtohtml.awk
+	restotab.awk tabtosum.awk tabtohtml.awk validate-qry.awk
 
 cgi: $(CGIS) $(CGIHELPERS)
 

@@ -18,7 +18,7 @@ echo
 #
 fname=`echo ${QUERY_STRING} | qryParam file`
 
-if [ ${#fname} == 0 ]; then
+if [[ ${#fname} == 0 ]]; then
   echo "<h2>Error! file not found</h2>"
   exit 0
 fi
@@ -33,7 +33,7 @@ sumrec=`grep -e "${fname}\$" /var/www/stf/xml/summary`
 #
 testname=`echo ${sumrec} | awk '{print $2}'`
 
-if [ ${#testname} == 0 ]; then
+if [[ ${#testname} == 0 ]]; then
   echo "<h2>Error! no test found</h2>"
   exit 0
 fi
@@ -41,7 +41,7 @@ fi
 #
 # make sure testname exists!
 #
-if [ ! -d ${xmlpath}/${testname} ]; then 
+if [[ ! -d ${xmlpath}/${testname} ]]; then 
     echo "<h2>Error\!  Test ${testname} not found</h2>"
     exit 0
 fi
@@ -51,7 +51,7 @@ fullrxml=${xmlpath}/${testname}/${fname}-results.xml
 #
 # make sure file exists...
 #
-if [ ! -e ${fullrxml} ]; then
+if [[ ! -e ${fullrxml} ]]; then
     echo "<h2>Error! can't find results file</h2>"
     exit 0
 fi
