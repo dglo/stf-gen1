@@ -38,7 +38,7 @@ BOOLEAN atwd_pedestal_noiseEntry(STF_DESCRIPTOR *d,
    short *chs[4] = { NULL, NULL, NULL, NULL };
    int trigger_mask = (atwd_chip_a_or_b) ? 
       HAL_FPGA_TEST_TRIGGER_ATWD0 : HAL_FPGA_TEST_TRIGGER_ATWD1;
-   double rms;
+   double rms, avg;
 
    *noise_positive_max = *noise_negative_max = 0;
 
@@ -71,6 +71,7 @@ BOOLEAN atwd_pedestal_noiseEntry(STF_DESCRIPTOR *d,
       /* get summed waveform... */
       for (j=0; j<cnt; j++) pattern[j]+=buffer[j];
    }
+   for (i=0; i<cnt; i++) pattern[i]/=loop_count;
 
    /* get differences... */
    for (i=0; i<(int)loop_count; i++) {
@@ -87,10 +88,11 @@ BOOLEAN atwd_pedestal_noiseEntry(STF_DESCRIPTOR *d,
       /* get differences... */
       for (j=0; j<cnt; j++) {
          const int diff = buffer[j] - pattern[j];
-         if (diff > *noise_positive_max) {
+
+         if (diff > (int) *noise_positive_max) {
             *noise_positive_max = diff;
          }
-         else if (-diff > *noise_negative_max) {
+         else if (-diff > (int) *noise_negative_max) {
             *noise_negative_max = -diff;
          }
 
@@ -103,7 +105,7 @@ BOOLEAN atwd_pedestal_noiseEntry(STF_DESCRIPTOR *d,
    free(pattern);
 
    /* compute statistics... */
-   {  double sum=0;
+   {  double sum=0, sum2=0;
       int n = 0;
    
       for (i=0; i<201; i++) {
@@ -111,20 +113,16 @@ BOOLEAN atwd_pedestal_noiseEntry(STF_DESCRIPTOR *d,
          n += error_histogram[i];
       }
 
-      {  const double avg = sum/n;
-         double sum2 = 0;
-      
-         *noise_mean = (unsigned) avg;
+      avg = sum/n;
+      *noise_mean = (unsigned) (avg*1000);
 
-         for (i=0; i<201; i++) sum2 += error_histogram[i]*((i-avg)*(i-avg));
-         
-         rms = (unsigned) sqrt( sum2 / (n-1) );
-         *noise_rms = (unsigned) (rms*1000);
-      }
+      for (i=0; i<201; i++) sum2 += error_histogram[i]*((i-avg)*(i-avg));
+      rms = sqrt( (1.0/(n-1.0)) * sum2 );
+      *noise_rms = (unsigned) (rms*1000);
    }
 
    return 
-      *noise_mean > 95 && *noise_mean < 105 &&
+      avg > 95 && avg < 105 &&
       rms < 1.5 &&
       *noise_negative_max < 10 &&
       *noise_positive_max < 10;
