@@ -11,6 +11,8 @@
   </xsl:template>
   <xsl:template match="stf:test">
   <xsl:variable name="testName" select="name"/>
+#include "hal/DOM_MB_fpga.h"
+
 static STF_PARAM <xsl:copy-of select="$testName"/>_params[] = {
     <xsl:apply-templates mode="PARAM" select="inputParameter"/>
     <xsl:apply-templates mode="PARAM" select="outputParameter"/>
@@ -31,6 +33,10 @@ static STF_DESCRIPTOR <xsl:copy-of select="$testName"/>_descriptor = {
   .majorVersion = <xsl:value-of select="version/@major"/>,
   .minorVersion = <xsl:value-of select="version/@minor"/>,
   .testRunnable = 0,
+  .fpgaDependencies = <xsl:choose>
+      <xsl:when test='((0=count(fpgaDependencies)) or (0=count(fpgaDependencies/*)))'>0,</xsl:when>
+      <xsl:otherwise><xsl:apply-templates select="fpgaDependencies/*"/></xsl:otherwise>
+  </xsl:choose>
   .nParams = <xsl:value-of select="count(inputParameter) + count(outputParameter)"/>,
   .params = <xsl:copy-of select="$testName"/>_params,
   .initPt = <xsl:copy-of select="$testName"/>Init,
@@ -93,6 +99,12 @@ static STF_DESCRIPTOR <xsl:copy-of select="$testName"/>_descriptor = {
       <xsl:otherwise>,</xsl:otherwise>
     </xsl:choose>
     <xsl:copy-of select="$nl"/>
+  </xsl:template>
+  <xsl:template match="stf:test/fpgaDependencies/*">DOM_HAL_FPGA_COMP_<xsl:copy-of select="local-name()"/>
+    <xsl:choose>
+      <xsl:when test='(last()=position())'>,</xsl:when>
+      <xsl:otherwise> &amp;<xsl:copy-of select="$nl"/><xsl:text>        </xsl:text></xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
   <xsl:template match="stf:test/*/boolean" mode="signature">BOOLEAN</xsl:template>
   <xsl:template match="stf:test/inputParameter/string" mode="signature">const char*</xsl:template>
