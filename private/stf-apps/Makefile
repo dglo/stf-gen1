@@ -1,21 +1,3 @@
-#AFLAGS = -mcpu=arm920t
-#CFLAGS = -mlittle-endian -mcpu=arm920 -Wall \
-#	-nostdinc -I/usr/arm-elf/arm-elf/include \
-#	-I/usr/arm-elf/lib/gcc-lib/arm-elf/3.2/include \
-#	-I../expat -I../../public -I../../../hal/public \
-#	-I ../../../epxa10/build/stf/private
-#
-#CPP = arm-elf-cpp
-#CC = arm-elf-gcc
-#AS = arm-elf-as
-#AS = arm-elf-ar
-#LD = arm-elf-ld -N
-#OBJCOPY = arm-elf-objcopy
-
-#SYSLIBS = /usr/arm-elf/arm-elf/lib/libc.a \
-#	/usr/arm-elf/arm-elf/lib/libm.a \
-#	/usr/arm-elf/lib/gcc-lib/arm-elf/3.2/libgcc.a
-
 .SUFFIXES: .c .o .S .elf .srec .xml .html .tab
 
 .c.o:
@@ -68,11 +50,21 @@ stfserv.elf: $(STFOBJS) stfserv.o
 		$(STFOBJS) stfserv.o \
 		$(LIBEXPAT) $(LIBHAL) $(SYSLIBS)
 
+$(STFSERVBIN): $(STFOBJS) stfserv.o
+	$(CC) -o $(STFSERVBIN) stfserv.o \
+		$(STFOBJS) $(LIBEXPAT) $(LIBHAL) $(SYSLIBS)
+
 menu.elf: $(STFOBJS) menu.o
 	$(LD) -r -o menu.elf \
 		$(STFOBJS) menu.o \
 		../../../epxa10/lib/libhal.a \
 		$(SYSLIBS)
+
+$(MENUBIN): $(STFOBJS) menu.o
+	$(CC) -o $(STFSERVBIN) menu.o \
+		$(STFOBJS) $(LIBEXPAT) $(LIBHAL) $(SYSLIBS)
+
+
 
 gendir: gendir.c ../public/stf/stf.h
 	gcc -o gendir -I../public \
@@ -147,11 +139,4 @@ all.tab: $(TABS)
 
 run-tests.html: run-tests.awk all.tab
 	awk -f run-tests.awk all.tab > run-tests.html
-
-
-
-
-
-
-
 
