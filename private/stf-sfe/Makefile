@@ -12,10 +12,10 @@ vpath %.xml ../stf-apps
 # add tests to each here...
 #
 TESTS = ADC memory StfEg atwd_pedestal atwd_baseline pmt_hv_ramp \
-		pmt_hv_stability pressure pulser_spe_mpe \
-		atwd_pedestal_sweep_forced atwd_pulser_spe \
-		atwd_pedestal_spe atwd_clock1x_forced \
-		fadc_fe_pulser fadc_baseline fadc_fe_forced
+	pmt_hv_stability pressure pulser_spe_mpe \
+	atwd_pedestal_sweep_forced atwd_pulser_spe \
+	atwd_pedestal_spe atwd_clock1x_forced \
+	fadc_fe_pulser fadc_baseline fadc_fe_forced
 
 TABS      = $(TESTS:%=%.tab)
 HTMLFILES = $(TESTS:%=%.html)
@@ -41,11 +41,13 @@ html: run-tests.html $(HTMLFILES) $(TABS) all.tab
 
 html-dirs:
 	(cd /var/www/stf/xml; mkdir -p $(HTMLDIRS); chmod g+w $(HTMLDIRS))
+	(cd /var/www/stf/xml; mkdir -p all-tests; chmod g+w all-tests)
 
 html-install: run-tests.html index.html cgi-install html html-dirs
 	cp *.html /var/www/stf
 	cp all.tab /var/www/stf/xml
 	cp servers /var/www/stf/xml
+	cp all-tests /var/www/stf/xml
 
 CGIS = run-test view-results view-summary validate-param pick-server \
 	plot-array pick-dhserver alloff

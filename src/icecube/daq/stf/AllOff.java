@@ -17,16 +17,9 @@ public class AllOff {
       
       try {
 	 DOMHubCom dhc = (DOMHubCom)Naming.lookup(dhUrl);
-	 
-	 CabledChannelStatusSet ccsSet = dhc.getCabledChannelStatusSet();
-	 
-	 Iterator it = ccsSet.iterator();
-	 while (it.hasNext()){
-	    CabledChannelStatus cs = (CabledChannelStatus) it.next();
-	    
-	    if (cs.isPowered()) {
-	       cs = dhc.disableChannelPwr(cs.getCard(), cs.getChannel());
-	    }
+
+	 if (dhc.getDOMStatusList().getDOMCount()>0) {
+	    dhc.powerOffAllChannels();
 	 }
       } catch (Exception e) {
 	 e.printStackTrace(System.out);

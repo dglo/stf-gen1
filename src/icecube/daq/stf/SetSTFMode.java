@@ -17,18 +17,14 @@ public class SetSTFMode {
       
       try {
 	 DOMHubCom dhc = (DOMHubCom)Naming.lookup(dhUrl);
-	 
-	 CabledChannelStatusSet ccsSet = dhc.getCabledChannelStatusSet();
-	 
-	 Iterator it = ccsSet.iterator();
-	 while (it.hasNext()){
-	    CabledChannelStatus cs = (CabledChannelStatus) it.next();
-	    
-	    if (!cs.isPowered()) {
-	       cs = dhc.enableChannelPwr(cs.getCard(), cs.getChannel());
-	    }
-	 }
 
+	 /* assume that, if there are no doms, we
+	  * need to power on...
+	  */
+	 if (dhc.getDOMStatusList().getDOMCount()>0) {
+	    dhc.powerOnAllChannels();
+	 }
+	 
 	 DOMStatusList dsl = dhc.getDOMStatusList();
 	 
 	 for (int i = 0; i < dsl.getDOMCount(); i++) {
