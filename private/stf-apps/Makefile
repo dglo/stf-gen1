@@ -4,7 +4,7 @@
 .SUFFIXES: .c .o .S .elf .srec .xml .html .tab .bin
 
 .c.o:
-	$(CC) -c $(CFLAGS) -Iprivate/expat $<
+	$(CC) -c $(CFLAGS) $<
 
 .S.o:
 	$(CPP) $(CPPFLAGS) -o $*.i $<
