@@ -64,7 +64,7 @@ BOOLEAN atwd_pmt_speEntry(STF_DESCRIPTOR *d,
     halWriteActiveBaseDAC(pmt_hv_low_volt*2); /* for pmt, input_dac=input_volt*2 */
    
    /* pretest 4) turn on pmt */
-   if (pmt_scanSPE(atwd_pedestal_dac, triggerable_spe_dac)) {
+   if (scanSPE(atwd_pedestal_dac, triggerable_spe_dac)) {
       /* no triggerable value found... */
       free(buffer);
       return FALSE;

@@ -273,3 +273,14 @@ BOOLEAN getParamValueAsBool(STF_PARAM *p)
 {
     return p->value.boolValue;
 }
+
+
+
+
+
+
+
+
+
+
+
