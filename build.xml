@@ -123,7 +123,6 @@ Build the library and documentation for the "@PROJECT@" project.
            <arg value="-fstandard.mk"/>
            <arg value="PROJECT=${project}"/>
            <arg value="PLATFORM=${platform}"/>
-           <arg value="C_BIN_NAMES=${c.bin.names}"/>
            <arg value="compile"/>
         </exec>
     </target>
@@ -195,7 +194,6 @@ Build the library and documentation for the "@PROJECT@" project.
            <arg value="-fstandard.mk"/>
            <arg value="PROJECT=${project}"/>
            <arg value="PLATFORM=${platform}"/>
-           <arg value="C_BIN_NAMES=${c.bin.names}"/>
            <arg value="lib"/>
         </exec>
     </target>
@@ -208,7 +206,6 @@ Build the library and documentation for the "@PROJECT@" project.
            <arg value="-fstandard.mk"/>
            <arg value="PROJECT=${project}"/>
            <arg value="PLATFORM=${platform}"/>
-           <arg value="C_BIN_NAMES=${c.bin.names}"/>
            <arg value="bin"/>
         </exec>
     </target>
@@ -289,7 +286,7 @@ Build the library and documentation for the "@PROJECT@" project.
     <target name="docs" depends="report,javadocs" description="Create API and test documents for this project">
     </target>
 
-    <target name="javaClean" depends="setProperties" if="java.used">
+    <target name="clean.java" depends="setProperties" if="java.used">
         <delete>
             <fileset dir="${lib_dir}">
                 <include name="${project}.jar" />
@@ -298,7 +295,7 @@ Build the library and documentation for the "@PROJECT@" project.
         </delete>
     </target>
 
-    <target name="cClean" depends="setProperties" if="c.used">
+    <target name="clean.c" depends="setProperties" if="c.used">
         <exec executable="gmake">
            <arg value="-fstandard.mk"/>
            <arg value="PLATFORM=${platform}"/>
@@ -307,7 +304,7 @@ Build the library and documentation for the "@PROJECT@" project.
         </exec>
     </target>
 
-    <target name="clean" depends="cClean,javaClean" description="Clean all directories and files built for this project">
+    <target name="clean" depends="clean.c,clean.java" description="Clean all directories and files built for this project">
         <delete dir="${build_dir}" />
         <delete dir="${api_dir}" />
         <delete dir="${junit_text_dir}" />
