@@ -33,21 +33,9 @@ BOOLEAN fadc_fe_forcedEntry(STF_DESCRIPTOR *d,
   unsigned half_max,start_width,end_width;
   int time_out;
 
-  short *waveform = (short *) calloc(514, sizeof(short));
-  int *waveform_sum = (int *) calloc(514, sizeof(int));
-  int *waveform_avg = (int *) calloc(514, sizeof(int));
-
-  /*  unsigned *waveform_sum = (unsigned *) calloc(514, sizeof(unsigned)); 
-      unsigned *waveform_avg = (unsigned *) calloc(514, sizeof(unsigned)); */
-
-  /*  short *waveform_sum = (short *) calloc(514, sizeof(short)); 
-      short *waveform_avg = (short *) calloc(514, sizeof(short)); */
-
-
-  /*  unsigned waveform[512]; 
-  unsigned waveform_sum[512];
-  unsigned waveform_avg[512];*/
-
+  short *waveform = (short *) calloc(512, sizeof(short));
+  int *waveform_sum = (int *) calloc(512, sizeof(int));
+  int *waveform_avg = (int *) calloc(512, sizeof(int));
 
   /*  A.Pretest checks: */
 
@@ -213,3 +201,13 @@ BOOLEAN fadc_fe_forcedEntry(STF_DESCRIPTOR *d,
 	   /*printf("exiting");*/
    return TRUE; 
 }
+
+
+
+
+
+
+
+
+
+
