@@ -34,8 +34,10 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   unsigned lp1,lp2;
   int temp;
   float tmp_float;
-  unsigned waveform[256];
-  unsigned histogram[1024];
+  short *waveform = (short *) calloc(256, sizeof(short));
+  short *histogram = (short *) calloc(1024, sizeof(short));
+  /*  unsigned waveform[256];
+      unsigned histogram[1024];*/
 
   /*  A.Pretest checks:*/ 
   /*    1.The two input DAC settings are programmed.*/
@@ -96,6 +98,9 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   *fadc_baseline_min = baseline_min;
   *fadc_baseline_max = baseline_max;
 
+
+  free(waveform);
+  free(histogram);
 
   /*    C.Success criteria: */
   /*    1.Set TEST_PASS_NOPASS to pass value if ALL of the following are true:*/
