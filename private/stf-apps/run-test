@@ -14,9 +14,8 @@ source /usr/lib/cgi-bin/stf/xml/bin/common.sh
 # 2) testname  <- get test name from query string
 # 3) fname.xml <- create xml file from query string
 # 4) run test [ stf -send fname -go testname -rcv testname fname-results]
-# 5) update summary file (database) [use:
-#     `show-time` `-Xalan fname-results restosum.xsl` fname >> summary-file]
-# 6) format results as html [Xalan fname-results.xml restohtml.html]
+# 5) update summary file (database)
+# 6) format results as html
 #
 echo "Content-type: text/html"
 echo

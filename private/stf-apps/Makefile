@@ -12,6 +12,7 @@ LD = arm-elf-ld -N
 OBJCOPY = arm-elf-objcopy
 
 SYSLIBS = /usr/local/arm-elf/arm-elf/lib/libc.a \
+	/usr/local/arm-elf/arm-elf/lib/libm.a \
 	/usr/local/arm-elf/lib/gcc-lib/arm-elf/3.2/libgcc.a
 
 .SUFFIXES: .c .o .S .elf .srec .xml .html
@@ -36,9 +37,9 @@ clean:
 	rm -f *.o *.i *.bin *.elf *.srec \
 		run-tests.html gendir genqry stfDirectory.[ch]
 
-TESTOBJS = memory.o StfEg.o
+TESTOBJS = adc.o memory.o StfEg.o
 STFOBJS = $(TESTOBJS) stfserv.o ../stf/stf.o stfDirectory.o memtests.o
-XMLFILES = memory.xml StfEg.xml
+XMLFILES = adc.xml memory.xml StfEg.xml
 
 stfserv.elf: $(STFOBJS) 
 	$(LD) -r -o stfserv.elf \

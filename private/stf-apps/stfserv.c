@@ -159,7 +159,6 @@ static void characterData(void *userData, const XML_Char *s, int len) {
 	  param!=NULL ? param->name : "?", *depthPtr, str);
 #endif
 
-
    if (NULL != param) {
       if (strcmp(param->type, CHAR_TYPE)==0) {
 	 param->value.charValue = strdup(str);
