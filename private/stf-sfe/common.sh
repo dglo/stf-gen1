@@ -73,38 +73,14 @@ javacmd="java -classpath /usr/lib/cgi-bin/stf/xml/bin"
 #
 # view results from a result id...
 #
-#
 # FIXME: this should be _much_ better, at least get rid of xmlv step...
 #
 function viewResults() {
-#
-# qry in case we don't want to use
-# the resultxml...
-#
-    local qry=`printf \
-    "select \
-       tt.name, p.name, rp.value, p.is_output, pt.name \
-     from \
-       STFResult as r \
-     left join STFResultParameter 
- STFResultParameter as rp, STFTestType as tt, \
-     STFTest as t, STFParameter as p \
-     STFParameterType as pt,  \
-   where \
-     r.stf_result_id=268 and \
-     rp.stf_result_id=268 and \
-     rp.stf_param_id=p.stf_param_id and \
-     r.stf_test_id=t.stf_test_id and \
-     t.stf_testtype_id=tt.stf_testtype_id and \
-     rp.value_index=1 \
-   order by \
-     p.name;" ${fname} ${fname}`
-
     local tabth=${awkpath}/tabtohtml.awk
     local restt=${awkpath}/restotab.awk
     local qry=`printf \
 	"select text from STFResultXML where stf_result_id=%s" $1`
-    ${mysqlcmd} "${qry}" | xmlv | awk -f ${restt} | \
+    ${mysqlcmd} "${qry}" | xmln | awk -f ${restt} | \
 	awk -v xml=$1 -f ${tabth}
 }
 
