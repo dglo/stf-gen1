@@ -4,7 +4,7 @@
 #include "stfDirectory.h"
 
 BOOLEAN StfEgInit(STF_DESCRIPTOR *d) {
-   return FALSE;
+   return TRUE;
 }
 
 BOOLEAN StfEgEntry(STF_DESCRIPTOR *d,
@@ -16,5 +16,5 @@ BOOLEAN StfEgEntry(STF_DESCRIPTOR *d,
                     char * *Para6,
                     unsigned *Para7,
                     unsigned long *Para8) {
-   return FALSE; 
+   return TRUE; 
 }
