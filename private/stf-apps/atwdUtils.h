@@ -20,3 +20,6 @@ int speUVoltToDAC(float uv, int pedestal_dac);
 float speDACToUVolt(int dac, int pedestal_dac);
 int mpeUVoltToDAC(float uv, int pedestal_dac);
 float mpeDACToUVolt(int dac, int pedestal_dac);
+
+int scanSPE(int atwd_pedestal_dac, unsigned *);
+

@@ -131,6 +131,72 @@ float mpeDACToUVolt(int dac, int pedestal_dac) {
    return 1/9.6 * (5e6*dac/1024 - pedestal_dac*5e6/4096);
 }
 
+/* find a reasonable value of the spe threshold dac... */
+int scanSPE(int atwd_pedestal_dac, unsigned *ret) {
+   DOM_HAL_FPGA_PULSER_RATES rate;
+   int retv=0, i;
+   const int spe_dac_nominal = (int) 
+      (atwd_pedestal_dac*(5000.0/4096.0)*(1024.0/5000.0));
+
+   /* set internal pulser amplitude to zero... */
+   halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER, 0);
+
+   /* turn it on... */
+   lookupPulserRate(78e3, &rate, NULL);
+   hal_FPGA_TEST_set_pulser_rate(rate);
+   hal_FPGA_TEST_set_scalar_period(DOM_HAL_FPGA_SCALAR_10MS);
+   hal_FPGA_TEST_disable_pulser(); /* FIXME: should be enable */
+   halUSleep(10000);
+
+#if 0   
+   printf("atwd_pedestal_dac: %d, spe_dac_nominal: %d\r\n", 
+          atwd_pedestal_dac, spe_dac_nominal);
+   
+   {
+      int ii;
+      for (ii=470; ii<570; ii++) {
+         int dac = ii;
+         halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH, dac);
+         /* let dac and counts settle */
+         halUSleep(1000 + 2 * 1000 * 10);
+         printf("yikes: dac=%d, counts=%d\r\n", dac, hal_FPGA_TEST_get_spe_rate());
+      }
+   }
+#endif
+
+   *ret = spe_dac_nominal*1.05;  /* assume all zeros... */
+   for (i=(int) (spe_dac_nominal*1.05); i>=(int) (spe_dac_nominal*0.95); i--) {
+      unsigned rate;
+      
+      /* set spe threshold dac */
+      halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH, i);
+      halUSleep(1000); /* let dac settle */
+
+      /* wait for counts to show up */
+      halUSleep(2 * 10 * 1000);
+
+      /* readout the counts... */
+      if ((rate=hal_FPGA_TEST_get_spe_rate())>0) {
+         if (i== (int) (spe_dac_nominal*1.05)) {
+            /* no zero transition found... */
+            /* printf("scanSPE: err: dac=%d, rate=%u\r\n", i, rate); */
+            *ret = spe_dac_nominal*0.95;
+            retv=1;
+            break;
+         }
+         else {
+            /* printf("scanSPE: ok: dac=%d, rate=%u\r\n", i, rate); */
+            *ret = i + 2;
+            break;
+         }
+      }
+      /* printf("scanSPE: dac=%d, rate=%u\r\n", i, rate); */
+   }
+
+   hal_FPGA_TEST_disable_pulser();
+
+   return retv;
+}
 
 
 
