@@ -56,13 +56,20 @@ gendir: gendir.c ../public/stf/stf.h
 	gcc -o gendir -I../public \
 		-I/usr/include/libxml2 gendir.c -Wall -g -lxml2
 
-stfDirectory.h stfDirectory.c: $(XMLFILES) gendir
+stfDirectory.h stfDirectory.c: $(XMLFILES) gendir Makefile
 	./gendir -skeleton $(XMLFILES)
 
 $(CFILES): %.c: %.h
 
 $(HDRFILES): stfDirectory.h
 	if [[ ! -h $@ ]]; then ln -s stfDirectory.h $@; fi
+
+
+
+
+
+
+
 
 
 
