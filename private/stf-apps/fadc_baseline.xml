@@ -41,7 +41,7 @@
   </outputParameter>
 
   <outputParameter>
-    <description>RMS standard deviation of the fadc baseline values.</description>
+    <description>RMS standard deviation of the fadc baseline values (in counts*1000).</description>
     <name>fadc_baseline_rms</name>
     <unsignedInt/>
   </outputParameter>

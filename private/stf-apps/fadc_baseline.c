@@ -1,9 +1,10 @@
 /* fadc_baseline.c, skeleton file created by gendir
    code added by Eric G. Henson eghenson@lbl.gov                                
  */
-#include "stdio.h"
-#include "stdlib.h"
-#include "math.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
 
 #include "stf/stf.h"
 #include "stf-apps/fadc_baseline.h"
@@ -19,7 +20,6 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
                     unsigned fadc_reference_dac,
                     unsigned atwd_pedestal_dac,
                     unsigned long loop_count,
-
                     unsigned *fadc_baseline_mean,
                     unsigned *fadc_baseline_rms,
                     unsigned *fadc_baseline_min,
@@ -31,13 +31,12 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   unsigned baseline_sum,baseline_sqr;
   unsigned baseline_mean,baseline_rms;
   unsigned sample_max,sample_min,sample_sum;
-  int sample_rms,sample_diff,sample_sqrs;
-  unsigned count,time_out;
+  double sample_sqrs;
+  unsigned time_out;
   unsigned lp1,lp2;
   int temp;
   float tmp_float;
   short *waveform = (short *) calloc(256, sizeof(short));
-  short *histogram = (short *) calloc(1024, sizeof(short));
   /*  unsigned waveform[256];
       unsigned histogram[1024];*/
 
@@ -59,12 +58,11 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   baseline_max=0;
   baseline_min=1024;
 
+  /* clear baseline histogram */
+  memset(fadc_baseline_histogram, 0, 1024*sizeof(unsigned));
+
   /*printf("setup done\n\r");*/
   baseline_rms=0;
-  for(lp1=0;lp1<loop_count;lp1++)
-    {
-      histogram[lp1]=0;
-    }
   for(lp2=0;lp2<loop_count;lp2++)
     {
            hal_FPGA_TEST_trigger_forced(HAL_FPGA_TEST_TRIGGER_FADC);
@@ -72,14 +70,15 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   /*    2.Calculate the mean of all the 256 samples values (integers ok, range [0-1023]):
           this is the baseline for this waveform.*/
 	   sample_sum=0;
-	   sample_min=0xFFFFFFFF;
-	   sample_max=0;	   
-	   for(lp1=0;lp1<256;lp1++)
+           sample_min = sample_max = waveform[0];
+	   for(lp1=1;lp1<256;lp1++)
 	   {
 	     /*printf("%d",waveform[lp1]);*/
-	       sample_sum+=(unsigned int)waveform[lp1];
+	       sample_sum+= waveform[lp1];
 	       if(waveform[lp1]>sample_max) sample_max = waveform[lp1];
                if(waveform[lp1]<sample_min) sample_min = waveform[lp1];
+
+               fadc_baseline_histogram[ waveform[lp1]&0x3ff ] ++;
            } 
 	   /*printf("\n\r"); */
 	   baseline=sample_sum/256;
@@ -99,17 +98,12 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
 	   /*           if(baseline>baseline_max) baseline_max = baseline; 
 			if(baseline<baseline_min) baseline_min = baseline; */
 
-  /*    4.Repeat from step 1, LOOP_COUNT times, keeping a histogram
-	(it is a 1024-bins histogram) of the baselines obtained.*/
-	   if(baseline>=0 && baseline<1024) histogram[baseline]+=1;
+  /*    4.Repeat from step 1, LOOP_COUNT times, keeping a histogram	
+(it is a 1024-bins histogram) of the baselines obtained.*/
+/*    5.Fill the output array FADC_BASELINE_HISTOGRAM with the baseline distribution.*/
     }
   /*printf("loops complete\n");  */
-/*    5.Fill the output array FADC_BASELINE_HISTOGRAM with the baseline distribution.*/
       /*printf("filling output arrays\n");*/
-      for(lp1=0;lp1<1024;lp1++)
-      {
-	fadc_baseline_histogram[lp1] = (unsigned int)histogram[lp1];
-      }
 
   /*    6.Compute the mean and the RMS using the running sums (integer arithmetic is ok).*/
   baseline_mean = baseline_sum / loop_count;
@@ -118,13 +112,11 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
 
  /*    7.Fill output variables FADC_BASELINE_MEAN, FADC_BASELINE_RMS, FADC_BASELINE_MIN, FADC_BASELINE_MAX*/
   *fadc_baseline_mean = baseline_mean; 
-  *fadc_baseline_rms = baseline_rms;
+  *fadc_baseline_rms = 1000 * baseline_rms;
   *fadc_baseline_min = baseline_min;
   *fadc_baseline_max = baseline_max;
 
-
   free(waveform);
-  free(histogram);
 
   /*    C.Success criteria: */
   /*    1.Set TEST_PASS_NOPASS to pass value if ALL of the following are true:*/
@@ -142,7 +134,7 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   /*    5.Maximum-Minimum < 5*/
   if(baseline_max-baseline_min>=7) return FALSE;
   /*    6.Baseline RMS < 3*/
-  if(baseline_rms>=3) return FALSE;
+  if(baseline_rms>=3000) return FALSE;
 
   return TRUE;
 }
