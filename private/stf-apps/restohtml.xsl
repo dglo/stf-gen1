@@ -3,27 +3,24 @@
 <xsl:template match="/">
   <html>
     <head>
-      <title>Results: <xsl:value-of select="test/name"/></title>
+      <title>Results: <xsl:value-of select="test-results/name"/></title>
     </head>
     <body>
-      <p>Name: <xsl:value-of select="test/name"/> 
-	(<xsl:value-of select="test/description"/>) 
-      </p>
+      <h3><xsl:value-of select="test-results/name"/> (<xsl:value-of select="test-results/description"/>) </h3>
 
-      <h3>Parameters</h3>
       <table>
 	<tbody>
 	    <tr>
 	      <th>Parameter</th><th>Type</th><th>Value</th>
 	    </tr>
-	  <xsl:for-each select="test/inputParameter">
+	  <xsl:for-each select="test-results/inputParameter">
 	    <tr>
 	      <td> <xsl:value-of select="name"/> </td>
 	      <td>Input</td>
 	      <td> <xsl:value-of select="value"/></td>
 	    </tr>
 	  </xsl:for-each>
-	  <xsl:for-each select="test/outputParameter">
+	  <xsl:for-each select="test-results/outputParameter">
 	    <tr>
 	      <td> <xsl:value-of select="name"/> </td>
 	      <td>Output</td>
