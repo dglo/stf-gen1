@@ -69,7 +69,7 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
     smallest SPE_DAC tried if they were all zeros.*/
   /*  8.Set the TRIGGERABLE_SPE_DAC output variable to
       2 + the first SPE_DAC setting that gave a Non-Zero value of the SPE rate.*/
-  if (scanSPE(atwd_pedestal_dac, triggerable_spe_dac)) {
+  if (scanSPE(atwd_pedestal_dac, triggerable_spe_dac, 1)) {
      /* printf("read failed\r\n"); */
     *fadc_baseline_mean = 0;
     *fadc_fe_pulser_amplitude = 0;

@@ -1,10 +1,10 @@
-/* atwd_pulser_spe.c, skeleton file created by George
+/* atwd_pmt_spe.c, skeleton file created by George
  */
 #include <stdlib.h>
 #include <math.h>
 
 #include "stf/stf.h"
-#include "stf-apps/atwd_pulser_spe.h"
+#include "stf-apps/atwd_pmt_spe.h"
 
 #include "hal/DOM_MB_hal.h"
 #include "hal/DOM_MB_fpga.h"
@@ -45,7 +45,7 @@ BOOLEAN atwd_pmt_speEntry(STF_DESCRIPTOR *d,
    int *sum_waveform = (int *) calloc(128, sizeof(int));
    int trigger_mask = (atwd_chip_a_or_b) ? 
       HAL_FPGA_TEST_TRIGGER_ATWD0 : HAL_FPGA_TEST_TRIGGER_ATWD1;
-   int spe_dac_nominal, pmt_dac;
+   int spe_dac_nominal, pmt_dac, pulser_or_not=0;
 
    /* pretest 1) all five atwd dac settings are programmed... */
    halWriteDAC(ch, atwd_sampling_speed_dac);
@@ -64,7 +64,7 @@ BOOLEAN atwd_pmt_speEntry(STF_DESCRIPTOR *d,
     halWriteActiveBaseDAC(pmt_hv_low_volt*2); /* for pmt, input_dac=input_volt*2 */
    
    /* pretest 4) turn on pmt */
-   if (scanSPE(atwd_pedestal_dac, triggerable_spe_dac)) {
+   if (scanSPE(atwd_pedestal_dac, triggerable_spe_dac, pulser_or_not)) {
       /* no triggerable value found... */
       free(buffer);
       return FALSE;

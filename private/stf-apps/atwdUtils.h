@@ -20,6 +20,7 @@ int speUVoltToDAC(float uv, int pedestal_dac);
 float speDACToUVolt(int dac, int pedestal_dac);
 int mpeUVoltToDAC(float uv, int pedestal_dac);
 float mpeDACToUVolt(int dac, int pedestal_dac);
+int upper_extreme_rate(int spe_dac_nominal);
+int lower_extreme_rate(int spe_dac_nominal);
 
-int scanSPE(int atwd_pedestal_dac, unsigned *);
-
+int scanSPE(int atwd_pedestal_dac, unsigned *, int pulser_or_not);
