@@ -96,10 +96,10 @@ BOOLEAN atwd_pmt_speEntry(STF_DESCRIPTOR *d,
    pmt_dac = pmt_hv_high_volt*2;
    halEnableBaseHV();
    halWriteActiveBaseDAC(pmt_dac);
-   *real_hv_output = halReadBaseADC()/2; 
 
    /* wait for dacs, et al... */
-   halUSleep(1000*100);
+   halUSleep(1000*2000);
+   *real_hv_output = halReadBaseADC()/2; 
 
    /* 3) take loop_count waveforms...
     */
