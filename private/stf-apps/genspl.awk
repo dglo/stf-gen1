@@ -4,6 +4,7 @@ BEGIN {
     print "package icecube.daq.stf;";
     print "";
     print "import icecube.daq.db.stftest.STFParameter;";
+    print "import icecube.daq.db.stftest.STFParameterType;";
     print "import icecube.daq.db.domprodtest.DOMProdTestException;";
     print "import java.util.HashMap;";
     print "import java.io.IOException;";
@@ -52,6 +53,8 @@ END {
 	printf "    p = new STFParameter("; 
 	if ( $3 == "input" ) print " true );";
 	else print " false );";
+
+	print "    p.setType(STFParameterType.getType(\"" $4 "\"));";
 
 	if ( NF > 4 && $5 != "" ) {
 	    print "    p.setDefaultValue(\"" $5 "\");";
