@@ -94,8 +94,8 @@ $(HDRFILES): stfDirectory.h
 ../bin/echomode: echomode.o $(EXOBJS)
 	gcc -o echomode echomode.o $(EXOBJS) $(LIBHAL) -lm
 
-$(GENJAVA): $(XMLFILES) genspl.awk
-	xmln $(XMLFILES) | awk -f ../stf-sfe/stftotab.awk | \
+$(GENJAVA): $(XMLFILES) tcal.xml genspl.awk
+	xmln $(XMLFILES) tcal.xml | awk -f ../stf-sfe/stftotab.awk | \
 		awk -f genspl.awk > $(GENJAVA)
 
 templates.tar.gz: $(XMLTEMPLATES)

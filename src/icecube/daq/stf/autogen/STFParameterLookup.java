@@ -919,6 +919,55 @@ public class STFParameterLookup {
     p.setType(STFParameterType.getType("unsignedIntArray"));
     hm.put("disc_sum_waveform", p);
 
+    ret.put("loopback_lc", hm=new HashMap());
+    p = new STFParameter( true );
+    p.setType(STFParameterType.getType("unsignedInt"));
+    p.setDefaultValue("10");
+    p.setMinValue("1");
+    p.setMaxValue("1000000");
+    hm.put("loop_count", p);
+    p = new STFParameter( false );
+    p.setType(STFParameterType.getType("unsignedInt"));
+    hm.put("lc_tx_quiet", p);
+    p = new STFParameter( false );
+    p.setType(STFParameterType.getType("unsignedInt"));
+    hm.put("lc_tx_dwn_hi", p);
+    p = new STFParameter( false );
+    p.setType(STFParameterType.getType("unsignedInt"));
+    hm.put("lc_tx_dwn_lo", p);
+    p = new STFParameter( false );
+    p.setType(STFParameterType.getType("unsignedInt"));
+    hm.put("lc_tx_up_hi", p);
+    p = new STFParameter( false );
+    p.setType(STFParameterType.getType("unsignedInt"));
+    hm.put("lc_tx_up_lo", p);
+    p = new STFParameter( false );
+    p.setType(STFParameterType.getType("unsignedInt"));
+    hm.put("lc_tx_up_hi_dwn_high", p);
+    p = new STFParameter( false );
+    p.setType(STFParameterType.getType("unsignedInt"));
+    hm.put("lc_tx_up_hi_dwn_lo", p);
+    p = new STFParameter( false );
+    p.setType(STFParameterType.getType("unsignedInt"));
+    hm.put("lc_tx_up_lo_dwn_lo", p);
+    p = new STFParameter( false );
+    p.setType(STFParameterType.getType("unsignedInt"));
+    hm.put("lc_tx_up_lo_dwn_hi", p);
+
+    ret.put("tcal", hm=new HashMap());
+    p = new STFParameter( false );
+    p.setType(STFParameterType.getType("unsignedInt"));
+    hm.put("round_trip_time", p);
+    p = new STFParameter( false );
+    p.setType(STFParameterType.getType("unsignedInt"));
+    hm.put("round_trip_error", p);
+    p = new STFParameter( false );
+    p.setType(STFParameterType.getType("unsignedIntArray"));
+    hm.put("dom_waveforms", p);
+    p = new STFParameter( false );
+    p.setType(STFParameterType.getType("unsignedIntArray"));
+    hm.put("dor_waveforms", p);
+
     return ret;
   } /* mkLookup */
 } /* STFParameterLookup */
