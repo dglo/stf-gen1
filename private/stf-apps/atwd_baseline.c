@@ -58,9 +58,9 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
       halWriteDAC(8, *atwd_disc_threshold_dac);
    }
 
-   /* FIXME: Thorsten recommends we wait a bit...
-   halUSleep(1000);
+   /* Thorsten recommends we wait a bit...
     */
+   halUSleep(1000);
 
    for (i=0; i<(int)loop_count; i++) {
       int j;
