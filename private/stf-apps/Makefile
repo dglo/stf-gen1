@@ -40,12 +40,13 @@ SYSLIBS = /usr/local/arm-elf/arm-elf/lib/libc.a \
 #
 # add tests to each here...
 #
-TESTOBJS  = ADC.o memory.o StfEg.o
-TABS      = ADC.tab memory.tab StfEg.tab
-XMLFILES  = ADC.xml memory.xml StfEg.xml
-HTMLFILES = ADC.html memory.html StfEg.html
+TESTOBJS  = ADC.o memory.o StfEg.o atwd_pedestal.o
+TABS      = ADC.tab memory.tab StfEg.tab atwd_pedestal.tab
+XMLFILES  = ADC.xml memory.xml StfEg.xml atwd_pedestal.xml
+HTMLFILES = ADC.html memory.html StfEg.html atwd_pedestal.html
+HTMLDIRS  = ADC memory StfEg atwd_pedestal
 
-all: stfserv.elf
+all: stfserv.elf menu.elf
 
 clean:
 	rm -f *.o *.i *.bin *.elf *.srec \
@@ -53,12 +54,18 @@ clean:
 		$(HTMLFILES) $(TABS) all.tab \
 		stftcp mk-name
 
-STFOBJS = $(TESTOBJS) stfserv.o ../stf/stf.o stfDirectory.o memtests.o
+STFOBJS = $(TESTOBJS) ../stf/stf.o stfDirectory.o memtests.o stfUtils.o
 
-stfserv.elf: $(STFOBJS) 
+stfserv.elf: $(STFOBJS) stfserv.o
 	$(LD) -r -o stfserv.elf \
-		$(STFOBJS) \
+		$(STFOBJS) stfserv.o \
 		../expat/xmlparse/libexpat.a \
+		../../../epxa10/lib/libhal.a \
+		$(SYSLIBS)
+
+menu.elf: $(STFOBJS) menu.o
+	$(LD) -r -o menu.elf \
+		$(STFOBJS) menu.o \
 		../../../epxa10/lib/libhal.a \
 		$(SYSLIBS)
 
@@ -92,7 +99,10 @@ install: html-install
 
 html: $(HTMLFILES) $(TABS) all.tab
 
-html-install: run-tests.html index.html cgi-install html
+html-dirs:
+	(cd /var/www/stf/xml; mkdir -p $(HTMLDIRS))
+
+html-install: run-tests.html index.html cgi-install html html-dirs
 	cp *.html /var/www/stf
 	cp all.tab /var/www/stf/xml
 

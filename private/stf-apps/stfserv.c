@@ -48,27 +48,13 @@
 
 #include "stf/stf.h"
 #include "hal/DOM_MB_hal.h"
-
+#include "stfUtils.h"
 
 #define talloc(a) ((a) *) malloc(sizeof(a))
 
 static STF_DESCRIPTOR *desc = NULL;
 static STF_PARAM *param = NULL;
 static const char *xmlTag = NULL;
-static const char *errorMessage = NULL;
-
-static void clearError(void) {
-   if (errorMessage!=NULL) {
-      free((char *)errorMessage);
-      errorMessage = NULL;
-   }
-}
-
-void stfError(const char *err) {
-   char *t = strdup(err);
-   clearError();
-   errorMessage = t;
-}
 
 /*static char *parmType = NULL;*/
 
@@ -239,9 +225,9 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
 		  stf->testRunnable ? BOOLEAN_TRUE : BOOLEAN_FALSE);   
    idx += sprintf(buf+idx, "   <boardID>%s</boardID>\r\n", halGetBoardID());
    
-   if (errorMessage!=NULL) {
+   if (stfErrorMessage()!=NULL) {
       idx+= sprintf(buf+idx, "    <errorMessage>%s</errorMessage>\r\n",
-		    errorMessage);
+		    stfErrorMessage());
       clearError();
    }
 
