@@ -15,7 +15,7 @@ echo ""
 echo "<html><body>"
 cd /usr/lib/cgi-bin/stf/xml/bin
 
-java alloff domhub2
+java alloff domhub2.lbl.gov
 
 echo "<h2>Done</h2>"
 echo "</body></html>"

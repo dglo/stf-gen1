@@ -146,8 +146,10 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    /* 6), 7) */
    if (pedestal_subtraction) {
       for (i=0; i<cnt; i++) {
-	 atwd_waveform_pulser_spe[i] =
-	    atwd_waveform_pulser_spe[i] - atwd_baseline_waveform[i] + 100;
+	 const int v1 = (int) atwd_waveform_pulser_spe[i];
+	 const int v2 = (int) atwd_baseline_waveform[i];
+	 const int v = v1 - v2 + 100;
+	 atwd_waveform_pulser_spe[i] = (v<0) ? 0 : v;
       }
       for (i=0; i<cnt; i++) atwd_baseline_waveform[i] = 100;
    }
