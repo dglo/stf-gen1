@@ -25,7 +25,7 @@ if xmlv $xmlfname | \
     echo "setwd('/tmp')" > /tmp/$$.R
     echo "${param} <- scan('data.$$');" >> /tmp/$$.R
     echo "bitmap(file='plot.$$.png')" >> /tmp/$$.R
-    echo "plot(${param})" >> /tmp/$$.R
+    echo "plot(${param}, type='l')" >> /tmp/$$.R
     echo "graphics.off()" >> /tmp/$$.R
 
     if R CMD BATCH /tmp/$$.R /tmp/$$.Rout; then
@@ -49,5 +49,11 @@ else
 fi
 
 rm -f /tmp/data.$$
+
+
+
+
+
+
 
 
