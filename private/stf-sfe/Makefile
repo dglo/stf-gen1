@@ -47,12 +47,11 @@ html-install: run-tests.html index.html cgi-install html html-dirs
 	cp all.tab /var/www/stf/xml
 	cp servers /var/www/stf/xml
 
-
 CGIS = run-test view-results view-summary validate-param pick-server \
-	plot-array
+	plot-array pick-dhserver alloff
 CGIHELPERS = mk-name chkpt stftcp sumtotable.awk common.sh qrytoxml.awk \
 	restotab.awk tabtosum.awk tabtohtml.awk validate-qry.awk \
-	servertab.awk getarray.awk
+	servertab.awk dhservertab.awk getarray.awk stfmode
 
 cgi: $(CGIS) $(CGIHELPERS)
 

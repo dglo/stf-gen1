@@ -6,7 +6,7 @@
 # set proper paths...
 #
 PATH=/bin:/usr/bin/:/usr/lib/cgi-bin/stf:/usr/lib/cgi-bin/stf/xml/bin
-PATH=${PATH}:/usr/local/bin
+PATH=${PATH}:/usr/local/bin:/usr/local/j2sdk/bin
 export PATH
 
 xmlpath=/var/www/stf/xml
