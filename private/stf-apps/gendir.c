@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <unistd.h>
+
 #include <libxml/xmlmemory.h>
 #include <libxml/parser.h>
 
@@ -248,9 +250,13 @@ int main(int argc, char *argv[]) {
    FILE *fptr, *hptr;
    char *descs[1024];
    int ndescs = 0;
+   int skeleton = 0;
    
    for (ai=1; ai<argc; ai++) {
       if (argv[ai][0]!='-') break;
+      if (strcmp(argv[ai], "-skeleton")==0) {
+	 skeleton = 1;
+      }
    }
 
    if (ai>=argc) { 
@@ -298,12 +304,13 @@ int main(int argc, char *argv[]) {
       }
 
       for (tdn = dn; tdn!=NULL; tdn = tdn->next) {
+	 FILE *cptr = NULL;
 	 int i;
 	 const int np = nparams(tdn);
 	 int nOutputs = 0, nInputs = 0;
-	 
 	 ParamNode *tp = NULL;
-
+	 char *fname;
+	 
 	 if (ndescs>=sizeof(descs)/sizeof(descs[0])) {
 	    fprintf(stderr, "too many descriptors!\n");
 	    return 1;
@@ -311,6 +318,27 @@ int main(int argc, char *argv[]) {
 	    
 	 descs[ndescs] = tdn->desc.name;
 	 ndescs++;
+
+	 if ((fname = (char *) malloc(strlen(tdn->desc.name) + 3))==NULL) {
+	    fprintf(stderr, "gendir: can't allocate fname\n");
+	    return 1;
+	 }
+	 sprintf(fname, "%s.c", tdn->desc.name);
+	 
+	 printf("skeleton: %d (%s)\n", skeleton, fname);
+
+	 if (skeleton && access(fname, F_OK)!=0) {
+	    printf("creating: '%s' (%d, %d)\n", fname, skeleton,
+		   access(fname, F_OK));
+	    
+	    cptr = fopen(fname, "w");
+
+	    fprintf(cptr, 
+		    "/* %s, skeleton file created by gendir\n */\n\n"
+		    "#include \"stf/stf.h\"\n"
+		    "#include \"stfDirectory.h\"\n\n",
+		    fname);
+	 }
 	 
 	 fprintf(fptr, "static STF_PARAM %s_params[%d] = {\n", 
 		 tdn->desc.name, np+1);
@@ -380,6 +408,13 @@ int main(int argc, char *argv[]) {
 	 fprintf(hptr, "BOOLEAN %sInit(STF_DESCRIPTOR *);\n", 
 		 tdn->desc.name);
 
+	 if (cptr!=NULL) {
+	    fprintf(cptr, 
+		    "BOOLEAN %sInit(STF_DESCRIPTOR *d) {\n"
+		    "   return FALSE;\n}\n\n",
+		    tdn->desc.name);
+	 }
+
 	 if (np>0) {
 	    /* if we have any params, put them into the
 	     * extern descriptor...
@@ -387,6 +422,12 @@ int main(int argc, char *argv[]) {
 	    fprintf(hptr, 
 		    "BOOLEAN %sEntry(STF_DESCRIPTOR *",
 		    tdn->desc.name);
+
+	    if (cptr!=NULL) {
+	       fprintf(cptr, 
+		       "BOOLEAN %sEntry(STF_DESCRIPTOR *",
+		       tdn->desc.name);
+	    }
 	    
 	    /* first inputs...
 	     */
@@ -396,6 +437,13 @@ int main(int argc, char *argv[]) {
 			  ",\n"
 			  "                    %s %s",
 			  getInputType(&tp->parm), tp->parm.name);
+
+		  if (cptr!=NULL) {
+		     fprintf(cptr,
+			     ",\n"
+			     "                    %s %s",
+			     getInputType(&tp->parm), tp->parm.name);
+		  }
 	       }
 	    }
 	    
@@ -407,10 +455,21 @@ int main(int argc, char *argv[]) {
 			  ",\n"
 			  "                    %s *%s", 
 			  getOutputType(&tp->parm), tp->parm.name);
+		  
+		  if (cptr!=NULL) {
+		     fprintf(cptr,
+			     ",\n"
+			     "                    %s *%s", 
+			     getOutputType(&tp->parm), tp->parm.name);
+		  }
 	       }
 	    }
 	    
 	    fprintf(hptr,");\n");
+
+	    if (cptr!=NULL) {
+	       fprintf(cptr, ") {\n   return FALSE; \n}\n");
+	    }
 
 	    /* add callout function...
 	     */
@@ -466,6 +525,8 @@ int main(int argc, char *argv[]) {
 		 tdn->desc.name, np>0 ? "Local" : "");
 	 fprintf(fptr, "  .isInit = 0\n");
 	 fprintf(fptr, "};\n");
+
+	 if (cptr!=NULL) fclose(cptr);
       }
 
       ai++;
