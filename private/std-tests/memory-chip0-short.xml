@@ -4,10 +4,11 @@
   xsi:schemaLocation="http://glacier.lbl.gov/icecube/daq/stf file:/Volumes/IceCube/WorkSpaces/jas-1/xml/daq/stf.xsd">
 <memory>
 <parameters>
-<loopCount>10</loopCount>
-<count>1024</count>
-<address>0</address>
+<loopCount>1</loopCount>
+<count>65536</count>
+<address>8388608</address>
 <testName>stuck-address</testName>
 </parameters>
 </memory>
 </stf:setup>
+
