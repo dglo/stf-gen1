@@ -3,6 +3,11 @@
   <name>atwd_pedestal_sweep_forced</name>
   <description>ATWD pedestal_atwd vs pedestal_voltage test</description>
   <version major="1" minor="0"/>
+
+  <fpgaDependencies>
+	<DAQ/>
+  </fpgaDependencies>
+
   <inputParameter>
     <description>DAC setting (of a 12 Bit device) for ATWD sampling speed</description>
     <name>atwd_sampling_speed_dac</name>
@@ -49,12 +54,6 @@
     <description>Selects one of 3 PMT analog signal channels with different gains</description>
     <name>atwd_channel</name>
     <unsignedInt default="0" maxValue="2" minValue="0"/>
-  </inputParameter>
-
-  <inputParameter>
-    <description>Selects ATWD launch method: 0=forced trigger, 1=SPE discriminator trigger</description>
-    <name>atwd_trig_forced_or_spe</name>
-    <unsignedInt default="0" maxValue="1" minValue="0"/>
   </inputParameter>
 
   <outputParameter>

@@ -32,7 +32,6 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
                     unsigned *atwd_baseline_max,
                     unsigned *atwd_baseline_histogram,
                     unsigned *atwd_disc_threshold_dac) {
-
    const int ch = 
       (atwd_chip_a_or_b) ? 
       DOM_HAL_DAC_ATWD0_TRIGGER_BIAS : DOM_HAL_DAC_ATWD1_TRIGGER_BIAS;

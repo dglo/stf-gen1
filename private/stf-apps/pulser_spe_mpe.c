@@ -15,12 +15,11 @@ BOOLEAN pulser_spe_mpeEntry(STF_DESCRIPTOR *d,
 			    unsigned int pulse_height, /* uV */
 			    unsigned int discriminator_level, /* uV */
 			    BOOLEAN mpe_discriminator, /* use MPE disc? */
-			    unsigned int pedestal_level, /* uV */
+			    unsigned int pedestal_dac, /* counts */
 			    unsigned int repetition_rate, /* Hz */
-			    unsigned int max_rate_deviation, /* Hz */
 			    unsigned int *measured_rate, /* Hz */
-			    unsigned int *actual_rate /* Hz */) {
-   int pedestal_dac;
+			    unsigned int *actual_rate /* Hz */,
+			    unsigned int *discriminator_dac /* counts */) {
    DOM_HAL_FPGA_PULSER_RATES rate;
    
    /* 1. amplitude of pulses is used to calc the value of pulser dac */
@@ -30,19 +29,20 @@ BOOLEAN pulser_spe_mpeEntry(STF_DESCRIPTOR *d,
    
    /* 3. pedestal dac value is calculated */
    /* 4. pedestal dac is set */
-   halWriteDAC(DOM_HAL_DAC_PMT_FE_PEDESTAL, 
-	       pedestal_dac = (int) (pedestal_level*4096.0/5000000.0));
+   halWriteDAC(DOM_HAL_DAC_PMT_FE_PEDESTAL, pedestal_dac);
 
    /* 5. calculate discriminator level value */
    /* 6. program spe/mpe dac */
    if (mpe_discriminator) {
       halWriteDAC(DOM_HAL_DAC_MULTIPLE_SPE_THRESH,
-		  (int)( (discriminator_level*9.6* +
+		  *discriminator_dac = 
+		  (int)( (discriminator_level*9.6 +
 			  (pedestal_dac*5000000.0/4096.0)) *
 			 1024/5000000.0));
    }
    else {
-      halWriteDAC(DOM_HAL_DAC_MULTIPLE_SPE_THRESH,
+      halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH,
+		  *discriminator_dac = 
 		  (int)( (discriminator_level*9.6*((2200+1000.0)/1000.0) +
 			  (pedestal_dac*5000000.0/4096.0))*
 			 1024/5000000.0));
@@ -79,11 +79,16 @@ BOOLEAN pulser_spe_mpeEntry(STF_DESCRIPTOR *d,
       rate = rates[idx].val;
       *actual_rate = (int) rates[idx].rate;
    }
+   
+   /* wait for dacs to settle...
+    */
+   halUSleep(100*1000);
+
    hal_FPGA_TEST_set_pulser_rate(rate);
    hal_FPGA_TEST_enable_pulser();
    
    /* 8. the spe/mpe counter is read */
-   halUSleep(1000);
+   halUSleep(200*1000);
    
    if (mpe_discriminator) {
       *measured_rate = (hal_FPGA_TEST_get_mpe_rate()*10);
@@ -91,11 +96,13 @@ BOOLEAN pulser_spe_mpeEntry(STF_DESCRIPTOR *d,
    else {
       *measured_rate = (hal_FPGA_TEST_get_spe_rate()*10);
    }
+
    /* 10. turn off pulser */
    hal_FPGA_TEST_disable_pulser();
 
-   /* 9. check counter value */
-   return abs(*measured_rate - *actual_rate)<=max_rate_deviation;
+   /* 9. check counter value, within +-10% */
+   return abs((int)( 100.0 * (*measured_rate - *actual_rate) / 
+		     (float) (*actual_rate)))<=10;
 }
 
 
