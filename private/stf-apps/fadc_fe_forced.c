@@ -109,7 +109,6 @@ BOOLEAN fadc_fe_forcedEntry(STF_DESCRIPTOR *d,
  /*    10.Take an FADC waveform with a CPU trigger and at the same time
         (on the same register write operation) turn ON the pulser.  */
        /* ***************** may need new command ********************* */
-       hal_FPGA_TEST_enable_pulser(); 
                 hal_FPGA_TEST_trigger_forced(HAL_FPGA_TEST_TRIGGER_FADC | HAL_FPGA_TEST_TRIGGER_FE_PULSER); 
 		/*  hal_FPGA_TEST_trigger_forced(HAL_FPGA_TEST_TRIGGER_FADC);*/
 	time_out = hal_FPGA_TEST_readout(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,waveform,512,HAL_FPGA_TEST_TRIGGER_FADC);
