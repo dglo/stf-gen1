@@ -36,7 +36,7 @@ BEGIN {
          #
          # run status program
          #
-	 if (system("chkpt 4 stftcp " $1 " " ($2+3000)) ) {
+	 if (system("chkpt 4 stftcp " $1 " " ($2+3000) " -ready") ) {
 	    status = "Not ready";
 	 }
 	 else {
