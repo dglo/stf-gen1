@@ -102,3 +102,5 @@ pmt_hv_ramp.h:
 pmt_hv_stability.h:
 	ln -s stfDirectory.h pmt_hv_stability.h
 
+fadc_fe_pulser.h:
+	ln -s stfDirectory.h fadc_fe_pulser.h
