@@ -20,8 +20,9 @@
 
 /* Pass/fail defines */
 /* Maximum allowed clock validation time, in us */
-/* Should be around 250 us * 8 */
-#define MAX_CLOCK_TIME_US  2050
+/* Should be around 2047-2048 us nominally*/
+/* Pass criterion is about 50us of instability */
+#define MAX_CLOCK_TIME_US  2100
 
 BOOLEAN flasher_clockInit(STF_DESCRIPTOR *desc) { return TRUE; }
 
