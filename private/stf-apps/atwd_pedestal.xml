@@ -78,7 +78,7 @@
   <outputParameter>
     <description>Average pedestal pattern waveform in ATWD counts units.</description>
     <name>atwd_pedestal_pattern</name>
-    <unsignedInt/>
+    <unsignedIntArray length="128" />
   </outputParameter>
 
   <outputParameter>

@@ -33,7 +33,6 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
    const int cnt = 128;
    short *buffer = (short *) calloc(cnt, sizeof(short));
    short *channels[4] = { NULL, NULL, NULL, NULL };
-   unsigned *sum = (unsigned *) calloc(cnt, sizeof(unsigned));
    int trigger_mask = (atwd_chip_a_or_b) ? 
       HAL_FPGA_TEST_TRIGGER_ATWD0 : HAL_FPGA_TEST_TRIGGER_ATWD1;
 
@@ -59,6 +58,14 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
     */
    halUSleep(1000);
 
+   /* azriel recommends to throw away a few atwd captures first...
+    */
+   for (i=0; i<8; i++) {
+      hal_FPGA_TEST_trigger_forced(trigger_mask);
+      while (!hal_FPGA_TEST_readout_done(trigger_mask)) ;
+      halUSleep(1000);
+   }
+
    for (i=0; i<(int)loop_count; i++) {
       int j;
       
@@ -83,7 +90,7 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
 			    cnt, NULL, 0, atwd_chip_a_or_b);
 
       /* get summed waveform... */
-      for (j=0; j<cnt; j++) sum[j]+=buffer[j];
+      for (j=0; j<cnt; j++) atwd_pedestal_pattern[j]+=buffer[j];
 
       /* E. repeat...
        */
@@ -92,11 +99,11 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
    /* F. divide the resulting sum waveform by LOOP_COUNT to get an average
     * waveform.
     */
-   for (i=0; i<cnt; i++) sum[i]/=loop_count;
+   for (i=0; i<cnt; i++) atwd_pedestal_pattern[i]/=loop_count;
    
-   /* FIXME: G. fill output arrays...
+   /* G. fill output arrays...
     */
-   *atwd_pedestal_pattern = 0;
+   for (i=0; i<128; i++) atwd_pedestal_pattern[i] = sum[i];
 
    /* H. Analyze pedestal waveform:
     *
