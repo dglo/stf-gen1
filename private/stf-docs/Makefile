@@ -12,21 +12,21 @@ stf-tests.ind: stf-tests.idx
 	makeindex stf-tests.idx
 
 stf-tests.idx: stf-tests.tex
-	latex stf-tests.tex
+	pdflatex stf-tests.tex
 
 stf-tests.ps: stf-tests.dvi
 	dvips -o stf-tests.ps stf-tests.dvi
 
-stf-tests.pdf : stf-tests.ps
-	gs -dNOPAUSE -q -dBATCH -sDEVICE=pdfwrite \
-		-sOutputFile=stf-tests.pdf stf-tests.ps
+stf-tests.pdf : $(TEXS) stf-tests.tex stf-tests.ind
+	pdflatex stf-tests.tex
 
 install: stf-tests.pdf stf-tests.ps stf-tests.dvi
 	cp -v stf-tests.pdf stf-tests.ps stf-tests.dvi ~/public_html/dom
 
 clean:
 	rm -f stf-tests.dvi stf-tests.ind stf-tests.log stf-tests.aux \
-		stf-tests.ilg *.tab *-inputs.tex *-outputs.tex
+		stf-tests.ilg *.tab *-inputs.tex *-outputs.tex \
+		stf-tests.idx stf-tests.out stf-tests.pdf stf-tests.toc
 
 ADC.tab: ../stf-apps/stftotab.awk ../stf-apps/ADC.xml
 	xmlv ../stf-apps/ADC.xml | \
@@ -51,7 +51,6 @@ atwd_pulser.tab: ../stf-apps/stftotab.awk ../stf-apps/atwd_pulser.xml
 memory.tab: ../stf-apps/stftotab.awk ../stf-apps/memory.xml
 	xmlv ../stf-apps/memory.xml | \
 		awk -v description="y" -f ../stf-apps/stftotab.awk > memory.tab
-
 
 ADC-inputs.tex: ADC.tab tabtotex.awk
 	awk -v input=y -f tabtotex.awk ADC.tab | \
