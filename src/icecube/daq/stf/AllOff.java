@@ -1,3 +1,5 @@
+package icecube.daq.stf;
+
 import icecube.daq.domhub.common.*;
 
 import java.rmi.Naming;
