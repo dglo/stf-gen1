@@ -58,7 +58,7 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
 
   /*  2.If HV base is connected HV is set to 0.*/
   /* Always assume base is installed */
-  halSetPMT_HV(0);
+  halPowerDownBase();
 
   /*  3.Set the Front-End pulser amplitude DAC to zero.*/
   halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER,0);

@@ -50,8 +50,8 @@ BOOLEAN pmt_hv_rampEntry(STF_DESCRIPTOR *desc,
     #endif
 
     /* Start with the PMT HV disabled */
-    halDisablePMT_HV();
-
+    halPowerDownBase();
+    
     /* Check the min/max parameters for sanity */
     if (hv_min_volt > hv_max_volt) {
         hv_min_volt = 0;
@@ -65,7 +65,8 @@ BOOLEAN pmt_hv_rampEntry(STF_DESCRIPTOR *desc,
 
     /* Set the starting level and enable the HV */
     hv_set_level = hv_min_level;
-    halEnablePMT_HV();
+    halPowerUpBase();
+    halEnableBaseHV();
     halWriteActiveBaseDAC(hv_set_level);
 
     #ifdef VERBOSE
@@ -118,7 +119,7 @@ BOOLEAN pmt_hv_rampEntry(STF_DESCRIPTOR *desc,
     }
 
     /* Turn the HV off */
-    halDisablePMT_HV();
+    halPowerDownBase();
 
     /* Did we exceed the allowed error? */
     if (hv_err_level > MAX_ERR_VOLT * 2) {

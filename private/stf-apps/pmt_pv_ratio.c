@@ -113,7 +113,8 @@ BOOLEAN pmt_pv_ratioEntry(STF_DESCRIPTOR *desc,
 
     /* Start with the PMT HV on, but set at a very low voltage */
     /* Pedestal measurements perhaps shift with HV off/on */
-    halEnablePMT_HV();
+    halPowerUpBase();
+    halEnableBaseHV();
     halWriteActiveBaseDAC(HV_START_VOLT * 2);
 
     /* Sleep a bit (5s) */
@@ -359,7 +360,7 @@ BOOLEAN pmt_pv_ratioEntry(STF_DESCRIPTOR *desc,
     /*---------------------------------------------------------------------------------*/
     
     /* Turn the HV off */
-    halDisablePMT_HV();
+    halPowerDownBase();
 
     /* Free allocated structures */
     free(buffer);

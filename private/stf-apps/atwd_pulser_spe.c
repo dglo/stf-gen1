@@ -55,7 +55,7 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    /* FIXME: clamp? */
 
    /* pretest 2) hv is off */
-   halDisablePMT_HV();
+   halPowerDownBase();
 
    /* pretest 3) fe pulser dac gets zero */
    halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER, 0);

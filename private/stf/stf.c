@@ -50,7 +50,7 @@ void stfInitTest(STF_DESCRIPTOR *sd) {
    halDisableBarometer();
    halDisableFlasher();
    halDisableLEDPS();
-   halDisablePMT_HV();
+   halPowerDownBase();
    
    halWriteDAC(DOM_HAL_DAC_ATWD0_TRIGGER_BIAS, 850 );
    halWriteDAC(DOM_HAL_DAC_ATWD0_RAMP_TOP, 2097 );

@@ -49,8 +49,7 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   halUSleep(500000);
   /*    2.If HV base is connected HV is set to 0.  */
   /* Always assume base is installed */
-  halSetPMT_HV(0);
-
+  halPowerDownBase();
 
   /*    B.Test algorithm: */
   /*    1.Take one waveform for the FADC with FORCED (CPU) trigger */

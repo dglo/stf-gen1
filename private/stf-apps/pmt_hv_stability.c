@@ -46,7 +46,7 @@ BOOLEAN pmt_hv_stabilityEntry(STF_DESCRIPTOR *desc,
     unsigned int *sample_arr;
 
     /* Start with the PMT HV disabled */
-    halDisablePMT_HV();
+    halPowerDownBase();
 
     #ifdef VERBOSE
     printf("DEBUG: Enabling PMT at %d V\r\n", hv_set_volt);
@@ -54,7 +54,8 @@ BOOLEAN pmt_hv_stabilityEntry(STF_DESCRIPTOR *desc,
 
     /* Enable the HV and set the level (in that order) */
     /* DAC value is 2xVoltage */
-    halEnablePMT_HV();
+    halPowerUpBase();
+    halEnableBaseHV();
     halWriteActiveBaseDAC(hv_set_volt * 2);
 
     /* If requested, wait a while before starting data collection */
@@ -122,7 +123,7 @@ BOOLEAN pmt_hv_stabilityEntry(STF_DESCRIPTOR *desc,
     *hv_read_rms_mvolt  = (int)(rms * 1000 / 2);
 
     /* Turn the HV off */
-    halDisablePMT_HV();
+    halPowerDownBase();
 
     /* Check for failure */
     if (*hv_read_rms_mvolt > HV_MAX_RMS_MVOLT) 

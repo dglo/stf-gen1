@@ -98,7 +98,7 @@ BOOLEAN flasher_currentEntry(STF_DESCRIPTOR *desc,
 
     /*---------------------------------------------------------------------------------*/
     /* Make sure PMT is off */
-    halDisablePMT_HV();
+    halPowerDownBase();
 
     /* Initialize the flasherboard and power up */
     hal_FB_enable();

@@ -53,7 +53,7 @@ BOOLEAN fadc_fe_forcedEntry(STF_DESCRIPTOR *d,
 
   /*    1.If HV base is connected HV is set to 0.*/
   /* Always assume base is installed */
-  halSetPMT_HV(0);
+  halPowerDownBase();
 
   /*    B.Test algorithm: */
   /*    1.The two input DAC settings are programmed.*/

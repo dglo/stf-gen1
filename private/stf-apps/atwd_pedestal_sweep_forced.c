@@ -49,7 +49,7 @@ BOOLEAN atwd_pedestal_sweep_forcedEntry(STF_DESCRIPTOR *d,
    /* FIXME: clamp? */
 
    /* pretest 2) hv is off */
-   halDisablePMT_HV();
+   halPowerDownBase();
 
    /* clear atwd */
    prescanATWD(trigger_mask);
