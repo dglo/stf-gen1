@@ -9,6 +9,8 @@
 #include "hal/DOM_MB_hal.h"
 #include "hal/DOM_MB_fpga.h"
 
+#include "stf-apps/atwdUtils.h"
+
 BOOLEAN atwd_baselineInit(STF_DESCRIPTOR *d) {
    return TRUE;
 }
@@ -63,18 +65,8 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
       halWriteDAC(DOM_HAL_DAC_MULTIPLE_SPE_THRESH, *atwd_disc_threshold_dac);
    }
 
-   /* Thorsten recommends we wait a bit...
-    */
-   halUSleep(1000);
-
-   /* azriel recommends to throw away a few atwd captures first...
-    */
-   for (i=0; i<8; i++) {
-      hal_FPGA_TEST_trigger_forced(trigger_mask);
-      while (!hal_FPGA_TEST_readout_done(trigger_mask)) ;
-      halUSleep(1000);
-   }
-
+   prescanATWD(trigger_mask);
+   
    for (i=0; i<(int)loop_count; i++) {
       int j;
       unsigned sum = 0;

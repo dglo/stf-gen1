@@ -39,16 +39,18 @@ clean:
 		memory.h atwd_pedestal.h adwd_baseline.h \
 		StfEg.h $(HDRFILES)
 
+EXOBJS = atwdUtils.o
 STFOBJS = $(TESTOBJS) ../stf/stf.o stfDirectory.o memtests.o stfUtils.o
 KOBJS = ../lib/crt0.o ../lib/libkernel.a
 
-stfserv.elf: stfserv.o $(STFOBJS) $(LIBHAL)
+stfserv.elf: stfserv.o $(EXOBJS) $(STFOBJS) $(LIBHAL)
 	$(LD) --script=$(KERNELX) -o stfserv.elf \
-		$(KOBJS) stfserv.o $(STFOBJS) $(LIBHAL) $(LIBEXPAT) $(SYSLIBS)
+		$(KOBJS) stfserv.o $(STFOBJS) $(EXOBJS) \
+			$(LIBHAL) $(LIBEXPAT) $(SYSLIBS)
 
-menu.elf: menu.o $(STFOBJS) $(LIBHAL)
+menu.elf: menu.o $(EXOBJS) $(STFOBJS) $(LIBHAL)
 	$(LD) --script=$(KERNELX) -o menu.elf \
-		$(KOBJS) menu.o $(STFOBJS) $(LIBHAL) $(SYSLIBS)
+		$(KOBJS) menu.o $(STFOBJS) $(EXOBJS) $(LIBHAL) $(SYSLIBS)
 
 ../bin/%.bin.gz: %.bin; gzip -c $< > $@
 

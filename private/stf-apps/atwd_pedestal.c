@@ -4,6 +4,7 @@
 
 #include "stf/stf.h"
 #include "stf-apps/atwd_pedestal.h"
+#include "stf-apps/atwdUtils.h"
 
 #include "hal/DOM_MB_hal.h"
 #include "hal/DOM_MB_fpga.h"
@@ -54,17 +55,7 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
       halWriteDAC(8, *atwd_disc_threshold_dac);
    }
 
-   /* Thorsten recommends we wait a bit...
-    */
-   halUSleep(1000);
-
-   /* azriel recommends to throw away a few atwd captures first...
-    */
-   for (i=0; i<8; i++) {
-      hal_FPGA_TEST_trigger_forced(trigger_mask);
-      while (!hal_FPGA_TEST_readout_done(trigger_mask)) ;
-      halUSleep(1000);
-   }
+   prescanATWD(trigger_mask);
 
    for (i=0; i<(int)loop_count; i++) {
       int j;
