@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 
-<project name="@PROJECT@" default="report" >
+<project name="stf" default="report" >
     <description>
-Build the library and documentation for the "@PROJECT@" project.
+Build the library and documentation for the "stf" project.
     </description>
+    <taskdef name="platform" classname="icecube.tools.ant.Platform"/>
+    <taskdef name="packageDir" classname="icecube.tools.ant.PackageDir"/>
 
     <target name="setProperties">
         <property file="./project.properties"/>
@@ -22,13 +24,14 @@ Build the library and documentation for the "@PROJECT@" project.
 
         <property name="include_dir" value="./include" />
         <property name="source_dir" value="./source" />
-        <property name="platform" value="MacOSX-ppc" />
+        <platform property="platform" />
+        <property name="old.platform" value="MacOSX-ppc" />
         <property name="platform_include_dir" value="${include_dir}/${platform}" />
         <property name="platform_source_dir" value="${source_dir}/${platform}" />
         <property name="platform_build_dir" value="${base_build_dir}/${platform}/${project}" />
 
         <property name="PACKAGE" value="${default_package}" />
-        <property name="package_dir" value="${default_package_dir}" />
+        <packageDir property="package_dir" package="${PACKAGE}" />
         <property name="search_dir" value="**" />
         <property name="src_dir" value="./src" />
         <property name="resource_dir" value="./resources" />
