@@ -187,7 +187,7 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    }
    
    *atwd_expected_amplitude = (int)
-      (pulser_amplitude_uvolt * 40.0/5000.0/pow(8, atwd_channel));
+      (pulser_amplitude_uvolt * 30.0/5000.0/pow(8, atwd_channel));
 
    free(buffer);
 
