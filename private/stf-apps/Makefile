@@ -62,6 +62,13 @@ menu.elf: menu.o $(STFOBJS)
 	$(LD) --script=$(KERNELX) -o menu.elf \
 		$(KOBJS) menu.o $(STFOBJS) $(LIBHAL) $(SYSLIBS)
 
+$(STFSERVBIN): stfserv.o $(STFOBJS)
+	$(CC) -o $(STFSERVBIN) stfserv.o \
+		$(STFOBJS) $(LIBHAL) $(LIBEXPAT) $(SYSLIBS)
+
+$(MENUBIN): menu.o $(STFOBJS)
+	$(CC) -o $(MENUBIN) menu.o $(STFOBJS) $(LIBHAL) $(SYSLIBS)
+
 $(STFSERVBINGZ): stfserv.bin
 	gzip -c stfserv.bin > $(STFSERVBINGZ)
 
