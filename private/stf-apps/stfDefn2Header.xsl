@@ -39,7 +39,7 @@ static STF_DESCRIPTOR <xsl:copy-of select="$testName"/>_descriptor = {
      .defValue = <xsl:apply-templates mode="default" select="."/>,
      .arraySize = "1",
      .value = {
-       .longValue = 0
+       .<xsl:apply-templates mode="value" select="."/>Value = <xsl:apply-templates mode="initialValue" select="."/>
      },
      .arrayLength = 1
    },
@@ -55,4 +55,10 @@ static STF_DESCRIPTOR <xsl:copy-of select="$testName"/>_descriptor = {
   <xsl:template match="stf:test/inputParameter/boolean|stf:test/inputParameter/string|stf:test/inputParameter/unsignedInt|stf:test/inputParameter/unsignedLong" mode="default">"<xsl:value-of select="@default"/>"</xsl:template>
   <xsl:template match="stf:test/inputParameter/*" mode="class">input</xsl:template>
   <xsl:template match="stf:test/outputParameter/*" mode="class">output</xsl:template>
+  <xsl:template match="stf:test/*/boolean" mode="value">bool</xsl:template>
+  <xsl:template match="stf:test/*/string" mode="value">char</xsl:template>
+  <xsl:template match="stf:test/*/unsignedInt" mode="value">int</xsl:template>
+  <xsl:template match="stf:test/*/unsingedLong" mode="value">long</xsl:template>
+  <xsl:template match="stf:test/*/*" mode="initialValue">0</xsl:template>
+  <xsl:template match="stf:test/*/string" mode="initialValue">""</xsl:template>
 </xsl:stylesheet>
