@@ -1,8 +1,9 @@
 AFLAGS = -mcpu=arm920t
 CFLAGS = -mlittle-endian -mcpu=arm920 -Wall \
-	-nostdinc -I/usr/local/arm-elf/arm-elf/include \
-	-I/usr/local/arm-elf/lib/gcc-lib/arm-elf/3.2/include \
-	-I../expat -I../../public -I../../../hal/public
+	-nostdinc -I/usr/arm-elf/arm-elf/include \
+	-I/usr/arm-elf/lib/gcc-lib/arm-elf/3.2/include \
+	-I../expat -I../../public -I../../../hal/public \
+	-I ../../../epxa10/build/stf/private
 
 CPP = arm-elf-cpp
 CC = arm-elf-gcc
@@ -11,9 +12,9 @@ AS = arm-elf-ar
 LD = arm-elf-ld -N
 OBJCOPY = arm-elf-objcopy
 
-SYSLIBS = /usr/local/arm-elf/arm-elf/lib/libc.a \
-	/usr/local/arm-elf/arm-elf/lib/libm.a \
-	/usr/local/arm-elf/lib/gcc-lib/arm-elf/3.2/libgcc.a
+SYSLIBS = /usr/arm-elf/arm-elf/lib/libc.a \
+	/usr/arm-elf/arm-elf/lib/libm.a \
+	/usr/arm-elf/lib/gcc-lib/arm-elf/3.2/libgcc.a
 
 .SUFFIXES: .c .o .S .elf .srec .xml .html .tab
 
