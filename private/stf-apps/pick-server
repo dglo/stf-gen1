@@ -48,15 +48,6 @@ awk -v stfserver=${stfserver} -v stfport=${stfport} \
     -f /usr/lib/cgi-bin/stf/xml/bin/servertab.awk \
     ${xmlpath}/servers
 
-#
-# display links at the bottom...
-#
-echo "<p>"
-echo "<a href=\"http://deimos.lbl.gov/stf/run-tests.html\">"
-echo "Configure and Run Tests</a>"
-
-echo "</body>"
-echo "</html>"
 
 
 

@@ -78,6 +78,8 @@ fullrxml=${xmlpath}/${testname}/${fname}-results.xml
 # in servers file...
 #
 stfserver=`echo $HTTP_COOKIE | qryCookie stfserver`
+
+
 if [[ ${#stfserver} == 0 ]]; then
     stfserver=`head -1 ${xmlpath}/servers | awk '{print $1}'`
 fi
@@ -93,10 +95,20 @@ echo "<h3>Running Test: server is ${stfserver} , port is ${stfport}</h3>"
 # 4) run the test
 #
 touch ${xmlpath}/${stfserver}:${stfport}
-chkpt 10 \
-    stftcp ${stfserver} ${stfport} \
-	-send ${fullqxml} -go ${testname} -rcv ${testname} ${fullrxml}
+chkpt 100 \
+    stftcp ${stfserver} `expr ${stfport} + 3000` \
+	-send ${fullqxml} -go ${testname} \
+	-rcv ${testname} ${fullrxml} >& /tmp/stf.out
 rm -f ${xmlpath}/${stfserver}:${stfport}
+
+if [[ ! -e ${fullrxml} ]]; then
+    echo "<h3>Error: couldn't create results</h3>"
+    echo "<p>The reason:"
+    echo "<pre>"
+    cat /tmp/stf.out
+    echo "</pre>"
+    exit 0
+fi
 
 #
 # 5) update summary file
@@ -113,3 +125,10 @@ echo ${tm} ${summary} ${fname} >> ${xmlpath}/summary
 #
 tabth=/usr/lib/cgi-bin/stf/xml/bin/tabtohtml.awk
 xmlv ${fullrxml} | awk -f ${restt} | awk -f ${tabth}
+
+
+
+
+
+
+

@@ -47,7 +47,17 @@ int main(int argc, char *argv[]) {
       return 1;
    }
    else if (ch==0) {
-      if (execv(argv[ai], nargv)) {
+      if (execvp(argv[ai], nargv)) {
+#if 0
+	 int i=0;
+	 printf("path: '%s'\n", getenv("PATH"));
+	 printf("ai: %d, argv[%d]='%s'\n", ai, ai, argv[ai]);
+	 while (nargv[i]!=NULL) {
+	    printf("nargv[%d] = '%s'\n", i, nargv[i]);
+	    i++;
+	 }
+	 fflush(stdout);
+#endif
 	 perror("exec");
 	 return 1;
       }
@@ -56,22 +66,20 @@ int main(int argc, char *argv[]) {
    alarm(alrmtime);
    pause();
    
-   if (caught==0) {
-      int status;
-      fprintf(stderr, "chkpt: unexpected signal!!!\n");
-      kill(ch, SIGTERM);
+   {  int status;
+   
+      if (caught==0) {
+	 kill(ch, SIGTERM);
+      }
+      else if (caught==SIGCHLD) {
+	 /* child died, we can exit normally... */
+      }
+      else if (caught==SIGALRM) {
+	 kill(ch, SIGTERM);
+      }
+
       wait(&status);
-      return status;
-   }
-   else if (caught==SIGCHLD) {
-      /* child died, we can exit normally... */
-   }
-   else if (caught==SIGALRM) {
-      int status;
-      printf("chkpt: process timed out!\n");
-      kill(ch, SIGTERM);
-      wait(&status);
-      return status;
+      return (WIFSIGNALED(status)) ? WTERMSIG(status) : WEXITSTATUS(status);
    }
 
    return 0;
