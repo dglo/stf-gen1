@@ -33,11 +33,11 @@ SYSLIBS = /usr/local/arm-elf/arm-elf/lib/libc.a \
 all: stfserv.elf
 
 clean:
-	rm -f *.o *.i *.bin *.elf *.srec gendir stfDirectory.c
+	rm -f *.o *.i *.bin *.elf *.srec gendir genqry stfDirectory.c
 
 TESTOBJS = memory.o StfEg.o
 STFOBJS = $(TESTOBJS) stfserv.o ../stf/stf.o stfDirectory.o
-XMLFILES = memory.xml StfEg.xml
+XMLFILES = memory.xml # StfEg.xml
 
 stfserv.elf: $(STFOBJS) 
 	$(LD) -r -o stfserv.elf \
@@ -52,6 +52,12 @@ gendir: gendir.c ../../include/stf/stf.h
 	gcc -o gendir -I../../include -I../../../hal/include \
 		-I/usr/include/libxml2 gendir.c -Wall -g -lxml2
 
+genqry: genqry.c
+	gcc -o genqry -I/usr/include/libxml2 genqry.c -Wall -g -lxml2
+
+run-tests.html: genqry $(XMLFILES)
+	./genqry $(XMLFILES)
+
 stfDirectory.c: $(XMLFILES) gendir
 	./gendir $(XMLFILES)
 
@@ -64,3 +70,5 @@ memory.html: memory.xml restohtml.xsl
 StfEg.h: StfEg.xml stfDefn2Header.xsl
 	xalan -IN StfEg.xml -OUT StfEg.h -XSL stfDefn2Header.xsl -Q
 
+html-install: run-tests.html
+	cp *.html ${HOME}/public_html/stf
