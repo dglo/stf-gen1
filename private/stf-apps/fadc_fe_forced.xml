@@ -37,7 +37,7 @@
   <inputParameter>
     <description>Number of waveforms to take and average over before analysis.</description>
     <name>loop_count</name>
-    <unsignedLong default="" minValue="0" maxValue="1000000"/>
+    <unsignedLong default="10" minValue="0" maxValue="1000000"/>
   </inputParameter>
 
   <inputParameter>
