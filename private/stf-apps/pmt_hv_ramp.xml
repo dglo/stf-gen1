@@ -2,18 +2,7 @@
 
 <stf:test xmlns:stf="http://glacier.lbl.gov/icecube/daq/stf">
   <name>pmt_hv_ramp</name>
-  <description>
-    PMT HV Ramp Up/Down Test
-    This test uses the HV base DAC to set the HV level
-    and then the base ADC to read it back out.  The voltage 
-    is stepped up from a minimum to a maximum value and then 
-    back down again.  Each HV level is allowed to settle for
-    10s before the ADC is read.
-    The output parameters indicate the HV level that had
-    the greatest deviation when read, and the value that
-    was read out.  The pass/fail criterion is the largest allowed
-    deviation between the DAC and ADC voltages.
-  </description>
+  <description>PMT HV Ramp Up/Down Test</description>
 
   <version major="1" minor="0"/>
 

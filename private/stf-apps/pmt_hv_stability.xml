@@ -2,15 +2,7 @@
 
 <stf:test xmlns:stf="http://glacier.lbl.gov/icecube/daq/stf">
   <name>pmt_hv_stability</name>
-  <description>
-    PMT HV Stability Test    
-
-    This test sets the PMT high voltage to a particular level 
-    and then simply monitors it for a given time.  The return
-    parameters include the mean, max, min, and rms of the collected
-    values.  Pass/fail criteria include a maximum allowed rms, and
-    a largest allowed |set-mean|, |mean-min|, and |mean-max|.
-  </description>
+  <description>PMT HV Stability Test</description>
   <version major="1" minor="0"/>
 
   <inputParameter>
@@ -22,19 +14,19 @@
   <inputParameter>
     <description>Total run time (seconds)</description>
     <name>run_time_sec</name>
-    <unsignedInt default="15" maxValue="3600" minValue="5"/>
+    <unsignedInt default="300" maxValue="3600" minValue="5"/>
   </inputParameter>
 
   <inputParameter>
     <description>Sample interval (milliseconds)</description>
     <name>sample_time_ms</name>
-    <unsignedInt default="50" maxValue="5000" minValue="10"/>
+    <unsignedInt default="1000" maxValue="10000" minValue="10"/>
   </inputParameter>
 
   <inputParameter>
     <description>Initial wait time (seconds)</description>
     <name>init_wait_sec</name>
-    <unsignedInt default="0" maxValue="600" minValue="0"/>
+    <unsignedInt default="15" maxValue="600" minValue="0"/>
   </inputParameter>
   
   <outputParameter>
