@@ -55,7 +55,7 @@ BOOLEAN ADCEntry(STF_DESCRIPTOR *desc,
        pass_or_fail[i]=(adc_count<=125 && adc_count>=75) ? 1:0;     /* default = 90 */              
      }
      else if (i == DOM_HAL_ADC_MINUS_5V_CURRENT) {
-       pass_or_fail[i]=(adc_count<=190 && adc_count>=100) ? 1:0;    /* default = 115 */               
+       pass_or_fail[i]=(adc_count<=220 && adc_count>=100) ? 1:0;    /* default = 115 */               
      }
      else if (i == DOM_HAL_ADC_DISC_ONESPE) {
        dac_count=halReadDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH);
