@@ -12,7 +12,7 @@ vpath %.xml ../stf-apps
 # add tests to each here...
 #
 TESTS = ADC memory StfEg atwd_pedestal atwd_baseline pmt_hv_ramp \
-		pmt_hv_stability pressure
+		pmt_hv_stability pressure pulser_spe_mpe
 
 TABS      = $(TESTS:%=%.tab)
 HTMLFILES = $(TESTS:%=%.html)
