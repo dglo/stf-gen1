@@ -84,7 +84,10 @@ void getSummedWaveform(int loop_count, unsigned trigger_mask, int channel,
    const int cnt = 128;
    short *buffer = (short *) calloc(cnt, sizeof(short));
    short *ch[4] = { NULL, NULL, NULL, NULL };
-   
+
+   /* clear waveform... */
+   memset(waveform, 0, cnt*sizeof(unsigned));
+
    /* set proper channel */
    ch[channel] = buffer;
    
@@ -108,3 +111,4 @@ void getSummedWaveform(int loop_count, unsigned trigger_mask, int channel,
 
    free(buffer);
 }
+
