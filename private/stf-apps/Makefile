@@ -69,6 +69,11 @@ $(CFILES): %.c: %.h
 $(HDRFILES): stfDirectory.h
 	if [[ ! -h $@ ]]; then ln -s stfDirectory.h $@; fi
 
+../bin/stfserv: stfserv.o $(STFOBJS) $(EXOBJS)
+	gcc -o stfserv stfserv.o $(STFOBJS) $(EXOBJS) $(LIBHAL) -lm -lexpat
+
+../bin/menu: menu.o $(STFOBJS) $(EXOBJS)
+	gcc -o menu menu.o $(STFOBJS) $(EXOBJS) $(LIBHAL) -lm
 
 
 
