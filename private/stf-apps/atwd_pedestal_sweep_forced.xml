@@ -77,7 +77,7 @@
   <outputParameter>
     <description>pedestal value in atwd counts for all pedestal settings</description>
     <name>atwd_pedestal_sweep_forced</name>
-    <unsignedInt/>
+    <unsignedIntArray length="4096"/>
   </outputParameter>
 
 </stf:test>
