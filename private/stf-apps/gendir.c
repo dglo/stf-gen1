@@ -143,8 +143,16 @@ static DescNode *parseFile(const char *fn, DescNode *next) {
 
 	 /* link this param...
 	  */
-	 pn->next = dn->parms;
-	 dn->parms = pn;
+	 pn->next = NULL;
+	 {  ParamNode *tmp;
+	    for (tmp=dn->parms; tmp!=NULL && tmp->next!=NULL; tmp=tmp->next) ;
+	    if (tmp==NULL) {
+	       dn->parms = pn;
+	    }
+	    else {
+	       tmp->next = pn;
+	    }
+	 }
       }
    }
    
