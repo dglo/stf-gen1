@@ -203,13 +203,13 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
       }
       else if (strcmp(stf->params[i].type, UINT_ARRAY_TYPE)==0) {
 	 for (j=0; j<stf->params[i].arrayLength; j++) {
-	    idx += sprintf(buf+idx, "%u", 
+	    idx += sprintf(buf+idx, "%u ", 
 			   stf->params[i].value.intArrayValue[j]);
 	 }
       }
       else if (strcmp(stf->params[i].type, ULONG_ARRAY_TYPE)==0) {
 	 for (j=0; j<stf->params[i].arrayLength; j++) {
-	    idx += sprintf(buf+idx, "%lu", 
+	    idx += sprintf(buf+idx, "%lu ", 
 			   stf->params[i].value.longArrayValue[j]);
 	 }
       }
