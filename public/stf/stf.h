@@ -121,7 +121,10 @@ struct STF_DESCRIPTOR_STRUCT {
 	BOOLEAN	testRunnable;
         BOOLEAN passed; /* valid after entryPt called... */
         const char *boardID; /* board id is read before test is started */
-   
+
+	/** The 'comps_mask' used to check FPGA dependencies */
+	unsigned int fpgaDependencies;
+
          /** number of parameters */
         int nParams;
 	/** pointer to this test's STF_PARAM structure */
