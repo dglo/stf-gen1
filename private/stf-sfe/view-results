@@ -41,7 +41,16 @@ qry=`printf "select distinct tt.name, p.name, rp.value, rp.value_index from \
 #
 # 6) display results...
 #
-tabth=/usr/lib/cgi-bin/stf/xml/bin/tabtohtml.awk
-restt=/usr/lib/cgi-bin/stf/xml/bin/restotab.awk
-qry=`printf "select text from STFResultXML where stf_result_id=%s" ${fname}`
-${mysqlcmd} "${qry}" | xmlv | awk -f ${restt} | awk -v xml=${fname} -f ${tabth}
+viewResults ${fname}
+#tabth=/usr/lib/cgi-bin/stf/xml/bin/tabtohtml.awk
+#restt=/usr/lib/cgi-bin/stf/xml/bin/restotab.awk
+#qry=`printf "select text from STFResultXML where stf_result_id=%s" ${fname}`
+#${mysqlcmd} "${qry}" | xmlv | awk -f ${restt} | awk -v xml=${fname} -f ${tabth}
+
+
+
+
+
+
+
+

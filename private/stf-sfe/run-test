@@ -106,17 +106,17 @@ if [[ ! -e ${fullrxml} ]]; then
     echo "<pre>"
     cat /tmp/stf.out
     echo "</pre>"
+    rm -f /tmp/stf.out
     exit 0
 fi
 
 #
-# 5) add test results to db...
+# remove temp file
 #
-${javacmd} addresults -technician arthur ${fullrxml} >& /dev/null
+rm -f /tmp/stf.out
 
 #
-# 6) display results...
+# 5) add test results to db and view them...
 #
-restt=/usr/lib/cgi-bin/stf/xml/bin/restotab.awk
-tabth=/usr/lib/cgi-bin/stf/xml/bin/tabtohtml.awk
-xmlv ${fullrxml} | awk -f ${restt} | awk -v xml=${fullrxml} -f ${tabth}
+viewResults `${javacmd} addresults -resultid -technician arthur ${fullrxml} | \
+    egrep '^resultid	' | awk '{print $2;}'`

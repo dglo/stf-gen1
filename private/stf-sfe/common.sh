@@ -68,3 +68,17 @@ mysqlcmd="mysql -h glacier.lbl.gov -pt35Tpas5 -u tester domprodtest -s -e"
 javacmd="java -classpath /usr/lib/cgi-bin/stf/xml/bin"
 
 
+#
+# view results from a result id...
+#
+#
+# FIXME: this should be _much_ better, at least get rid of xmlv step...
+#
+function viewResults() {
+    local tabth=/usr/lib/cgi-bin/stf/xml/bin/tabtohtml.awk
+    local restt=/usr/lib/cgi-bin/stf/xml/bin/restotab.awk
+    local qry=`printf \
+	"select text from STFResultXML where stf_result_id=%s" $1`
+    ${mysqlcmd} "${qry}" | xmlv | awk -f ${restt} | \
+	awk -v xml=$1 -f ${tabth}
+}
