@@ -44,7 +44,7 @@ echo
 #
 # display the table...
 #
-awk -v stfserver=${stfserver} -v stfport=${stfport} \
+awk -v stfserver=${stfserver} -v stfport=${stfport} -v xmlpath=${xmlpath} \
     -f /usr/lib/cgi-bin/stf/xml/bin/servertab.awk \
     ${xmlpath}/servers
 
