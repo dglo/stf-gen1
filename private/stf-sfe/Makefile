@@ -24,7 +24,7 @@ all: html cgi stftcp chkpt
 
 clean:
 	rm -f *.o *.i *.bin *.elf *.srec \
-		$(TABS) all.tab \
+		$(TABS) tcal.tab all.tab \
 		chkpt stftcp mk-name
 
 test-cgi: test-cgi.c
@@ -35,7 +35,7 @@ stf: stf.c
 
 install: html-install
 
-html: $(TABS) all.tab
+html: $(TABS) tcal.tab all.tab
 
 html-dirs:
 	(cd /var/www/stf/xml; mkdir -p $(HTMLDIRS))
@@ -74,5 +74,5 @@ stftcp: stftcp.c
 chkpt: chkpt.c
 	gcc -o chkpt -Wall chkpt.c
 
-all.tab: $(TABS)
-	cat $(TABS) > all.tab
+all.tab: $(TABS) tcal.tab
+	cat $(TABS) tcal.tab > all.tab
