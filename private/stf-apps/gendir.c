@@ -30,7 +30,8 @@ static void usage(void) {
    fprintf(stderr, "usage: gendir xmlfiles...\n");
 }
 
-static void fillParam(STF_PARAM *param, xmlDocPtr doc, struct _xmlNode *children) {
+static void fillParam(STF_PARAM *param, xmlDocPtr doc, 
+		      struct _xmlNode *children) {
    xmlNodePtr pxn;
 
    param->arraySize = "1";
@@ -49,18 +50,22 @@ static void fillParam(STF_PARAM *param, xmlDocPtr doc, struct _xmlNode *children
 
 	 ap = xmlHasProp(pxn, "minValue");
 	 if (ap!=NULL) 
-	    param->minValue = xmlNodeListGetString(doc, ap->xmlChildrenNode, 1);
+	    param->minValue = 
+	       xmlNodeListGetString(doc, ap->xmlChildrenNode, 1);
 	 
 	 ap = xmlHasProp(pxn, "maxValue");
 	 if (ap!=NULL) 
-	    param->maxValue = xmlNodeListGetString(doc, ap->xmlChildrenNode, 1);
+	    param->maxValue = 
+	       xmlNodeListGetString(doc, ap->xmlChildrenNode, 1);
 	 
 	 ap = xmlHasProp(pxn, "default");
 	 if (ap!=NULL) 
-	    param->defValue = xmlNodeListGetString(doc, ap->xmlChildrenNode, 1);
+	    param->defValue = 
+	       xmlNodeListGetString(doc, ap->xmlChildrenNode, 1);
 
 	 if (strcmp(param->type, CHAR_TYPE)==0) {
-	    param->value.charValue = (param->defValue==NULL) ? "" : param->defValue;
+	    param->value.charValue = 
+	       (param->defValue==NULL) ? "" : param->defValue;
 	 }
 	 else if (strcmp(param->type, UINT_TYPE)==0) {
 	    param->value.intValue = 
@@ -130,7 +135,8 @@ static DescNode *parseFile(const char *fn, DescNode *next) {
 	 }
 
 	 pn->parm.class = 
-	    xmlStrcmp(cur->name, (const xmlChar *) "inputParameter")==0 ? "input" : 
+	    xmlStrcmp(cur->name, 
+		      (const xmlChar *) "inputParameter")==0 ? "input" : 
 	    "output";
 
 	 fillParam(&pn->parm, doc, cur->xmlChildrenNode);
@@ -150,6 +156,81 @@ static int nparams(const DescNode *node) {
    int np = 0;
    for (p=node->parms; p!=NULL; p=p->next) np++;
    return np;
+}
+
+static const char *getInputType(STF_PARAM *p) {
+   if (strcmp(p->type, CHAR_TYPE)==0) {
+      return "const char *";
+   }
+   else if (strcmp(p->type, UINT_TYPE)==0) {
+      return "unsigned";
+   }
+   else if (strcmp(p->type, ULONG_TYPE)==0) {
+      return "unsigned long";
+   }
+   else if (strcmp(p->type, BOOLEAN_TYPE)==0) {
+      return "BOOLEAN";
+   }
+   else if (strcmp(p->type, UINT_ARRAY_TYPE)==0) {
+      return "const unsigned *";
+   }
+   else if (strcmp(p->type, ULONG_ARRAY_TYPE)==0) {
+      return "const unsigned long *";
+   }
+   else {
+      fprintf(stderr, "invalid type '%s'\n", p->type);
+      return NULL;
+   }
+}
+
+static const char *getOutputType(STF_PARAM *p) {
+   if (strcmp(p->type, CHAR_TYPE)==0) {
+      return "char *";
+   }
+   else if (strcmp(p->type, UINT_TYPE)==0) {
+      return "unsigned";
+   }
+   else if (strcmp(p->type, ULONG_TYPE)==0) {
+      return "unsigned long";
+   }
+   else if (strcmp(p->type, BOOLEAN_TYPE)==0) {
+      return "BOOLEAN";
+   }
+   else if (strcmp(p->type, UINT_ARRAY_TYPE)==0) {
+      return "unsigned *";
+   }
+   else if (strcmp(p->type, ULONG_ARRAY_TYPE)==0) {
+      return "unsigned long *";
+   }
+   else {
+      fprintf(stderr, "invalid type '%s'\n", p->type);
+      return NULL;
+   }
+}
+
+static const char *getUnionField(STF_PARAM *p) {
+   if (strcmp(p->type, CHAR_TYPE)==0) {
+      return "charValue";
+   }
+   else if (strcmp(p->type, UINT_TYPE)==0) {
+      return "intValue";
+   }
+   else if (strcmp(p->type, ULONG_TYPE)==0) {
+      return "longValue";
+   }
+   else if (strcmp(p->type, BOOLEAN_TYPE)==0) {
+      return "boolValue";
+   }
+   else if (strcmp(p->type, UINT_ARRAY_TYPE)==0) {
+      return "intArrayValue";
+   }
+   else if (strcmp(p->type, ULONG_ARRAY_TYPE)==0) {
+      return "longArrayValue";
+   }
+   else {
+      fprintf(stderr, "invalid type '%s'\n", p->type);
+      return NULL;
+   }
 }
 
 
@@ -197,6 +278,8 @@ int main(int argc, char *argv[]) {
       for (tdn = dn; tdn!=NULL; tdn = tdn->next) {
 	 int i;
 	 const int np = nparams(tdn);
+	 int nOutputs = 0, nInputs = 0;
+	 
 	 ParamNode *tp = NULL;
 
 	 if (ndescs>=sizeof(descs)/sizeof(descs[0])) {
@@ -210,6 +293,9 @@ int main(int argc, char *argv[]) {
 	 fprintf(fptr, "static STF_PARAM %s_params[%d] = {\n", 
 		 tdn->desc.name, np+1);
 	 for (i=0, tp=tdn->parms; i<np; i++, tp=tp->next) {
+	    if (strcmp(tp->parm.class, "output")==0) nOutputs++;
+	    else nInputs++;
+
 	    fprintf(fptr, "   {\n");
 	    fprintf(fptr, "     .name = \"%s\",\n", tp->parm.name);
 	    fprintf(fptr, "     .class = \"%s\",\n", tp->parm.class);
@@ -268,10 +354,80 @@ int main(int argc, char *argv[]) {
 	 fprintf(fptr, "};\n");
 	 
 	 fprintf(fptr, "\n");
-	 fprintf(fptr, "extern BOOLEAN %sInit(STF_DESCRIPTOR *);\n", tdn->desc.name);
-	 fprintf(fptr, "extern BOOLEAN %sEntry(STF_DESCRIPTOR *);\n",
+
+	 fprintf(fptr, "extern BOOLEAN %sInit(STF_DESCRIPTOR *);\n", 
 		 tdn->desc.name);
-	 
+
+	 if (np>0) {
+	    /* if we have any params, put them into the
+	     * extern descriptor...
+	     */
+	    fprintf(fptr, 
+		    "extern BOOLEAN %sEntry(STF_DESCRIPTOR *",
+		    tdn->desc.name);
+	    
+	    /* first inputs...
+	     */
+	    for (i=0, tp=tdn->parms; i<np; i++, tp=tp->next) {
+	       if (strcmp(tp->parm.class, "input")==0) {
+		  fprintf(fptr,
+			  ",\n"
+			  "                           %s %s",
+			  getInputType(&tp->parm), tp->parm.name);
+	       }
+	    }
+	    
+	    /* now do outputs...
+	     */
+	    for (i=0, tp=tdn->parms; i<np; i++, tp=tp->next) {
+	       if (strcmp(tp->parm.class, "output")==0) {
+		  fprintf(fptr,
+			  ",\n"
+			  "                           %s *%s", 
+			  getOutputType(&tp->parm), tp->parm.name);
+	       }
+	    }
+	    
+	    fprintf(fptr,");\n");
+
+	    /* add callout function...
+	     */
+	    fprintf(fptr, 
+		    "\nstatic BOOLEAN %sEntryLocal(STF_DESCRIPTOR *d) {\n",
+		    tdn->desc.name);
+
+	    fprintf(fptr, "   return %sEntry(d", tdn->desc.name);
+
+	    /* first inputs...
+	     */
+	    for (i=0, tp=tdn->parms; i<np; i++, tp=tp->next) {
+	       if (strcmp(tp->parm.class, "input")==0) {
+		  fprintf(fptr,
+			  ",\n"
+			  "                     "
+			  "getParamByName(d, \"%s\")->value.%s",
+			  tp->parm.name, getUnionField(&tp->parm));
+	       }
+	    }
+	    
+	    /* now do outputs...
+	     */
+	    for (i=0, tp=tdn->parms; i<np; i++, tp=tp->next) {
+	       if (strcmp(tp->parm.class, "output")==0) {
+		  fprintf(fptr,
+			  ",\n"
+			  "                     "
+			  "&getParamByName(d,  \"%s\")->value.%s",
+			  tp->parm.name, getUnionField(&tp->parm));
+	       }
+	    }
+	    
+	    fprintf(fptr,");\n}\n");
+	 }
+	 else 
+	    fprintf(fptr, "extern BOOLEAN %sEntry(STF_DESCRIPTOR *);\n",
+		    tdn->desc.name);
+
 	 fprintf(fptr, "\n");
 	 fprintf(fptr, "static STF_DESCRIPTOR %s_descriptor = {\n", 
 		 tdn->desc.name);
@@ -284,7 +440,8 @@ int main(int argc, char *argv[]) {
 	 fprintf(fptr, "  .nParams = %d,\n", np);
 	 fprintf(fptr, "  .params = %s_params,\n", tdn->desc.name);
 	 fprintf(fptr, "  .initPt = %sInit,\n", tdn->desc.name);
-	 fprintf(fptr, "  .entryPt = %sEntry,\n", tdn->desc.name);
+	 fprintf(fptr, "  .entryPt = %sEntry%s,\n",
+		 tdn->desc.name, np>0 ? "Local" : "");
 	 fprintf(fptr, "  .isInit = 0\n");
 	 fprintf(fptr, "};\n");
       }
@@ -293,7 +450,7 @@ int main(int argc, char *argv[]) {
    }
    
    xmlCleanupParser();
-
+   
    /* write the actual directory...
     */
    fprintf(fptr, "\nSTF_DESCRIPTOR *stfDirectory[]={\n");
@@ -305,5 +462,4 @@ int main(int argc, char *argv[]) {
    
    return 0;
 }
-
 
