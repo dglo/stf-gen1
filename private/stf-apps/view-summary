@@ -25,6 +25,5 @@ awk -f /e/arthur/xml/bin/sumtotable.awk /e/arthur/xml/summary
 #
 # FIXME: search code goes here...
 #
-
 echo "  </body>"
 echo "</html>"

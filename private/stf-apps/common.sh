@@ -12,7 +12,15 @@ PATH=/d/apps/msys-1.0/bin:/d/apps/mingw/bin:/e/arthur/xml/bin:${xpath}
 xmlpath=e:\\arthur\\xml
 
 #
-# qry-param.sh param
+# splitParams, split the paramString into lines, translate
+#  as we go...
+#
+function splitParams() {
+    tr '+' ' ' | awk 'BEGIN { FS="="; RS="&" } { printf "%s\t%s\n", $1, $2; }'
+}
+
+#
+# qryParam param
 #
 #  get a parameter from a qry string (in stdin)
 #
@@ -24,10 +32,9 @@ xmlpath=e:\\arthur\\xml
 # the beginning...
 #
 function qryParam() {
-    parm=`tr '+' ' ' | \
-	awk ' BEGIN { FS="="; RS="&" } { print $1, $2; }' | \
-	grep -e "^$1 " | \
-	sed -n "s/^$1 //1p"`
+    local parm=`splitParams | \
+	grep -e "^$1	" | \
+	sed -n "s/^$1	//1p"`
 
     if [ $1 == "test" ]; then
 	echo $parm | sed -n 's/^Run //1p'

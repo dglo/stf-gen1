@@ -11,8 +11,8 @@ source /e/arthur/xml/bin/common.sh
 # run-test [IN query string (QUERY_STRING)]
 #
 # 1) fname     <- get file name (mk-name)
-# 2) testname  <- get test name from query string (get-test-name)
-# 3) fname.xml <- create xml file from query string (mk-test-xml)
+# 2) testname  <- get test name from query string
+# 3) fname.xml <- create xml file from query string
 # 4) run test [ stf -send fname -go testname -rcv testname fname-results]
 # 5) update summary file (database) [use:
 #     `show-time` `-Xalan fname-results restosum.xsl` fname >> summary-file]
@@ -48,7 +48,17 @@ fi
 # 3) create xml file from query string...
 #
 qxml=${fname}-qry.xml
-mk-test-xml "${QUERY_STRING}" > ${xmlpath}\\${testname}\\${qxml}
+
+# 
+# mkTestXml testName
+#
+function mkTestXml() {
+    echo ${QUERY_STRING} | splitParams | \
+	awk -v test=$1 -f /e/arthur/xml/bin/qrytoxml.awk
+}
+
+mkTestXml `echo $QUERY_STRING | qryParam test` > \
+    ${xmlpath}\\${testname}\\${qxml}
 
 fullqxml=${xmlpath}\\${testname}\\${qxml}
 fullrxml=${xmlpath}\\${testname}\\${fname}-results.xml

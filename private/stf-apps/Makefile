@@ -77,10 +77,7 @@ test-cgi.exe: test-cgi.c
 stf.exe: stf.c
 	gcc -o stf.exe -Wall -I../../include stf.c
 
-CGIDIR = c:/program files/apache group/apache2/cgi-bin
-
-install: test-cgi.exe test-cgi.exe
-	cp test-cgi.exe test-cgi.exe "$(CGIDIR)"
+install: html-install
 
 memory.html: memory.xml restohtml.xsl
 	xalan -IN memory.xml -OUT memory.html -HTML -XSL restohtml.xsl -Q
@@ -93,8 +90,7 @@ html-install: run-tests.html index.html cgi-install
 #	cp *.html ${HOME}/public_html/stf
 
 CGIS = run-test view-results view-summary
-CGIHELPERS = mk-name.exe mk-test-xml.exe \
-	stf.exe sumtotable.awk common.sh
+CGIHELPERS = mk-name.exe stf.exe sumtotable.awk common.sh qrytoxml.awk
 XSLFILES = restohtml.xsl restosum.xsl
 
 cgi: $(CGIS) $(CGIHELPERS)
@@ -104,14 +100,5 @@ cgi-install: $(CGIS) $(CGIHELPERS) $(XSLFILES)
 	cp $(CGIHELPERS) "/e/arthur/xml/bin"
 	cp $(XSLFILES) "/e/arthur/xml"
 
-show-time.exe: show-time.c
-	gcc -o show-time.exe -Wall show-time.c
-
 mk-name.exe: mk-name.c
 	gcc -o mk-name.exe -Wall mk-name.c
-
-get-test-name.exe: get-test-name.c parse-qry.c
-	gcc -o get-test-name.exe -Wall get-test-name.c parse-qry.c
-
-mk-test-xml.exe: mk-test-xml.c parse-qry.c
-	gcc -o mk-test-xml.exe -Wall mk-test-xml.c parse-qry.c
