@@ -11,3 +11,5 @@ $(BUILD_DIR)/$(PVT_DIR_NAME)/%.h : %.xml
 $(BUILD_DIR)/$(PVT_DIR_NAME)/%Dictionary.c : %.xsd
 	@test -d $(@D) || mkdir -p $(@D)
 	$(XSLT) -in $< -out $@ -xsl $(<D)/xsd2Dictionary.xsl
+
+-include ../dom-loader/$(PLATFORM_PUB_ROOT)/loader/loaderTargets.mk
