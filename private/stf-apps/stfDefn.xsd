@@ -63,6 +63,11 @@
                 <xs:element name="unsignedLong">
                   <xs:complexType/>
                 </xs:element>
+                <xs:element name="unsignedIntArray">
+                  <xs:complexType>
+                     <xs:attribute name="length" type="xs:unsignedLong" use="required"/>
+                  </xs:complexType>
+                </xs:element>
               </xs:choice>
             </xs:sequence>
           </xs:complexType>
