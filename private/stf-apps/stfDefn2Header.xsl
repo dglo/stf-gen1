@@ -29,24 +29,11 @@ static STF_DESCRIPTOR <xsl:copy-of select="$testName"/>_descriptor = {
   .isInit = 0
 };
   </xsl:template>
-  <xsl:template match="stf:test/*" mode="PARAM">
-    <xsl:apply-templates mode="PARAM" select="boolean|string|unsignedInt|unsignedLong"/>
-  </xsl:template>
-  <xsl:template match="stf:test/*/boolean" mode="paraType">boolean</xsl:template>
-  <xsl:template match="stf:test/*/string" mode="paraType">string</xsl:template>
-  <xsl:template match="stf:test/*/unsignedInt" mode="paraType">unsignedInt</xsl:template>
-  <xsl:template match="stf:test/*/unsignedLong" mode="paraType">unsignedLong</xsl:template>
-  <xsl:template match="stf:test/inputParameter/boolean|stf:test/inputParameter/string" mode="max">NULL</xsl:template>
-  <xsl:template match="stf:test/inputParameter/boolean|stf:test/inputParameter/string" mode="min">NULL</xsl:template>
-  <xsl:template match="stf:test/inputParameter/boolean|stf:test/inputParameter/string" mode="default">"<xsl:value-of select="@default"/>"</xsl:template>
-  <xsl:template match="stf:test/inputParameter/unsignedInt|stf:test/inputParameter/unsignedLong" mode="max">"<xsl:value-of select="@maxValue"/>"</xsl:template>
-  <xsl:template match="stf:test/inputParameter/unsignedInt|stf:test/inputParameter/unsignedLong" mode="min">"<xsl:value-of select="@minValue"/>"</xsl:template>
-  <xsl:template match="stf:test/inputParameter/unsignedInt|stf:test/inputParameter/unsignedLong" mode="default">"<xsl:value-of select="@default"/>"</xsl:template>
-  <xsl:template match="stf:test/inputParameter/*" mode="PARAM">
+  <xsl:template match="stf:test/*/*" mode="PARAM">
    {
      .name = "<xsl:copy-of select="../name"/>",
-     .class = "input",
-     .type = "<xsl:apply-templates mode="paraType" select="."/>",
+     .class = "<xsl:apply-templates mode="class" select="."/>",
+     .type = "<xsl:value-of select="local-name()"/>",
      .maxValue = <xsl:apply-templates mode="max" select="."/>,
      .minValue = <xsl:apply-templates mode="min" select="."/>,
      .defValue = <xsl:apply-templates mode="default" select="."/>,
@@ -57,19 +44,16 @@ static STF_DESCRIPTOR <xsl:copy-of select="$testName"/>_descriptor = {
      .arrayLength = 1
    },
   </xsl:template>
-  <xsl:template match="stf:test/outputParameter/*" mode="PARAM">
-   {
-     .name = "<xsl:copy-of select="../name"/>",
-     .class = "output",
-     .type = "<xsl:apply-templates mode="paraType" select="."/>",
-     .maxValue = NULL,
-     .minValue = NULL,
-     .defValue = NULL,
-     .arraySize = "1",
-     .value = {
-       .longValue = 0
-     },
-     .arrayLength = 1
-   },
+  <xsl:template match="stf:test/*" mode="PARAM">
+    <xsl:apply-templates mode="PARAM" select="boolean|string|unsignedInt|unsignedLong"/>
   </xsl:template>
+  <xsl:template match="stf:test/*/*" mode="max">NULL</xsl:template>
+  <xsl:template match="stf:test/*/*" mode="min">NULL</xsl:template>
+  <xsl:template match="stf:test/outputParameter/*" mode="default">NULL</xsl:template>
+  <xsl:template match="stf:test/inputParameter/boolean|stf:test/inputParameter/string" mode="default">"<xsl:value-of select="@default"/>"</xsl:template>
+  <xsl:template match="stf:test/inputParameter/unsignedInt|stf:test/inputParameter/unsignedLong" mode="max">"<xsl:value-of select="@maxValue"/>"</xsl:template>
+  <xsl:template match="stf:test/inputParameter/unsignedInt|stf:test/inputParameter/unsignedLong" mode="min">"<xsl:value-of select="@minValue"/>"</xsl:template>
+  <xsl:template match="stf:test/inputParameter/unsignedInt|stf:test/inputParameter/unsignedLong" mode="default">"<xsl:value-of select="@default"/>"</xsl:template>
+  <xsl:template match="stf:test/inputParameter/*" mode="class">input</xsl:template>
+  <xsl:template match="stf:test/outputParameter/*" mode="class">output</xsl:template>
 </xsl:stylesheet>
