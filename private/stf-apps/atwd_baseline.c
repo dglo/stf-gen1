@@ -1,4 +1,4 @@
-/* atwd_baseline.c, skeleton file created by gendir
+/* atwd_baseline.c, skeleton file created by gendir and modified by George
  */
 #include <stddef.h>
 #include <stdlib.h>
@@ -38,12 +38,13 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
       (atwd_chip_a_or_b) ? 
       DOM_HAL_DAC_ATWD0_TRIGGER_BIAS : DOM_HAL_DAC_ATWD1_TRIGGER_BIAS;
    int i;
-   unsigned minv, maxv;
+   unsigned minv, maxv, valid_max, valid_min;
    const int cnt = 128;
    short *buffer = (short *) calloc(cnt, sizeof(short));
    short *channels[4] = { NULL, NULL, NULL, NULL };
    unsigned *values = (unsigned *) calloc(loop_count, sizeof(unsigned));
    unsigned sm = 0, sm2 = 0;
+   double prob, good_rms, sigma;
    const int trigger_mask = (atwd_chip_a_or_b) ?
       HAL_FPGA_TEST_TRIGGER_ATWD0 : HAL_FPGA_TEST_TRIGGER_ATWD1;
 
@@ -120,16 +121,34 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
       const int diff = (int) values[i] - sm;
       sm2 += diff*diff;
    }
+   good_rms = sqrt( (1.0/(loop_count-1)) * sm2 );
 
    *atwd_baseline_mean = sm;
-   *atwd_baseline_rms = (int) sqrt( (1.0/(loop_count-1)) * sm2 );
+   *atwd_baseline_rms = 1000.0*good_rms;
    *atwd_baseline_min = minv;
    *atwd_baseline_max = maxv;
 
+   prob = 0.01/loop_count;
+
+   if(prob>=1e-5 && prob<1e-4)        sigma=4.4;
+   else if (prob>=1e-6 && prob<1e-5)  sigma=4.9;
+   else if (prob>=1e-7 && prob<1e-6)  sigma=5.35;
+   else if (prob>=1e-8 && prob<1e-7)  sigma=5.75;
+   else if (prob>=1e-9 && prob<1e-8)  sigma=6.15;
+   else sigma=0;
+
+   valid_max = sm + sigma*(good_rms);
+   valid_min = sm - sigma*(good_rms);
+
    free(buffer);
-   free(values);
-   
+   free(values);   
+
+   if(*atwd_baseline_mean >200 || *atwd_baseline_mean <100)
+     return FALSE;
+   if(*atwd_baseline_max >valid_max || *atwd_baseline_min <valid_min)
+     return FALSE;
+   if(*atwd_baseline_rms/1000 >2)
+     return FALSE;
+
    return TRUE;
 }
-
-

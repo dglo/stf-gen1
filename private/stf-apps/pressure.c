@@ -1,4 +1,4 @@
-/* pressure.c, skeleton file created by gendir
+/* pressure.c, skeleton file created by gendir and modified by George
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -29,10 +29,10 @@ BOOLEAN pressureEntry(STF_DESCRIPTOR *d,
 
   /*unsigned here;*/
   /*  unsigned *adc_5v_mean_mvolts;*/
-  unsigned long loop_n,pressure_sum,voltage_sum;
-  unsigned short pressure_value,voltage_value;
+  unsigned loop_n, pressure_sum, voltage_sum;
+  unsigned short pressure_value, voltage_value;
   unsigned Adc_5v_mean_counts;
-  double pressure_float,temp_float,temp2_float,sum_sqr_float;
+  double pressure_float, temp_float, temp2_float, sum_sqr_float;
   unsigned short *buff;
 
 buff = (unsigned short *) calloc(loop_count+2, sizeof(short));
@@ -41,11 +41,14 @@ buff = (unsigned short *) calloc(loop_count+2, sizeof(short));
   /*  adc_5v_mean_mvolts = &here;*/
 
   halEnableBarometer();
+  halUSleep(100000);
+/* add 100 msec wait */
   if(loop_count<2) loop_count=2;
   pressure_sum = 0;
+  voltage_sum = 0;
   *adc_max_counts = 0;
   *adc_min_counts = 0xffff;
-  for(loop_n=0;loop_n<loop_count;loop_n++)
+  for(loop_n=5;loop_n<loop_count+5;loop_n++)
     {
       buff[loop_n] = halReadADC(DOM_HAL_ADC_PRESSURE);
       pressure_sum +=buff[loop_n];
@@ -54,23 +57,23 @@ buff = (unsigned short *) calloc(loop_count+2, sizeof(short));
 
       if(buff[loop_n]<*adc_min_counts) *adc_min_counts = buff[loop_n];
       if(buff[loop_n]>*adc_max_counts) *adc_max_counts = buff[loop_n];
+      }
 
     }
   halDisableBarometer();
 
-  *adc_mean_counts = pressure_sum / loop_n;
-  Adc_5v_mean_counts = voltage_sum / loop_n;
-  temp_float = (double)Adc_5v_mean_counts * 2.5/4095 * (25.0/10.0)*1000.0;
+  *adc_mean_counts = pressure_sum/loop_n;
+  Adc_5v_mean_counts = voltage_sum/loop_n;
+  temp_float = (double)Adc_5v_mean_counts * 0.002 * (25.0/10.0)*1000.0;
   *adc_5v_mean_mvolts = (unsigned short)floor(temp_float);
 
   sum_sqr_float = 0;
-  for(loop_n=0;loop_n<loop_count;loop_n++)
+  for(loop_n=5;loop_n<loop_count+5;loop_n++)
     {
       pressure_value = buff[loop_n];
       pressure_float = (double)(pressure_value-*adc_mean_counts);
-      pressure_float = (double)pressure_value;
-      pressure_float -= (double)*adc_mean_counts;
       sum_sqr_float += pressure_float * pressure_float;
+      }
     }
   temp_float = sqrt( (1.0/((double)loop_n-1.0)) * sum_sqr_float );  
   *adc_rms_counts = (unsigned short)floor(temp_float);
@@ -93,12 +96,12 @@ buff = (unsigned short *) calloc(loop_count+2, sizeof(short));
     return FALSE;
   if(dom_sealed)
     {
-      if(*adc_mean_kpascal <90 ||*adc_mean_kpascal >110)
+      if(*adc_mean_kpascal >60 || *adc_mean_kpascal <30)
 	return FALSE;
     }
   else if(!dom_sealed)
     {
-        if(*adc_mean_kpascal <30 ||*adc_mean_kpascal >60)
+        if(*adc_mean_kpascal >110 || *adc_mean_kpascal <90)
 	    return FALSE;
     }
 
