@@ -12,7 +12,7 @@
 #include "stf/stf.h"
 #include "stf/memtests.h"
 
-#include "stf-apps/memory.h"
+#include "stf-apps/memorySignatures.h"
 
 BOOLEAN memoryInit(STF_DESCRIPTOR *d) {
    return TRUE;

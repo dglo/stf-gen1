@@ -17,10 +17,7 @@ static STF_PARAM <xsl:copy-of select="$testName"/>_params[] = {
    { .name = "" }
 };
 
-extern BOOLEAN <xsl:copy-of select="$testName"/>Init(STF_DESCRIPTOR *);
-extern BOOLEAN <xsl:copy-of select="$testName"/>Entry(STF_DESCRIPTOR *,
-<xsl:apply-templates mode="Entry" select="inputParameter"/>
-<xsl:apply-templates mode="Entry" select="outputParameter"/>
+#include "stf-apps/<xsl:copy-of select="$testName"/>Signatures.h"
 
 static BOOLEAN <xsl:copy-of select="$testName"/>EntryLocal(STF_DESCRIPTOR *d) {
    return <xsl:copy-of select="$testName"/>Entry(d,
@@ -40,7 +37,6 @@ static STF_DESCRIPTOR <xsl:copy-of select="$testName"/>_descriptor = {
   .entryPt = <xsl:copy-of select="$testName"/>EntryLocal,
   .isInit = 0
 };
-
 <xsl:copy-of select="$nl"/>
   </xsl:template>
   <xsl:template match="stf:test/*/*" mode="PARAM">
