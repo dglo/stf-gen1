@@ -44,7 +44,7 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    int *sum_waveform = (int *) calloc(128, sizeof(int));
    int trigger_mask = (atwd_chip_a_or_b) ? 
       HAL_FPGA_TEST_TRIGGER_ATWD0 : HAL_FPGA_TEST_TRIGGER_ATWD1;
-   int spe_dac_nominal, fe_pulser_dac, pulser_or_not=1;
+   int spe_dac_nominal, fe_pulser_dac, use_pulser=1;
 
    /* pretest 1) all five atwd dac settings are programmed... */
    halWriteDAC(ch, atwd_sampling_speed_dac);
@@ -61,7 +61,7 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER, 0);
    
    /* pretest 4) turn on fe pulser */
-   if (scanSPE(atwd_pedestal_dac, triggerable_spe_dac, pulser_or_not)) {
+   if (scanSPE(atwd_pedestal_dac, triggerable_spe_dac, use_pulser)) {
       /* no triggerable value found... */
       hal_FPGA_TEST_disable_pulser();
       free(buffer);
@@ -142,16 +142,18 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    /* 8) reverse waveform */
    reverseATWDIntWaveform(atwd_waveform_pulser_spe);
 
-   /* 9) find max index */
+   /* 9) find max index for the REAL pulse, excluding 50~80 */
    {   int maxIdx = 0;
        unsigned maxValue = atwd_waveform_pulser_spe[maxIdx];
        int half_max, hmxIdx = 127, hmnIdx = 0;
        
        for (i=1; i<128; i++) {
-	  if (maxValue < atwd_waveform_pulser_spe[i]) {
+	 if (i>=80 || i<=50) {
+	   if (maxValue < atwd_waveform_pulser_spe[i]) {
 	     maxIdx = i;
 	     maxValue = atwd_waveform_pulser_spe[i];
 	  }
+	 }
        }
 
        /* 10) */
@@ -162,16 +164,20 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
 	  (*atwd_waveform_amplitude)/2 + *atwd_baseline_waveform;
 
        for (i=maxIdx; i<cnt; i++) {
-	  if (atwd_waveform_pulser_spe[i]<half_max) {
+	 if (i>=80 || i<=50) {
+	   if (atwd_waveform_pulser_spe[i]<half_max) {
 	     hmxIdx = i;
 	     break;
 	  }
+	 }
        }
        for (i=maxIdx; i>=0; i--) {
-	  if (atwd_waveform_pulser_spe[i]<half_max) {
+	 if (i>=80 || i<=50) {
+	   if (atwd_waveform_pulser_spe[i]<half_max) {
 	     hmnIdx = i;
 	     break;
 	  }
+	 }
        }
 
        /* 14 */
