@@ -153,10 +153,10 @@ int main(int argc, char *argv[]) {
       }
       fprintf(fptr, "  </tbody>\n</table>\n");
       fprintf(fptr, 
-	      "<button name=\"test\" value=\"%s\" type=\"submit\">"
-	      "Run Test"
+	      "<button name=\"test\" value=\"Run %s\" type=\"submit\">"
+	      "Run %s"
 	      "</button>\n",
-	      tn);
+	      tn, tn);
       fprintf(fptr, "</body>\n</html>\n");
       fclose(fptr);
       
