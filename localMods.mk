@@ -5,3 +5,5 @@ XML_HDRS := $(wildcard $(XML_HDRS_SEARCH))
 BUILT_HDRS := $(patsubst %.xml, $(BUILD_DIR)/%.$(C_INC_SUFFIX), $(XML_HDRS))
 
 INCS := $(INCS) $(BUILT_HDRS)
+
+vpath %.xml $(PUB_DIR_NAME)/$(PLATFORM) $(PUB_DIR_NAME) $(PVT_DIR_NAME)/$(PLATFORM) $(PVT_DIR_NAME)
