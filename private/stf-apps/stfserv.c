@@ -140,7 +140,7 @@ static void characterData(void *userData, const XML_Char *s, int len) {
 	    param->value.intValue = atoi(str);
 	 }
 	 else if (strcmp(param->type, ULONG_TYPE)==0) {
-	    param->value.longValue = strtol(str, 0, NULL);
+	    param->value.longValue = strtol(str, NULL, 0);
 	 }
 	 else if (strcmp(param->type, BOOLEAN_TYPE)==0) {
 	    param->value.boolValue = strcmp(str, BOOLEAN_TRUE)==0;
