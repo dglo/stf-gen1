@@ -67,9 +67,6 @@
   <outputParameter>
     <description>Average waveform FADC baseline values in ATWD counts units.</description>
     <name>fadc_fe_pulser_waveform</name>
-    <unsignedIntArray length="512"/>
+    <unsignedIntArray length="256"/>
   </outputParameter>
-
-
-
 </stf:test>

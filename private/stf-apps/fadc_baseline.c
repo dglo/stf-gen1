@@ -36,7 +36,7 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   unsigned lp1,lp2;
   int temp;
   float tmp_float;
-  short *waveform = (short *) calloc(256, sizeof(short));
+  short *waveform = (short *) calloc(512, sizeof(short));
   /*  unsigned waveform[256];
       unsigned histogram[1024];*/
 
@@ -66,12 +66,12 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   for(lp2=0;lp2<loop_count;lp2++)
     {
            hal_FPGA_TEST_trigger_forced(HAL_FPGA_TEST_TRIGGER_FADC);
-           time_out = hal_FPGA_TEST_readout(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,waveform,256,HAL_FPGA_TEST_TRIGGER_FADC);
+           time_out = hal_FPGA_TEST_readout(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,waveform,512,HAL_FPGA_TEST_TRIGGER_FADC);
   /*    2.Calculate the mean of all the 256 samples values (integers ok, range [0-1023]):
           this is the baseline for this waveform.*/
 	   sample_sum=0;
            sample_min = sample_max = waveform[0];
-	   for(lp1=1;lp1<256;lp1++)
+	   for(lp1=1;lp1<512;lp1++)
 	   {
 	     /*printf("%d",waveform[lp1]);*/
 	       sample_sum+= waveform[lp1];
@@ -81,13 +81,13 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
                fadc_baseline_histogram[ waveform[lp1]&0x3ff ] ++;
            } 
 	   /*printf("\n\r"); */
-	   baseline=sample_sum/256;
+	   baseline=sample_sum/512;
 	   sample_sqrs=0;
-           for(lp1=0;lp1<256;lp1++) 
+           for(lp1=0;lp1<512;lp1++) 
 	   {  
 	     sample_sqrs += (waveform[lp1]-baseline)*(waveform[lp1]-baseline);
 	   }
-	   baseline_rms+=sqrt(sample_sqrs/256);
+	   baseline_rms+=sqrt(sample_sqrs/512);
 
   /*    3.Keep a sum of all baselines, and a sum of the squares for RMS calculation.
           Also keep the minimum and maximum baselines.*/
