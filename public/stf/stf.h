@@ -41,7 +41,7 @@
 #define ULONG_TYPE "unsignedLong"
 #define BOOLEAN_TYPE "boolean"
 #define BOOLEAN_TRUE "true"
-#define BOOLEAN_FLASE "false"
+#define BOOLEAN_FALSE "false"
 #define UINT_ARRAY_TYPE "unsigned int array"
 #define ULONG_ARRAY_TYPE "unsigned long array"
 
