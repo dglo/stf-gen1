@@ -56,7 +56,7 @@ END {
 
    if (nready>0) {
       print "<p>";
-      print "<a href=\"http://deimos.lbl.gov/stf/run-tests.html\">";
+      print "<a href=\"http://deimos.lbl.gov/cgi-bin/stf/run-tests\">";
       print "Configure and Run Tests</a>";
    }
    else {

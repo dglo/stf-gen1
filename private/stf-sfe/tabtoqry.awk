@@ -14,7 +14,7 @@ BEGIN {
 }
 
 {
-   if ( $4 == "input" ) {
+   if ( $1 == test && $4 == "input" ) {
       printf("    <tr>");
       printf("<td>%s</td>", $2);
       printf("<td>%s</td>", $5);

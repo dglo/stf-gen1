@@ -9,6 +9,8 @@ PATH=/bin:/usr/bin/:/usr/lib/cgi-bin/stf:/usr/lib/cgi-bin/stf/xml/bin
 PATH=${PATH}:/usr/local/bin:/usr/local/j2sdk/bin
 export PATH
 
+awkpath=/usr/lib/cgi-bin/stf/xml/bin
+
 xmlpath=/var/www/stf/xml
 
 function qryCookie() {
@@ -55,6 +57,8 @@ function prtTime() {
     awk 'BEGIN { printf "%s", systime() }' 
 }
 
-
-
+#
+# set the mysql command...
+#
+mysqlcmd="mysql -h glacier.lbl.gov -pt35Tpas5 -u tester domprodtest -s -e"
 
