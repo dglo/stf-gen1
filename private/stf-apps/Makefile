@@ -40,7 +40,7 @@ clean:
 		run-tests.html gendir genqry stfDirectory.c
 
 TESTOBJS = memory.o StfEg.o
-STFOBJS = $(TESTOBJS) stfserv.o ../stf/stf.o stfDirectory.o
+STFOBJS = $(TESTOBJS) stfserv.o ../stf/stf.o stfDirectory.o memtests.o
 XMLFILES = memory.xml StfEg.xml
 
 stfserv.elf: $(STFOBJS) 
