@@ -93,14 +93,14 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
 			    channels[0], channels[1], channels[2], channels[3],
 			    cnt, NULL, 0, trigger_mask);
 
-      /* sum it and create histogram... */
-      for (j=0; j<cnt; j++) {
-	 sum+=buffer[j];
-	 atwd_baseline_histogram[ buffer[j]&0x3ff ] ++;
-      }
+      /* sum it ... */
+      for (j=0; j<cnt; j++) sum+=buffer[j];
 
-      /* record it... */
+      /* average and record it... */
       values[i] = sum/cnt;
+
+      /* histogram it... */
+      atwd_baseline_histogram[ values[i]&0x3ff ] ++;
 
       /* E. repeat...
        */
