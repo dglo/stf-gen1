@@ -37,14 +37,13 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
                     unsigned *atwd_waveform_pulser_spe) {
    const int ch = (atwd_chip_a_or_b) ? 0 : 4;
    int i;
-   DOM_HAL_FPGA_PULSER_RATES rate;
    const int cnt = 128;
    short *channels[4] = { NULL, NULL, NULL, NULL };
    short *buffer = (short *) calloc(128, sizeof(short));
    int *sum_waveform = (int *) calloc(128, sizeof(int));
    int trigger_mask = (atwd_chip_a_or_b) ? 
       HAL_FPGA_TEST_TRIGGER_ATWD0 : HAL_FPGA_TEST_TRIGGER_ATWD1;
-   int spe_dac_nominal, fe_pulser_dac, use_pulser=1;
+   int fe_pulser_dac, use_pulser=1;
 
    /* pretest 1) all five atwd dac settings are programmed... */
    halWriteDAC(ch, atwd_sampling_speed_dac);
@@ -98,7 +97,7 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    fe_pulser_dac = (int) (pulser_amplitude_uvolt * (25.0/5000.0));
    if (fe_pulser_dac>1023) fe_pulser_dac = 1023;
    halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER, fe_pulser_dac);
-   hal_FPGA_TEST_set_pulser_rate(rate);
+   hal_FPGA_TEST_set_pulser_rate(DOM_HAL_FPGA_PULSER_RATE_78k);
    hal_FPGA_TEST_enable_pulser();
 
    /* wait for dacs, et al... */

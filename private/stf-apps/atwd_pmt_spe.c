@@ -45,7 +45,7 @@ BOOLEAN atwd_pmt_speEntry(STF_DESCRIPTOR *d,
    int *sum_waveform = (int *) calloc(128, sizeof(int));
    int trigger_mask = (atwd_chip_a_or_b) ? 
       HAL_FPGA_TEST_TRIGGER_ATWD0 : HAL_FPGA_TEST_TRIGGER_ATWD1;
-   int spe_dac_nominal, pmt_dac, use_pulser=0;
+   int pmt_dac, use_pulser=0;
 
    /* pretest 1) all five atwd dac settings are programmed... */
    halWriteDAC(ch, atwd_sampling_speed_dac);
