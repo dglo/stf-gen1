@@ -60,7 +60,9 @@ function prtTime() {
 #
 # set the mysql command...
 #
-mysqlcmd="mysql -h glacier.lbl.gov -pt35Tpas5 -u tester domprodtest -s -e"
+mysqlargs="mysql -h glacier.lbl.gov -pt35Tpas5 -u tester domprodtest -s"
+mysqlcmd="${mysqlargs} -e"
+mysqlbatch="${mysqlargs} -B"
 
 #
 # java command
@@ -196,25 +198,63 @@ function getPick() {
 #
 function addResults() {
     local restt=${awkpath}/restotab.awk
-    local domid=`xmlv $1 | awk -f ${restt} | \
-	awk '{ print $2, $3; }' | egrep '^boardID' | awk '{print $2;}'`
+    
+    # tab the xml results...
+    xmlv $1 | awk -f ${restt} > /tmp/results-tab.$$
 
+    # get the test name...
+    local testname=`head -1 /tmp/results-tab.$$ | awk '{ print $1; }'`
+    local domid=`awk '$2 ~ /boardID/ { print $3; }' /tmp/results-tab.$$`
     local prodid=`${mysqlcmd} \
 	"select prod_id from Product \
 	 where prodtype_id=6 and lab_id=2 and hardware_serial='${domid}';"`
 
     # add hw id if necessary...
     if [[ ${#prodid} == 0 ]]; then
-	${javacmd} addhw ${domid}
+	local q="insert into Product (prod_id, prodtype_id, lab_id, \
+	  hardware_serial) \
+	  values(0, 6, 2, '${domid}'); select LAST_INSERT_ID();"
+	local prodid=`${mysqlcmd} "${q}"`
     fi
-	
-    # get results...
-    ${javacmd} \
-	addresults -resultid -technician arthur $1 | \
-	    egrep '^resultid	' | awk '{print $2;}'
+
+    # get testtypeid, testid...
+    local testid=`${mysqlcmd} \
+	"select t.stf_test_id from \
+	 STFTestType tt, STFTest t \
+         where tt.name='${testname}' and \
+	 t.stf_testtype_id=tt.stf_testtype_id and \
+	 t.version='1.0'"`
+
+    # get date
+    local dt=`date '+%Y-%m-%d %H:%M:%S'`
+    
+    # get passed
+    local passed=`awk '$2 ~ /passed/ { print ($3=="true") ? 1 : 0; }' \
+	/tmp/results-tab.$$`
+
+    # get runnable
+    local runnable=`awk '$2 ~ /testRunnable/ { print ($3=="true") ? 1 : 0; }' \
+	/tmp/results-tab.$$`
+
+    # get result id...
+    local q="insert into STFResult \
+		(stf_result_id, prod_id, tech_id, stf_test_id, date_tested, \
+		 passed, runnable) values(0, ${prodid}, 2, ${testid}, \
+		 '${dt}', ${passed}, ${runnable}); select LAST_INSERT_ID();"
+    local resid=`${mysqlcmd} "${q}"`
+
+    # insert resultxml...
+    echo "insert into STFResultXML (stf_result_id, text)" > /tmp/q.$$
+    echo "  values(${resid}, " >> /tmp/q.$$
+    sed "s/'/\\\'/g" $1 | sed "1s/^/'/1" >> /tmp/q.$$
+    echo "');" >> /tmp/q.$$
+    cat /tmp/q.$$ | tr '\n' ' ' | tr -d '\r' | ${mysqlbatch}
+    rm -f /tmp/q.$$
+    rm -f /tmp/results-tab.$$
+
+    # return result id...
+    echo ${resid}
 }
-
-
 
 
 

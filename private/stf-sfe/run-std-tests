@@ -155,12 +155,11 @@ for (( i=1; i<=${ndoms}; i++ )); do
     echo "</tr>"
 done
 
-echo "</tbody>";
-echo "</table>";
-echo "</body>";
-echo "</html>";
+echo "</tbody>"
+echo "</table>"
+echo "</body>"
+echo "</html>"
 
 rm -f /tmp/dhtab.$$
-
 
 
