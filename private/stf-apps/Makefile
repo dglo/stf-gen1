@@ -48,12 +48,12 @@ menu.elf: menu.o $(STFOBJS)
 	$(LD) --script=$(KERNELX) -o menu.elf \
 		$(KOBJS) menu.o $(STFOBJS) $(LIBHAL) $(SYSLIBS)
 
-$(STFSERVBIN): stfserv.o $(STFOBJS)
-	$(CC) -o $(STFSERVBIN) stfserv.o \
+stfserv.bin: stfserv.o $(STFOBJS) $(LIBHAL)
+	$(CC) -o stfserv.bin stfserv.o \
 		$(STFOBJS) $(LIBHAL) $(LIBEXPAT) $(SYSLIBS)
 
-$(MENUBIN): menu.o $(STFOBJS)
-	$(CC) -o $(MENUBIN) menu.o $(STFOBJS) $(LIBHAL) $(SYSLIBS)
+menu.bin: menu.o $(STFOBJS) $(LIBHAL)
+	$(CC) -o menu.bin menu.o $(STFOBJS) $(LIBHAL) $(SYSLIBS)
 
 $(STFSERVBINGZ): stfserv.bin
 	gzip -c stfserv.bin > $(STFSERVBINGZ)
@@ -64,9 +64,6 @@ $(MENUBINGZ): menu.bin
 gendir: gendir.c ../public/stf/stf.h
 	gcc -o gendir -I../public \
 		-I/usr/include/libxml2 gendir.c -Wall -g -lxml2
-
-#genqry: genqry.c
-#	gcc -o genqry -I/usr/include/libxml2 genqry.c -Wall -g -lxml2
 
 stfDirectory.c: $(XMLFILES) gendir
 	./gendir -skeleton $(XMLFILES)
