@@ -8,7 +8,7 @@ BEGIN {
 	   test);
    printf("<body>\n");
    printf("<h2>Configure and Run %s Test</h2>\n", test);
-   printf("<form action="  "\"http://deimos.lbl.gov/cgi-bin/stf/run-test\"" " method=\"get\">\n");
+   printf("<form action="  "\"/cgi-bin/stf/run-test\"" " method=\"get\">\n");
    printf("<table border=\"1\">\n  <tbody>\n");
    printf( "    " "<tr><th>Name</th>" "<th>Type</th>" "<th>Value</th>" "<th>Min</th>" "<th>Max</th>" "</tr>\n");
 }

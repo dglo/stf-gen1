@@ -80,22 +80,116 @@ function viewResults() {
 # the resultxml...
 #
     local qry=`printf \
-    "select distinct tt.name, p.name, rp.value, rp.value_index from \
-     STFTestType tt, STFTest t, STFResult r, STFParameter p, \
-     STFParameterType pt, STFResultParameter rp \
+    "select \
+       tt.name, p.name, rp.value, p.is_output, pt.name \
+     from \
+       STFResult as r \
+     left join STFResultParameter 
+ STFResultParameter as rp, STFTestType as tt, \
+     STFTest as t, STFParameter as p \
+     STFParameterType as pt,  \
    where \
-     r.stf_result_id=%s and \
-     rp.stf_result_id=%s and \
+     r.stf_result_id=268 and \
+     rp.stf_result_id=268 and \
      rp.stf_param_id=p.stf_param_id and \
      r.stf_test_id=t.stf_test_id and \
-     t.stf_testtype_id=tt.stf_testtype_id \
+     t.stf_testtype_id=tt.stf_testtype_id and \
+     rp.value_index=1 \
    order by \
      p.name;" ${fname} ${fname}`
 
-    local tabth=/usr/lib/cgi-bin/stf/xml/bin/tabtohtml.awk
-    local restt=/usr/lib/cgi-bin/stf/xml/bin/restotab.awk
+    local tabth=${awkpath}/tabtohtml.awk
+    local restt=${awkpath}/restotab.awk
     local qry=`printf \
 	"select text from STFResultXML where stf_result_id=%s" $1`
     ${mysqlcmd} "${qry}" | xmlv | awk -f ${restt} | \
 	awk -v xml=$1 -f ${tabth}
 }
+
+function getSession() {
+    echo $HTTP_COOKIE | qryCookie stfsession
+}
+
+function closeSession() {
+    local session=`getSession`
+    if [[ -d /tmp/stf/${session} ]]; then
+	rm -rf /tmp/stf/${session}
+    fi
+}
+
+function newSession() {
+    local session=`mk-name`
+
+    #
+    # are we initialized...
+    #
+    if [[ ! -d /tmp/stf ]]; then
+	mkdir /tmp/stf
+    fi
+
+    #
+    # clear old session
+    #
+    if [[ ! -d /tmp/stf/${session} ]]; then
+	rm -rf /tmp/stf/${session}
+    fi
+
+    #
+    # make the session directory
+    #
+    mkdir /tmp/stf/${session}
+
+    echo ${session}
+}
+
+#
+# print the currently selected dhtab info
+#
+function currentPick() {
+    local session=`echo $HTTP_COOKIE | qryCookie stfsession`
+    local pick=`getPick`
+
+    if [[ ${pick} == 0 ]]; then
+	head -1 ${xmlpath}/servers
+    else
+	sed -n `printf "%dp" ${pick}` /tmp/stf/${session}/dhtab
+    fi
+}
+
+#
+# print the currently selected server...
+#
+function currentServer() {
+    currentPick | awk '{print $1; }'
+}
+
+#
+# print the currently selected port...
+#
+function currentPort() {
+    currentPick | awk '{print $2; }'
+}
+
+#
+# select a server, given line number of dhtab file
+#
+function setPick() {
+    local session=`echo $HTTP_COOKIE | qryCookie stfsession`
+    echo $1 > /tmp/stf/${session}/pick
+}
+
+#
+# get the current pick or 0
+#
+function getPick() {
+    local session=`echo $HTTP_COOKIE | qryCookie stfsession`
+    local pick=`cat /tmp/stf/${session}/pick`
+    if [[ ${#pick} == 0 ]]; then
+	echo 0
+    else
+	echo ${pick}
+    fi
+}
+
+
+

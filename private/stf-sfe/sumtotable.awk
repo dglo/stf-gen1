@@ -10,7 +10,7 @@ BEGIN {
   print "    <tr>",
     "<th>" $1 "</th>",
     "<th>" $2 "</th>",
-    "<th><a href=\"http://deimos.lbl.gov/cgi-bin/stf/view-results?file=" $5 "\">" (($4 == "1" ) ? "OK" : "FAILED" ) "</a></th>",
+    "<th><a href=\"/cgi-bin/stf/view-results?file=" $5 "\">" (($4 == "1" ) ? "OK" : "FAILED" ) "</a></th>",
     "</tr>";
 }
 

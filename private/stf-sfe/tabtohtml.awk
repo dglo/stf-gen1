@@ -52,7 +52,7 @@ BEGIN {
     cmd | getline isArray;
     
     if (isArray == "unsignedIntArray") {
-       value = "<a href=\"http://deimos.lbl.gov/cgi-bin/stf/plot-array" \
+       value = "<a href=\"/cgi-bin/stf/plot-array" \
 	  "?file=" xml "&parameter=" $2 "\">plot</a>";
     }
     else {
