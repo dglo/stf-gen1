@@ -1,20 +1,20 @@
-/*
- *
- *
- * copywrite info
- *
+/* StfEg.c, skeleton file created by gendir
  */
-#include <stdio.h>
-
 #include "stf/stf.h"
+#include "stfDirectory.h"
 
 BOOLEAN StfEgInit(STF_DESCRIPTOR *d) {
-   printf("StfEgInit\r\n");
-   return TRUE;
+   return FALSE;
 }
 
-BOOLEAN StfEgEntry(STF_DESCRIPTOR *d) {
-   printf("StfEgEntry\r\n");
-   return TRUE;
+BOOLEAN StfEgEntry(STF_DESCRIPTOR *d,
+                    BOOLEAN Para1,
+                    const char * Para2,
+                    unsigned Para3,
+                    unsigned long Para4,
+                    BOOLEAN *Para5,
+                    char * *Para6,
+                    unsigned *Para7,
+                    unsigned long *Para8) {
+   return FALSE; 
 }
-
