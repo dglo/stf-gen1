@@ -52,7 +52,7 @@ CGIS = run-test view-results view-summary validate-param pick-server \
 CGIHELPERS = mk-name chkpt stftcp sumtotable.awk common.sh qrytoxml.awk \
 	restotab.awk tabtosum.awk tabtohtml.awk validate-qry.awk \
 	servertab.awk dhservertab.awk getarray.awk stfmode run-tests.awk \
-	tabtoqry.awk
+	tabtoqry.awk dbtestfixup.awk
 
 cgi: $(CGIS) $(CGIHELPERS)
 

@@ -79,7 +79,6 @@ fullrxml=${xmlpath}/${testname}/${fname}-results.xml
 #
 stfserver=`echo $HTTP_COOKIE | qryCookie stfserver`
 
-
 if [[ ${#stfserver} == 0 ]]; then
     stfserver=`head -1 ${xmlpath}/servers | awk '{print $1}'`
 fi
@@ -111,24 +110,13 @@ if [[ ! -e ${fullrxml} ]]; then
 fi
 
 #
-# 5) update summary file
+# 5) add test results to db...
 #
-restt=/usr/lib/cgi-bin/stf/xml/bin/restotab.awk
-tabts=/usr/lib/cgi-bin/stf/xml/bin/tabtosum.awk
-
-summary=`xmlv ${fullrxml} | awk -f ${restt} | awk -f ${tabts}`
-tm=`gawk 'BEGIN { printf "%s", systime() }'`
-echo ${tm} ${summary} ${fname} >> ${xmlpath}/summary
+${javacmd} addresults -technician arthur ${fullrxml} >& /dev/null
 
 #
 # 6) display results...
 #
+restt=/usr/lib/cgi-bin/stf/xml/bin/restotab.awk
 tabth=/usr/lib/cgi-bin/stf/xml/bin/tabtohtml.awk
 xmlv ${fullrxml} | awk -f ${restt} | awk -v xml=${fullrxml} -f ${tabth}
-
-
-
-
-
-
-

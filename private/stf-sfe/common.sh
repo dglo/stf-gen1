@@ -62,3 +62,9 @@ function prtTime() {
 #
 mysqlcmd="mysql -h glacier.lbl.gov -pt35Tpas5 -u tester domprodtest -s -e"
 
+#
+# java command
+#
+javacmd="java -classpath /usr/lib/cgi-bin/stf/xml/bin"
+
+

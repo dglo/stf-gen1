@@ -59,11 +59,6 @@ BEGIN {
        value = $3;
     }
 
-    #
-    # FIXME: check to see if this is an array and
-    # put link to plot here...
-    #
-    
     print "<tr>";
     print "<td>" $2 "</td><td>" type "</td><td>" value "</td>";
     print  "</tr>";
