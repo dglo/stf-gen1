@@ -181,14 +181,14 @@ char * getParamName(STF_PARAM *p)
 
 /*------------------------------------------------------------
  */
-char * getParamClass(STF_PARAM *p)
+const char * getParamClass(STF_PARAM *p)
 {
     return p->class;
 }
 
 /*------------------------------------------------------------
  */
-char * getParamType(STF_PARAM *p)
+const char * getParamType(STF_PARAM *p)
 {
     return p->type;
 }

@@ -161,10 +161,10 @@ STF_PARAM * getParamByName(STF_DESCRIPTOR *p, const char *name);
 char * getParamName(STF_PARAM *p);
 
 /** get param class */
-char * getParamClass(STF_PARAM *p);
+const char * getParamClass(STF_PARAM *p);
 
 /** get param type */
-char * getParamType(STF_PARAM *p);
+const char * getParamType(STF_PARAM *p);
 
 /** get param minimum value */
 char * getParamMinValue(STF_PARAM *p);
