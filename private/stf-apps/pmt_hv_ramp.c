@@ -19,6 +19,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "stf/stf.h"
 #include "hal/DOM_MB_hal.h"
@@ -75,7 +76,7 @@ BOOLEAN pmt_hv_rampEntry(STF_DESCRIPTOR *desc,
     #endif
 
     /* Read the HV base ID */
-    strcpy(*hv_id, halHVSerial());
+    *hv_id = halHVSerial();
     #ifdef VERBOSE
     printf("DEBUG: HV ID is %s\r\n", *hv_id);
     #endif
