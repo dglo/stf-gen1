@@ -8,7 +8,7 @@
     <unsignedInt default="10" maxValue="1000" minValue="1"/>
   </inputParameter>
   <inputParameter>
-    <name>fluffy</name>
-    <unsignedInt default="10" maxValue="1000" minValue="1"/>
+    <name>bufferSize</name>
+    <unsignedInt default="4" maxValue="4096" minValue="1"/>
   </inputParameter>
 </stf:test>

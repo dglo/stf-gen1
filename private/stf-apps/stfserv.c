@@ -30,6 +30,7 @@
  *
  *
  * FIXME: loop count input and output!!!!
+ *   factor out 
  */
 #include <stdio.h>
 #include <stdlib.h>
