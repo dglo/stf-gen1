@@ -72,4 +72,3 @@ echo `show-time` `Xalan ${fullrxml} ${fullsxsl}` ${fname} \
 # 6) display results...
 #
 Xalan ${fullrxml} ${xmlpath}\\restohtml.xsl
-
