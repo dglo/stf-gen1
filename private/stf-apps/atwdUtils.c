@@ -113,6 +113,27 @@ void getSummedWaveform(int loop_count, unsigned trigger_mask, int channel,
 }
 
 int speUVoltToDAC(float uv, int pedestal_dac) {
+#if 0
+#error "in atwd_baseline.c"
+(unsigned) 
+	 ((spe_discriminator_uvolt * 9.6 * (2200+1000)/1000 + 
+	   atwd_pedestal_dac * 5000000 / 4096)*1024/5000000);
+
+#error "in atwd_pedestal.c"
+      (unsigned) 
+	 ((spe_descriminator_uvolt * 9.6 * (2200+1000)/1000 + 
+	   atwd_pedestal_dac * 5000000 / 4096)*1024/5000000);
+
+#error "in pulser_spe_mpe.c"
+      (int)( (discriminator_level*9.6*((2200+1000.0)/1000.0) +
+              (pedestal_dac*5000000.0/4096.0))*
+             1024/5000000.0));
+#endif
+
    return (int) 
       ( ( uv*9.6*(2200+249)/249.0 + pedestal_dac*5e6/4096) * 1024/5e6);
+}
+
+float speDACToUVolt(int dac) {
+   return (float) 1.0/9.6 * (1000/(2200+1000)) * dac * 5e6 / 1024;
 }
