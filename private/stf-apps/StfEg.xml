@@ -45,4 +45,11 @@
         <name>Para8</name>
         <unsignedLong/>
     </outputParameter>
+
+    <outputParameter>
+        <description>An unsigned int array output parameter.</description>
+	<name>Para9</name>
+	<unsignedIntArray length="10" />
+    </outputParameter>
 </stf:test>
+

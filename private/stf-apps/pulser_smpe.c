@@ -53,4 +53,3 @@ BOOLEAN pulser_spe_mpeEntry(STF_DESCRIPTOR *d,
 
    return TRUE;
 }
-

@@ -204,13 +204,13 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
       else if (strcmp(stf->params[i].type, UINT_ARRAY_TYPE)==0) {
 	 for (j=0; j<stf->params[i].arrayLength; j++) {
 	    idx += sprintf(buf+idx, "%u", 
-			   stf->params[i].value.intArrayPtr[j]);
+			   stf->params[i].value.intArrayValue[j]);
 	 }
       }
       else if (strcmp(stf->params[i].type, ULONG_ARRAY_TYPE)==0) {
 	 for (j=0; j<stf->params[i].arrayLength; j++) {
 	    idx += sprintf(buf+idx, "%lu", 
-			   stf->params[i].value.longArrayPtr[j]);
+			   stf->params[i].value.longArrayValue[j]);
 	 }
       }
       else {
@@ -405,10 +405,7 @@ int main() {
 	    state = 6;
 	 }
 	 else {
-	    if (!sd->isInit) {
-	       sd->testRunnable = sd->initPt(sd);
-	       sd->isInit = 1;
-	    }
+	    stfInitTest(sd);
 	    
 	    if (sd->testRunnable==0) {
 	       sprintf(msg, "test '%s' is not runnable", name);

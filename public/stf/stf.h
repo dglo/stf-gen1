@@ -47,8 +47,8 @@
 #define BOOLEAN_TYPE "boolean"
 #define BOOLEAN_TRUE "true"
 #define BOOLEAN_FALSE "false"
-#define UINT_ARRAY_TYPE "unsigned int array"
-#define ULONG_ARRAY_TYPE "unsigned long array"
+#define UINT_ARRAY_TYPE "unsignedIntArray"
+#define ULONG_ARRAY_TYPE "unsignedLongArray"
 
 #ifndef NULL
 /** define NULL, if not already available */
@@ -93,8 +93,8 @@ typedef struct {
 	    unsigned int intValue;
 	    unsigned long longValue;
 	    BOOLEAN boolValue;
-	    unsigned int *intArrayPtr;
-	    unsigned long *longArrayPtr;
+	    unsigned int *intArrayValue;
+	    unsigned long *longArrayValue;
 	} value;
 	/** number of elements in the array...unused for non array params */
 	unsigned int arrayLength;
@@ -144,6 +144,9 @@ struct STF_DESCRIPTOR_STRUCT {
 
 /* Prototypes
  */
+
+/** initialize a test */
+void stfInitTest(STF_DESCRIPTOR *d);
 
 /** initialize all tests */
 void stfInitAllTests(void);

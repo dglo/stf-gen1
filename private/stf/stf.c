@@ -5,6 +5,7 @@
  *
  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "stf/stf.h"
@@ -14,51 +15,39 @@
 
 /* Module level variables
  */
+void stfInitTest(STF_DESCRIPTOR *sd) {
+   if (!sd->isInit) {
+      int i;
+      
+      sd->testRunnable = sd->initPt(sd);
+      sd->isInit = 1;
+      
+      for (i=0; i<sd->nParams; i++) {
+	 if (strcmp(sd->params[i].type, UINT_ARRAY_TYPE)==0) {
+	    sd->params[i].value.intArrayValue = 
+	       (unsigned *) calloc(sd->params[i].arrayLength,
+				   sizeof(unsigned));
+	 }
+	 if (strcmp(sd->params[i].type, ULONG_ARRAY_TYPE)==0) {
+	    sd->params[i].value.longArrayValue = 
+	       (unsigned long *) calloc(sd->params[i].arrayLength,
+				   sizeof(unsigned long));
+	 }
+      }
+      
+   }
+}
 
 /*------------------------------------------------------------
  */
 void stfInitAllTests()
 {
     STF_DESCRIPTOR *d=NULL;
-    STF_PARAM *newParam;
-    unsigned int i;
-    unsigned long l;
 
     d=findNextTest(d);
     while(d!=NULL) {
-	d->testRunnable = (d->initPt)(d);
-	
-        // init all params for this test to their default values
-        newParam=d->params;
-        while(strcmp(newParam->name,"")) {
-	    if(!strcmp(newParam->type,CHAR_TYPE)) {
-	        strcpy(newParam->value.charValue,newParam->defValue);
-	    }
-	    if(!strcmp(newParam->type,UINT_TYPE)) {
-	        sscanf(newParam->defValue,"%u",&i);
-	        newParam->value.intValue=i;
-	    }
-	    if(!strcmp(newParam->type,ULONG_TYPE)) {
-	        sscanf(newParam->defValue,"%lu",&l);
-	        newParam->value.intValue=l;
-	    }
-	    if(!strcmp(newParam->type,BOOLEAN_TYPE)) {
-	        if(!strcmp(newParam->defValue,BOOLEAN_TRUE)) {
-		    newParam->value.boolValue=TRUE;
-	        }
-	        else {
-		    newParam->value.boolValue=FALSE;
-	        }
-	    }
-
-	    // add code to init arrayLength field from arraySize
-	    // if any inconsistencies, tag test as unrunnable and don't
-	    // bother calling test's init fcn.
-
-	    newParam++;
-        }
-        // go to next test
-        d=findNextTest(d);
+       stfInitTest(d);
+       d=findNextTest(d);
     }
 }
 

@@ -65,6 +65,13 @@ static void fillParam(STF_PARAM *param, xmlDocPtr doc,
 	    param->defValue = 
 	       xmlNodeListGetString(doc, ap->xmlChildrenNode, 1);
 
+	 ap = xmlHasProp(pxn, "length");
+	 if (ap!=NULL) {
+	    param->arraySize = xmlNodeListGetString(doc, ap->xmlChildrenNode, 
+						    1);
+	    param->arrayLength = atoi(param->arraySize);
+	 }
+
 	 if (strcmp(param->type, CHAR_TYPE)==0) {
 	    param->value.charValue = 
 	       (param->defValue==NULL) ? "" : param->defValue;
@@ -243,6 +250,11 @@ static const char *getUnionField(STF_PARAM *p) {
    }
 }
 
+static int isArrayType(const char *type) {
+   return 
+      strcmp(type, UINT_ARRAY_TYPE)==0 ||
+      strcmp(type, ULONG_ARRAY_TYPE)==0;
+}
 
 int main(int argc, char *argv[]) {
    int ai, i;
@@ -382,12 +394,14 @@ int main(int argc, char *argv[]) {
 		       tp->parm.value.boolValue);
 	    }
 	    else if (strcmp(tp->parm.type, UINT_ARRAY_TYPE)==0) {
-	       fprintf(fptr, "     .intArrayValue = &%s_%s_array\n",
-		       tdn->desc.name, tp->parm.name);
+	       fprintf(fptr, 
+		       "       .intArrayValue = NULL "
+		       "/* initialized at run time */\n");
 	    }
 	    else if (strcmp(tp->parm.type, ULONG_ARRAY_TYPE)==0) {
-	       fprintf(fptr, "     .longArrayValue = &%s_%s_array\n",
-		       tdn->desc.name, tp->parm.name);
+	       fprintf(fptr, 
+		       "       .longArrayValue = NULL "
+		       "/* initialized at run time */\n");
 	    }
 	    else {
 	       fprintf(stderr, "invalid type '%s'\n", tp->parm.type);
@@ -450,14 +464,18 @@ int main(int argc, char *argv[]) {
 	       if (strcmp(tp->parm.class, "output")==0) {
 		  fprintf(hptr,
 			  ",\n"
-			  "                    %s *%s", 
-			  getOutputType(&tp->parm), tp->parm.name);
+			  "                    %s %s%s", 
+			  getOutputType(&tp->parm),
+			  isArrayType(tp->parm.type) ? "" : "*",
+			  tp->parm.name);
 		  
 		  if (cptr!=NULL) {
 		     fprintf(cptr,
 			     ",\n"
-			     "                    %s *%s", 
-			     getOutputType(&tp->parm), tp->parm.name);
+			     "                    %s %s%s", 
+			     getOutputType(&tp->parm), 
+			     isArrayType(tp->parm.type) ? "" : "*",
+			     tp->parm.name);
 		  }
 	       }
 	    }
@@ -495,7 +513,8 @@ int main(int argc, char *argv[]) {
 		  fprintf(fptr,
 			  ",\n"
 			  "                     "
-			  "&getParamByName(d,  \"%s\")->value.%s",
+			  "%sgetParamByName(d,  \"%s\")->value.%s",
+			  isArrayType(tp->parm.type) ? "" : "&",
 			  tp->parm.name, getUnionField(&tp->parm));
 	       }
 	    }
