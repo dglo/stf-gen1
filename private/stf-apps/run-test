@@ -1,0 +1,75 @@
+#!d:\apps\msys-1.0\bin\sh.exe
+
+#
+# set proper path...
+#
+xpath=/e/apps/xerces-c2_1_0-win32/bin
+xpath=${xpath}:/e/apps/xml-xalan/c/Build/Win32/VC6/Release
+PATH=/d/apps/msys-1.0/bin:/d/apps/mingw/bin:/e/arthur/xml/bin:${xpath}
+
+xmlpath=e:\\arthur\\xml
+
+#
+# run-test [IN query string (QUERY_STRING)]
+#
+# 1) fname     <- get file name (mk-name)
+# 2) testname  <- get test name from query string (get-test-name)
+# 3) fname.xml <- create xml file from query string (mk-test-xml)
+# 4) run test [ stf -send fname -go testname -rcv testname fname-results]
+# 5) update summary file (database) [use:
+#     `show-time` `-Xalan fname-results restosum.xsl` fname >> summary-file]
+# 6) format results as html [Xalan fname-results.xml restohtml.html]
+#
+echo "Content-type: text/html"
+echo
+
+#
+# 1) set fname
+#
+fname=`mk-name`
+
+#
+# 2) get test name from query string
+#
+testname=`get-test-name ${QUERY_STRING}`
+
+if [ ${#testname} == 0 ]; then
+  echo "<h2>Error! no test specified</h2>"
+  exit 0
+fi
+
+#
+# make sure testname exists!
+#
+if [ ! -d ${xmlpath}/${testname} ]; then 
+    echo "<h2>Error\!  Test ${testname} not found</h2>"
+    exit 0
+fi
+
+#
+# 3) create xml file from query string...
+#
+qxml=${fname}-qry.xml
+mk-test-xml "${QUERY_STRING}" > ${xmlpath}\\${testname}\\${qxml}
+
+fullqxml=${xmlpath}\\${testname}\\${qxml}
+fullrxml=${xmlpath}\\${testname}\\${fname}-results.xml
+
+#
+# 4) run the test
+#
+stf -send ${fullqxml} -go ${testname} -rcv ${testname} ${fullrxml}
+
+#
+# 5) update summary file
+#
+fullsxsl=${xmlpath}\\restosum.xsl
+
+echo `show-time` `Xalan ${fullrxml} ${fullsxsl}` ${fname} \
+    >> ${xmlpath}\\summary
+
+#
+# 6) display results...
+#
+Xalan ${fullrxml} ${xmlpath}\\restohtml.xsl
+
