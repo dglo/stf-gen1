@@ -56,6 +56,12 @@
     <unsignedInt default="0" maxValue="2" minValue="0"/>
   </inputParameter>
 
+  <inputParameter>
+    <description>The full range in mV</description>
+    <name>full_range_mv</name>
+    <unsignedInt default="1500" maxValue="4095" minValue="0"/>
+  </inputParameter>
+
   <outputParameter>
     <description>Number of ATWD counts per volt</description>
     <name>half_range_counts_per_volt</name>

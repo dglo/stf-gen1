@@ -28,6 +28,9 @@ void reverseATWDIntWaveform(unsigned *p) {
 
 void prescanATWD(unsigned trigger_mask) {
    int i;
+
+   /* make sure atwd mux is on led */
+   halSelectAnalogMuxInput(DOM_HAL_MUX_PMT_LED_CURRENT);
    
    /* Thorsten recommends we wait a bit...
     */

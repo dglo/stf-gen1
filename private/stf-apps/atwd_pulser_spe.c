@@ -32,6 +32,7 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
                     unsigned *atwd_baseline_waveform,
                     unsigned *atwd_waveform_width,
                     unsigned *atwd_waveform_amplitude,
+                    unsigned *atwd_waveform_position,
                     unsigned *atwd_expected_amplitude,
                     unsigned *atwd_waveform_pulser_spe) {
    const int ch = (atwd_chip_a_or_b) ? 0 : 4;
@@ -40,10 +41,10 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    const int cnt = 128;
    short *channels[4] = { NULL, NULL, NULL, NULL };
    short *buffer = (short *) calloc(128, sizeof(short));
+   int *sum_waveform = (int *) calloc(128, sizeof(int));
    int trigger_mask = (atwd_chip_a_or_b) ? 
       HAL_FPGA_TEST_TRIGGER_ATWD0 : HAL_FPGA_TEST_TRIGGER_ATWD1;
    int spe_dac_nominal, fe_pulser_dac;
-   int atwd_waveform_position;
 
    /* pretest 1) all five atwd dac settings are programmed... */
    halWriteDAC(ch, atwd_sampling_speed_dac);
@@ -101,7 +102,7 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    prescanATWD(trigger_mask);
 
    /* acquire pedestal baseline */
-   for (i=0; i<cnt; i++) atwd_baseline_waveform[i] = 0;
+   for (i=0; i<cnt; i++) sum_waveform[i] = 0;
    for (i=0; i<n_pedestal_waveforms; i++) {
       int j;
       
@@ -112,9 +113,9 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
 			    channels[0], channels[1], channels[2], 
 			    channels[3],
 			    cnt, NULL, 0, trigger_mask);
-      for (j=0; j<cnt; j++) atwd_baseline_waveform[j] += buffer[j];
+      for (j=0; j<cnt; j++) sum_waveform[j] += buffer[j];
    }
-   for (i=0; i<cnt; i++) atwd_baseline_waveform[i] /= n_pedestal_waveforms;
+   for (i=0; i<cnt; i++) sum_waveform[i] /= n_pedestal_waveforms;
 
    /* 2) set fe pulser dac... */
    fe_pulser_dac = (int) (pulser_amplitude_uvolt * (25.0/5000.0));
@@ -145,18 +146,23 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
 
    /* 6), 7) */
    if (pedestal_subtraction) {
+      *atwd_baseline_waveform = 100;
+      
       for (i=0; i<cnt; i++) {
 	 const int v1 = (int) atwd_waveform_pulser_spe[i];
-	 const int v2 = (int) atwd_baseline_waveform[i];
+	 const int v2 = (int) sum_waveform[i];
 	 const int v = v1 - v2 + 100;
 	 atwd_waveform_pulser_spe[i] = (v<0) ? 0 : v;
       }
-      for (i=0; i<cnt; i++) atwd_baseline_waveform[i] = 100;
    }
    else {
-      reverseATWDIntWaveform(atwd_baseline_waveform);
+      *atwd_baseline_waveform = 0;
+      for (i=0; i<cnt; i++) *atwd_baseline_waveform += sum_waveform[i];
+      *atwd_baseline_waveform /= cnt;
    }
    
+   free(sum_waveform);
+
    /* 8) reverse waveform */
    reverseATWDIntWaveform(atwd_waveform_pulser_spe);
 
@@ -173,11 +179,11 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
        }
 
        /* 10) */
-       *atwd_waveform_amplitude = maxValue - atwd_baseline_waveform[maxIdx];
+       *atwd_waveform_amplitude = maxValue - *atwd_baseline_waveform;
 
        /* 11) */
        half_max = 
-	  (*atwd_waveform_amplitude)/2 + atwd_baseline_waveform[maxIdx];
+	  (*atwd_waveform_amplitude)/2 + *atwd_baseline_waveform;
 
        for (i=maxIdx; i<cnt; i++) {
 	  if (atwd_waveform_pulser_spe[i]<half_max) {
@@ -195,7 +201,7 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
        /* 14 */
        *atwd_waveform_width = hmxIdx - hmnIdx;
 
-       atwd_waveform_position = maxIdx + 1;
+       *atwd_waveform_position = maxIdx + 1;
    }
    
    *atwd_expected_amplitude = (int)
@@ -204,8 +210,8 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    free(buffer);
 
    return 
-      atwd_waveform_position > 2 &&
-      atwd_waveform_position < 9 &&
+      *atwd_waveform_position > 2 &&
+      *atwd_waveform_position < 9 &&
       *atwd_waveform_width > 2 &&
       *atwd_waveform_width < 6;
 }
