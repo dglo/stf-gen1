@@ -9,19 +9,15 @@ source /usr/lib/cgi-bin/stf/xml/bin/common.sh
 # get xml filename...
 #
 fname=`echo $QUERY_STRING | qryParam file`
-xmlfname=/tmp/${fname}-results.xml
 qry=`printf "select text from STFResultXML where stf_result_id=%s" ${fname}`
-${mysqlcmd} "${qry}" > ${xmlfname}
 
 #
 # get parameter name...
 #
 param=`echo $QUERY_STRING | qryParam parameter`
 
-if xmlv $xmlfname | \
-    awk -v param=${param} \
-	-f /usr/lib/cgi-bin/stf/xml/bin/getarray.awk >& \
-    /tmp/data.$$; then
+if ${mysqlcmd} "${qry}" | xmln | awk -f ${awkpath}/restotab.awk | \
+    awk "\$2 ~ /${param}/ { print \$3; }" >& /tmp/data.$$; then
     #
     # create an R script...
     #
@@ -52,7 +48,6 @@ else
 fi
 
 rm -f /tmp/data.$$
-rm -f ${xmlfname}
 
 
 
