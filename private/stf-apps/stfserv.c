@@ -37,13 +37,13 @@
 #include <string.h>
 #include <ctype.h>
 
+#include <unistd.h>
+
 #include "xmlparse/xmlparse.h"
 
 #include "stf/stf.h"
 #include "hal/DOM_MB_hal.h"
 
-extern ssize_t read(int , void *, size_t);
-extern ssize_t write(int , const void *, size_t);
 
 #define talloc(a) ((a) *) malloc(sizeof(a))
 
