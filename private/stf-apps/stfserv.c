@@ -59,34 +59,41 @@ static void startElement(void *userData, const char *name, const char **atts) {
 
   xmlTag = name;
 
-  /* FIXME: put these at the proper depth...
-   */
-  if (strcmp(xmlTag, "version")==0) {
-     const int major = atoi(atts[0]);
-     const int minor = atoi(atts[1]);
-     const int err = 
-	major!=desc->majorVersion || minor!=desc->minorVersion;
-     
-     /* FIXME: what do we do now?!?!
-      */
-  }
-  else if (strcmp(xmlTag, "inputParameter")==0) {
-     parmType = INPUT_PARAM;
-     param = NULL;
-  }
-  else if (strcmp(xmlTag, "outputParameter")==0) {
-     parmType = OUTPUT_PARAM;
-     param = NULL;
-  }
-
-  if (*depth == 0) {
-     if (strcmp(xmlTag, "test")) {
-	fprintf(stdout, "invalid top level object '%s', expecting 'test'\r\n",
-	       xmlTag);
+  switch (*depth) {
+  case 0:
+     if (strcmp(xmlTag, "stf:setup")) {
+	fprintf(stdout, "invalid top level object '%s', expecting 'stf:setup'\r\n",
+		xmlTag);
      }
+     break;
+  case 1:
+     if ((desc = findTestByName(xmlTag))==NULL) {
+	fprintf(stderr, "can't get descriptor name '%s'\r\n", xmlTag);
+     }
+     break;
+  case 2:
+     if (strcmp(xmlTag, "version")==0) {
+	const int major = atoi(atts[0]);
+	const int minor = atoi(atts[1]);
+	const int err = 
+	   major!=desc->majorVersion || minor!=desc->minorVersion;
+	
+	/* FIXME: what do we do now?!?!
+	 */
+     } else if (strcmp(xmlTag, "parameters")==0) {
+     }
+     break;
+  case 3:
+     if ((param = getParamByName(desc, xmlTag))==NULL) {
+	fprintf(stderr, "can't get param name '%s'\r\n", xmlTag);
+     }
+     break;
+  default:
+     fprintf(stderr, "element nesting too deep.\r\n");
+     break;
   }
-
   *depth = *depth + 1;
+  return;
 }
 
 /* when an element is done...
@@ -94,6 +101,7 @@ static void startElement(void *userData, const char *name, const char **atts) {
 static void endElement(void *userData, const char *name) {
   int *depthPtr = userData;
   *depthPtr = *depthPtr - 1;
+  param = NULL;
 }
 
 /* s is not 0 terminated. */
@@ -119,39 +127,21 @@ static void characterData(void *userData, const XML_Char *s, int len) {
 	  (xmlTag==NULL) ? "NULL" : xmlTag, desc, param, *depth, str);
 #endif
 
-   if (*depth==2) {
-      if (strcmp(xmlTag, "name")==0) {
-	 if ((desc = findTestByName(str))==NULL) {
-	    fprintf(stderr, "can't get descriptor name '%s'\r\n", str);
-	 }
+   if (NULL != param) {
+      if (strcmp(param->type, CHAR_TYPE)==0) {
+	 param->value.charValue = strdup(str);
+      }
+      else if (strcmp(param->type, UINT_TYPE)==0) {
+	 param->value.intValue = atoi(str);
+      }
+      else if (strcmp(param->type, ULONG_TYPE)==0) {
+	 param->value.longValue = strtol(str, NULL, 0);
+      }
+      else if (strcmp(param->type, BOOLEAN_TYPE)==0) {
+	 param->value.boolValue = strcmp(str, BOOLEAN_TRUE)==0;
       }
    }
-   else if (*depth == 3) {
-      if (strcmp(xmlTag, "name")==0) {
-	 if ((param = getParamByName(desc, str))==NULL) {
-	    fprintf(stderr, "can't get param name '%s'\r\n", s);
-	 }
-	 param->class = parmType;
-      }
-      if (strcmp(xmlTag, "value")==0) {
-	 if (strcmp(param->type, CHAR_TYPE)==0) {
-	    param->value.charValue = strdup(str);
-	 }
-	 else if (strcmp(param->type, UINT_TYPE)==0) {
-	    param->value.intValue = atoi(str);
-	 }
-	 else if (strcmp(param->type, ULONG_TYPE)==0) {
-	    param->value.longValue = strtol(str, NULL, 0);
-	 }
-	 else if (strcmp(param->type, BOOLEAN_TYPE)==0) {
-	    param->value.boolValue = strcmp(str, BOOLEAN_TRUE)==0;
-	 }
-      }
-      else if (strcmp(xmlTag, "arraySize")==0) {
-	 param->arraySize = strdup(str);
-	 param->arrayLength = atoi(param->arraySize);
-      }
-   }
+   return;
 }
 
 /* turn a directory entry into a xml file...
@@ -167,19 +157,18 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
    int i;
 
    idx += sprintf(buf+idx, "<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\r\n");
-   idx += sprintf(buf+idx, "<test-results>\r\n");
-   idx += sprintf(buf+idx, " <name>%s</name>\r\n", stf->name);
-   idx += sprintf(buf+idx, " <description>%s</description>\r\n", stf->desc);
-   idx += sprintf(buf+idx, " <version major=\"%d\" minor=\"%d\"/>\r\n", 
+   idx += sprintf(buf+idx, "<stf:result xmlns:stf=\"http://glacier.lbl.gov/icecube/daq/stf\"\r\n");
+   idx += sprintf(buf+idx, "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n");
+   idx += sprintf(buf+idx, "  xsi:schemaLocation=\"http://glacier.lbl.gov/icecube/daq/stf stf.xsd\">\r\n");
+   idx += sprintf(buf+idx, " <%s>\r\n", stf->name);
+   idx += sprintf(buf+idx, "  <description>\r\n%s\r\n  </description>\r\n", stf->desc);
+   idx += sprintf(buf+idx, "  <version major=\"%d\" minor=\"%d\"/>\r\n", 
 		  stf->majorVersion, stf->minorVersion);
-
+   idx += sprintf(buf+idx, "  <parameters>\r\n");
    for (i=0; i<stf->nParams; i++) {
       int j;
       
-      idx += sprintf(buf+idx, "  <%sParameter>\r\n", stf->params[i].class);
-      idx += sprintf(buf+idx, "   <name>%s</name>\r\n", stf->params[i].name);
-
-      idx += sprintf(buf+idx, "   <value>");
+      idx += sprintf(buf+idx, "   <%s>", stf->params[i].name);
       if (strcmp(stf->params[i].type, CHAR_TYPE)==0) {
 	 idx += sprintf(buf+idx, "%s", stf->params[i].value.charValue);
       }
@@ -196,43 +185,31 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
       }
       else if (strcmp(stf->params[i].type, UINT_ARRAY_TYPE)==0) {
 	 for (j=0; j<stf->params[i].arrayLength; j++) {
-	    idx += sprintf(buf+idx, "%u ", 
+	    idx += sprintf(buf+idx, "%u", 
 			   stf->params[i].value.intArrayPtr[j]);
 	 }
       }
       else if (strcmp(stf->params[i].type, ULONG_ARRAY_TYPE)==0) {
 	 for (j=0; j<stf->params[i].arrayLength; j++) {
-	    idx += sprintf(buf+idx, "%lu ", 
+	    idx += sprintf(buf+idx, "%lu", 
 			   stf->params[i].value.longArrayPtr[j]);
 	 }
       }
       else {
 	 idx += sprintf(buf+idx, "?");
       }
-      idx += sprintf(buf+idx, "</value>\r\n");
-      idx += sprintf(buf+idx, "   <arraySize>%s</arraySize>\r\n",
-		     stf->params[i].arraySize);
-      idx += sprintf(buf+idx, "  </%sParameter>\r\n", stf->params[i].class);
+      idx += sprintf(buf+idx, "</%s>\r\n", stf->params[i].name);
    }
 
-   idx += sprintf(buf+idx, "  <outputParameter>\r\n");
-   idx += sprintf(buf+idx, "    <name>passed</name>\r\n");
-   idx += sprintf(buf+idx, "    <value>%s</value>\r\n", 
+   idx += sprintf(buf+idx, "   <passed>%s</passed>\r\n", 
 	   stf->passed ? BOOLEAN_TRUE : BOOLEAN_FALSE);
-   idx += sprintf(buf+idx, "  </outputParameter>\r\n");
+   idx += sprintf(buf+idx, "   <testRunnable>%s</testRunnable>\r\n", 
+		  stf->testRunnable ? BOOLEAN_TRUE : BOOLEAN_FALSE);   
+   idx += sprintf(buf+idx, "   <boardID>%s</broadID>\r\n", getBoardID());
    
-   idx += sprintf(buf+idx, "  <outputParameter>\r\n");
-   idx += sprintf(buf+idx, "    <name>testRunnable</name>\r\n");
-   idx += sprintf(buf+idx, "    <value>%s</value>\r\n", 
-		  stf->testRunnable ? BOOLEAN_TRUE : BOOLEAN_FALSE);
-   idx += sprintf(buf+idx, "  </outputParameter>\r\n");
-   
-   idx += sprintf(buf+idx, "  <outputParameter>\r\n");
-   idx += sprintf(buf+idx, "    <name>boardID</name>\r\n");
-   idx += sprintf(buf+idx, "    <value>%s</value>\r\n", getBoardID());
-   idx += sprintf(buf+idx, "  </outputParameter>\r\n");
-   
-   idx += sprintf(buf+idx, "</test-results>\r\n");
+   idx += sprintf(buf+idx, "  <parameters>\r\n");
+   idx += sprintf(buf+idx, " <%s>\r\n", stf->name);
+   idx += sprintf(buf+idx, "<stf:result>\r\n");
    return idx;
 }
 
@@ -251,8 +228,8 @@ static int getLine(char *line, int max) {
       }
 
 #if 0
-      for (i=0; i<idx; i++) fprintf(stdout, "%02x ", line[i]);
-      fprintf(stdout, "\r\n");
+      for (i=0; i<idx; i++) fprintf(stderr, "%02x ", line[i]);
+      fprintf(stderr, "\r\n");
 #endif
 
       /* look for '\r'...
