@@ -79,7 +79,7 @@ atwd_baseline.c: stfDirectory.h atwd_baseline.h
 pmt_hv_ramp.c: stfDirectory.h pmt_hv_ramp.h
 pmt_hv_stability.c: stfDirectory.h pmt_hv_stability.h
 pressure.c: stfDirectory.h pressure.h
-fadc_fe_pulser.c: stfDirectory.h
+fadc_fe_pulser.c: stfDirectory.h fadc_fe_pulser.h
 
 memory.h:
 	ln -s stfDirectory.h memory.h
@@ -104,3 +104,4 @@ pmt_hv_stability.h:
 
 fadc_fe_pulser.h:
 	ln -s stfDirectory.h fadc_fe_pulser.h
+
