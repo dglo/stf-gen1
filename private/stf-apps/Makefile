@@ -37,7 +37,7 @@ all: stfserv.elf
 
 clean:
 	rm -f *.o *.i *.bin *.elf *.srec \
-		run-tests.html gendir genqry stfDirectory.c
+		run-tests.html gendir genqry stfDirectory.[ch]
 
 TESTOBJS = memory.o StfEg.o
 STFOBJS = $(TESTOBJS) stfserv.o ../stf/stf.o stfDirectory.o memtests.o
@@ -72,6 +72,12 @@ run-tests.html: genqry.exe $(XMLFILES)
 stfDirectory.c: $(XMLFILES) gendir
 	./gendir -skeleton $(XMLFILES)
 
+stfDirectory.h: $(XMLFILES) gendir
+	./gendir -skeleton $(XMLFILES)
+
+StfEg.c: stfDirectory.h
+memory.c: stfDirectory.h
+ 
 test-cgi.exe: test-cgi.c
 	gcc -Wall -o test-cgi.exe test-cgi.c
 
@@ -103,3 +109,5 @@ cgi-install: $(CGIS) $(CGIHELPERS) $(XSLFILES)
 
 mk-name.exe: mk-name.c
 	gcc -o mk-name.exe -Wall mk-name.c
+
+
