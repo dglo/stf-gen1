@@ -71,7 +71,7 @@ menu.elf: menu.o $(EXOBJS) $(STFOBJS) $(LIBHAL)
 
 echomode.elf: echomode.o $(LIBHAL)
 	$(LD) --script=$(KERNELX) -o echomode.elf \
-		$(KOBJS) echomode.o $(STFOBJS) $(EXOBJS) $(LIBHAL) $(SYSLIBS)
+		$(KOBJS) echomode.o $(LIBHAL) $(SYSLIBS)
 
 ../bin/%.bin.gz: %.bin; gzip -c $< > $@
 
