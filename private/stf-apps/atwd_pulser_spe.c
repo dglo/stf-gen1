@@ -61,35 +61,11 @@ BOOLEAN atwd_pulser_speEntry(STF_DESCRIPTOR *d,
    halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER, 0);
    
    /* pretest 4) turn on fe pulser */
-   lookupPulserRate(78e3, &rate, NULL);
-   hal_FPGA_TEST_set_pulser_rate(rate);
-   hal_FPGA_TEST_enable_pulser();
-
-   /* pretest 5) find reasonable value of spe disc level... */
-   *triggerable_spe_dac = 0;
-   spe_dac_nominal = (int) 
-      (atwd_pedestal_dac*(5000.0/4096.0)*(1024.0/5000.0));
-   for (i=(int) (spe_dac_nominal*1.05); i>=(int) (spe_dac_nominal*0.95); i--) {
-   /* for (i=0; i<4096; i++) { */
-      /* set spe threshold dac */
-      halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH, i);
-
-      /* wait for counts to show up */
-      halUSleep(200*1000);
-
-      /* readout the counts... */
-      if (hal_FPGA_TEST_get_spe_rate()>0) {
-	 *triggerable_spe_dac = i + 2;
-	 break;
-      }
-   }
-
-   if (*triggerable_spe_dac == 0 ) {
+   if (scanSPE(atwd_pedestal_dac, triggerable_spe_dac)) {
       /* no triggerable value found... */
-      *triggerable_spe_dac = (int) spe_dac_nominal*1.05;
       hal_FPGA_TEST_disable_pulser();
       free(buffer);
-      /* return FALSE; */
+      return FALSE;
    }
    
    /* pretest 9) set spe_dac */
