@@ -13,7 +13,7 @@ void clearError(void) {
 }
 
 void stfError(const char *err) {
-   char *t = strdup(err);
+   char *t = (char *)strdup(err);
    clearError();
    errorMessage = t;
 }
