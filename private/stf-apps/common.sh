@@ -3,14 +3,13 @@
 #
 
 #
-# set proper path...
+# set proper paths...
 #
-xpath=/usr/local/bin
-xpath=${xpath}:/e/apps/xerces-c2_1_0-win32/bin
-xpath=${xpath}:/e/apps/xml-xalan/c/Build/Win32/VC6/Release
-PATH=/d/apps/msys-1.0/bin:/d/apps/mingw/bin:/e/arthur/xml/bin:${xpath}
+PATH=/bin:/usr/bin/:/usr/lib/cgi-bin/stf:/usr/lib/cgi-bin/stf/xml/bin
+PATH=${PATH}:/usr/local/bin
+export PATH
 
-xmlpath=e:\\arthur\\xml
+xmlpath=/var/www/stf/xml
 
 #
 # splitParams, split the paramString into lines, translate
@@ -50,3 +49,7 @@ function qryParam() {
 function prtTime() { 
     awk 'BEGIN { printf "%s", systime() }' 
 }
+
+
+
+

@@ -10,7 +10,7 @@ BEGIN {
   print "    <tr>",
     "<th>" strftime("%a %b %d %Y, %H:%M:%S", $1) "</th>",
     "<th>" $2 "</th>",
-    "<th><a href=\"http://icecube-1.lbl.gov/cgi-bin/view-results?file=" $5 "\">" (($4 == "true" ) ? "OK" : "FAILED" ) "</a></th>",
+    "<th><a href=\"http://deimos.lbl.gov/cgi-bin/stf/view-results?file=" $5 "\">" (($4 == "true" ) ? "OK" : "FAILED" ) "</a></th>",
     "</tr>";
 }
 

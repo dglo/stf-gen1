@@ -1,9 +1,9 @@
-#!d:\apps\msys-1.0\bin\sh.exe
+#!/bin/sh
 
 #
 # include common functions/variables
 #
-source /e/arthur/xml/bin/common.sh
+source /usr/lib/cgi-bin/stf/xml/bin/common.sh
 
 #
 # view-results?file=basename
@@ -26,7 +26,7 @@ fi
 #
 # get this record from the summary file...
 #
-sumrec=`grep -e "${fname}\$" /e/arthur/xml/summary`
+sumrec=`grep -e "${fname}\$" /var/www/stf/xml/summary`
 
 #
 # 2) get test name from the summary file...
@@ -56,4 +56,10 @@ if [ ! -e ${fullrxml} ]; then
     exit 0
 fi
 
-Xalan ${fullrxml} ${xmlpath}\\restohtml.xsl
+restt=/usr/lib/cgi-bin/stf/xml/bin/restotab.awk
+tabth=/usr/lib/cgi-bin/stf/xml/bin/tabtohtml.awk
+xmlv ${fullrxml} | awk -f ${restt} | awk -f ${tabth}
+
+
+
+

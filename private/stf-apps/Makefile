@@ -30,9 +30,6 @@ SYSLIBS = /usr/local/arm-elf/arm-elf/lib/libc.a \
 	$(LD) --script=raw.x -o $*-raw.elf $*-raw.o
 	$(OBJCOPY) -O srec $*-raw.elf $*.srec
 
-.xml.html:
-	Xalan -o $*.html $< restohtml.xsl
-
 all: stfserv.elf
 
 clean:
@@ -57,17 +54,8 @@ gendir: gendir.c ../../public/stf/stf.h
 genqry: genqry.c
 	gcc -o genqry -I/usr/include/libxml2 genqry.c -Wall -g -lxml2
 
-LIBXMLINC = -I/d/apps/libxml2-2.4.30.win32/include \
-	-I/d/apps/iconv-1.8.win32/include \
-	-I/d/apps/openssl-0.9.6c/include
-LIBXMLLIBPATH = -L/d/apps/libxml2-2.4.30.win32/lib
-
-genqry.exe: genqry.c
-	gcc -o genqry.exe $(LIBXMLINC) -Wall -g \
-		$(LIBXMLLIBPATH) genqry.c -lxml2
-
-run-tests.html: genqry.exe $(XMLFILES)
-	./genqry.exe $(XMLFILES)
+run-tests.html: genqry $(XMLFILES)
+	./genqry $(XMLFILES)
 
 stfDirectory.c: $(XMLFILES) gendir
 	./gendir -skeleton $(XMLFILES)
@@ -78,36 +66,42 @@ stfDirectory.h: $(XMLFILES) gendir
 StfEg.c: stfDirectory.h
 memory.c: stfDirectory.h
  
-test-cgi.exe: test-cgi.c
-	gcc -Wall -o test-cgi.exe test-cgi.c
+test-cgi: test-cgi.c
+	gcc -Wall -o test-cgi test-cgi.c
 
-stf.exe: stf.c
-	gcc -o stf.exe -Wall -I../../include stf.c
+stf: stf.c
+	gcc -o stf -Wall -I../../include stf.c
 
 install: html-install
 
-memory.html: memory.xml restohtml.xsl
-	xalan -IN memory.xml -OUT memory.html -HTML -XSL restohtml.xsl -Q
-
-StfEg.h: StfEg.xml stfDefn2Header.xsl
-	xalan -IN StfEg.xml -OUT StfEg.h -XSL stfDefn2Header.xsl -Q
+#StfEg.h: StfEg.xml stfDefn2Header.xsl
+#	xalan -IN StfEg.xml -OUT StfEg.h -XSL stfDefn2Header.xsl -Q
 
 html-install: run-tests.html index.html cgi-install
-	cp *.html "/c/program files/apache group/apache2/htdocs/stf"
-#	cp *.html ${HOME}/public_html/stf
+	cp *.html /var/www/stf
 
 CGIS = run-test view-results view-summary
-CGIHELPERS = mk-name.exe stf.exe sumtotable.awk common.sh qrytoxml.awk
+CGIHELPERS = mk-name stftcp sumtotable.awk common.sh qrytoxml.awk \
+	restotab.awk tabtosum.awk tabtohtml.awk
 XSLFILES = restohtml.xsl restosum.xsl
 
 cgi: $(CGIS) $(CGIHELPERS)
 
 cgi-install: $(CGIS) $(CGIHELPERS) $(XSLFILES)
-	cp $(CGIS) "/c/program files/apache group/apache2/cgi-bin"
-	cp $(CGIHELPERS) "/e/arthur/xml/bin"
-	cp $(XSLFILES) "/e/arthur/xml"
+	cp $(CGIS) /usr/lib/cgi-bin/stf
+	if [[ ! -f /var/www/stf/xml/uniq.txt ]]; then echo "0" > /var/www/stf/xml/uniq.txt; fi
+	cp $(CGIHELPERS) "/usr/lib/cgi-bin/stf/xml/bin"
+	cp $(XSLFILES) "/var/www/stf/xml"
 
-mk-name.exe: mk-name.c
-	gcc -o mk-name.exe -Wall mk-name.c
+mk-name: mk-name.c
+	gcc -o mk-name -Wall mk-name.c
+
+stftcp: stftcp.c
+	gcc -o stftcp -Wall -I../../public -I../../../hal/public stftcp.c
+
+
+
+
+
 
 

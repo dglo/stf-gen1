@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 	    fprintf(fptr, "<h2>Configure and Run %s Test</h2>\n", tn);
 	    fprintf(fptr,
 		    "<form action="
-		    "\"http://icecube-1.lbl.gov/cgi-bin/run-test\""
+		    "\"http://deimos.lbl.gov/cgi-bin/stf/run-test\""
                     " method=\"get\">\n");
 	    fprintf(fptr, "<table border=\"1\">\n  <tbody>\n");
 	    fprintf(fptr, 

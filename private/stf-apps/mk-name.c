@@ -7,77 +7,62 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <windows.h>
+#include <sys/types.h>
+#include <sys/file.h>
+
+#include <unistd.h>
+#include <fcntl.h>
 
 int main() {
-  const char *lockFile = "e:\\arthur\\xml\\uniq.lock";
-  const char *numFile = "e:\\arthur\\xml\\uniq.txt";
-  HANDLE lf, nf;
-  int i;
+  const char *numFile = "/var/www/stf/xml/uniq.txt";
   unsigned v;
-  DWORD nr;
   char line[80];
+  int nw;
+  int fd = open(numFile, O_RDWR);
+  
+  if (fd<0) {
+     perror("open");
+     return 1;
+  }
 
-  /* create lock file...
+  /* lock the file...
    */
-  for (i=0; i<10; i++) {
-    if ((lf = CreateFile(lockFile,
-			 0, 
-			 0,
-			 NULL,
-			 CREATE_NEW,
-			 FILE_ATTRIBUTE_NORMAL,
-			 0)) == INVALID_HANDLE_VALUE) {
-      Sleep(100);
-    }
-    else break;
-  }
-
-  if (i==10) {
-    fprintf(stderr, "can't open lock file!\n");
-    return 1;
-  }
-
-  CloseHandle(lf);
-
-  if ((nf = CreateFile(numFile,
-		       FILE_READ_DATA|FILE_WRITE_DATA,
-		       0,
-		       NULL,
-		       OPEN_EXISTING,
-		       FILE_ATTRIBUTE_NORMAL,
-		       0))==INVALID_HANDLE_VALUE) {
-    fprintf(stderr, "can't open num file!\n");
-    DeleteFile(lockFile);
-    return 1;
+  if (flock(fd, LOCK_EX)<0) {
+     perror("flock");
+     return 1;
   }
 
   memset(line, 0, sizeof(line));
-  if (!ReadFile(nf, line, sizeof(line)-1, &nr, NULL)) {
-    fprintf(stderr, "can't read num file!\n");
-    DeleteFile(lockFile);
-    return 1;
+  if (read(fd, line, sizeof(line)-1)<0) {
+     perror("read");
+     return 1;
   }
 
   if (sscanf(line, "%u", &v)!=1) {
     fprintf(stderr, "can't parse num file!\n");
-    DeleteFile(lockFile);
     return 1;
   }
   
   printf("%08u\n", v);
 
-  SetFilePointer(nf, 0, NULL, FILE_BEGIN);
+  lseek(fd, 0, SEEK_SET);
 
   sprintf(line, "%u", v+1);
-  if (!WriteFile(nf, line, strlen(line), &nr, NULL)) {
+  if ((nw=write(fd, line, strlen(line)))!=strlen(line)) {
     fprintf(stderr, "can't write new value to num file...\n");
-    DeleteFile(lockFile);
     return 1;
   }
 
-  DeleteFile(lockFile);
-  CloseHandle(nf);
+  /* lock the file...
+   */
+  if (flock(fd, LOCK_UN)<0) {
+     perror("flock");
+     return 1;
+  }
 
+  close(fd);
+  
   return 0;
 }
+
+
