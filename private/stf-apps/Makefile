@@ -93,8 +93,8 @@ html-install: run-tests.html index.html cgi-install
 #	cp *.html ${HOME}/public_html/stf
 
 CGIS = run-test view-results view-summary
-CGIHELPERS = show-time.exe mk-name.exe get-test-name.exe mk-test-xml.exe \
-	stf.exe sumtotable.awk
+CGIHELPERS = mk-name.exe mk-test-xml.exe \
+	stf.exe sumtotable.awk common.sh
 XSLFILES = restohtml.xsl restosum.xsl
 
 cgi: $(CGIS) $(CGIHELPERS)

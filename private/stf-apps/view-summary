@@ -1,13 +1,9 @@
 #!d:\apps\msys-1.0\bin\sh.exe
 
 #
-# set proper path...
+# include common routines/variables
 #
-xpath=/e/apps/xerces-c2_1_0-win32/bin
-xpath=${xpath}:/e/apps/xml-xalan/c/Build/Win32/VC6/Release
-PATH=/usr/bin:/d/apps/msys-1.0/bin:/d/apps/mingw/bin:/e/arthur/xml/bin:${xpath}
-
-xmlpath=e:\\arthur\\xml
+source /e/arthur/xml/bin/common.sh
 
 #
 # view-summary
@@ -21,7 +17,14 @@ echo "    <title>Summary</title>"
 echo "  </head>"
 echo "  <body>"
 
+#
+# FIXME: check for parameters -- add link to search...
+#
 awk -f /e/arthur/xml/bin/sumtotable.awk /e/arthur/xml/summary
+
+#
+# FIXME: search code goes here...
+#
 
 echo "  </body>"
 echo "</html>"
