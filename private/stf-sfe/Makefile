@@ -12,7 +12,7 @@ vpath %.xml ../stf-apps
 # add tests to each here...
 #
 TESTS = ADC memory StfEg atwd_pedestal atwd_baseline pmt_hv_ramp \
-	pmt_hv_stability pressure pulser_spe_mpe \
+	pmt_hv_stability pmt_pv_ratio pressure pulser_spe_mpe \
 	atwd_pedestal_sweep_forced atwd_pulser_spe \
 	atwd_pedestal_spe atwd_clock1x_forced \
 	fadc_fe_pulser fadc_baseline fadc_fe_forced \
