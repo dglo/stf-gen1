@@ -167,16 +167,43 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
 		  stf->testRunnable ? "TRUE" : "FALSE");
 
    for (i=0; i<stf->nParams; i++) {
+      int j;
+      
       idx += sprintf(buf+idx, "  <param>\r\n");
       idx += sprintf(buf+idx, "   <name>%s</name>\r\n", stf->params[i].name);
       idx += sprintf(buf+idx, "   <class>%s</class>\r\n", stf->params[i].class);
       idx += sprintf(buf+idx, "   <type>%s</type>\r\n", stf->params[i].type);
-      idx += sprintf(buf+idx, "   <maxValue>%s</maxValue>\r\n", 
-		     stf->params[i].maxValue);
-      idx += sprintf(buf+idx, "   <minValue>%s</minValue>\r\n", 
-		     stf->params[i].minValue);
-      idx += sprintf(buf+idx, "   <defValue>%s</defValue>\r\n", 
-		     stf->params[i].defValue);
+
+      idx += sprintf(buf+idx, "   <value>");
+      if (strcmp(stf->params[i].type, CHAR_TYPE)==0) {
+	 idx += sprintf(buf+idx, "%s", stf->params[i].value.charValue);
+      }
+      else if (strcmp(stf->params[i].type, UINT_TYPE)==0) {
+	 idx += sprintf(buf+idx, "%u", stf->params[i].value.intValue);
+      }
+      else if (strcmp(stf->params[i].type, ULONG_TYPE)==0) {
+	 idx += sprintf(buf+idx, "%lu", stf->params[i].value.longValue);
+      }
+      else if (strcmp(stf->params[i].type, BOOLEAN_TYPE)==0) {
+	 idx += sprintf(buf+idx, "%s", 
+			stf->params[i].value.boolValue ? 
+			BOOLEAN_TRUE : BOOLEAN_FALSE);
+      }
+      else if (strcmp(stf->params[i].type, UINT_ARRAY_TYPE)==0) {
+	 for (j=0; j<stf->params[i].arrayLength; j++) {
+	    idx += sprintf(buf+idx, "%u ", stf->params[i].value.intArrayPtr[j]);
+	 }
+      }
+      else if (strcmp(stf->params[i].type, ULONG_ARRAY_TYPE)==0) {
+	 for (j=0; j<stf->params[i].arrayLength; j++) {
+	    idx += sprintf(buf+idx, "%lu ", stf->params[i].value.longArrayPtr[j]);
+	 }
+      }
+      else {
+	 idx += sprintf(buf+idx, "?");
+      }
+      idx+=sprintf(buf+idx, "</value>\r\n");
+      
       idx += sprintf(buf+idx, "   <arraySize>%s</arraySize>\r\n",
 		     stf->params[i].arraySize);
       idx += sprintf(buf+idx, "  </param>\r\n");

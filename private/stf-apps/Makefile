@@ -7,6 +7,7 @@ CFLAGS = -mlittle-endian -mcpu=arm920 -Wall \
 CPP = arm-elf-cpp
 CC = arm-elf-gcc
 AS = arm-elf-as
+AS = arm-elf-ar
 LD = arm-elf-ld -N
 OBJCOPY = arm-elf-objcopy
 
@@ -35,13 +36,11 @@ clean:
 	rm -f *.o *.i *.bin *.elf *.srec gendir stfDirectory.c
 
 TESTOBJS = memory.o StfEg.o
-STFOBJS = $(KOBJS) $(TESTOBJS) stfserv.o ../stf/stf.o stfDirectory.o
+STFOBJS = $(TESTOBJS) stfserv.o ../stf/stf.o stfDirectory.o
 XMLFILES = memory.xml StfEg.xml
-LINKERSCR = ../../../dom-loader/source/epxa10/loader/kernel.x
 
 stfserv.elf: $(STFOBJS) 
-	$(LD) --script=$(LINKERSCR) \
-		-o stfserv.elf \
+	$(LD) -r -o stfserv.elf \
 		$(STFOBJS) \
 		../expat/xmlparse/libexpat.a \
 		$(SYSLIBS)
