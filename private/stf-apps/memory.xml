@@ -17,6 +17,6 @@
   </inputParameter>
   <inputParameter>
     <name>testName</name>
-    <string/>
+    <string default="stuck-address"/>
   </inputParameter>
 </stf:test>
