@@ -64,7 +64,7 @@ void stfInitTest(STF_DESCRIPTOR *sd) {
    halWriteDAC(DOM_HAL_DAC_SINGLE_SPE_THRESH , 500 );
    halWriteDAC(DOM_HAL_DAC_LED_BRIGHTNESS , xxx );
    halWriteDAC(DOM_HAL_DAC_FAST_ADC_REF , xxx );
-   halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER , 500 );
+   halWriteDAC(DOM_HAL_DAC_INTERNAL_PULSER , 0 );
    halWriteDAC(DOM_HAL_DAC_FE_AMP_LOWER_CLAMP , xxx );
    }
    
