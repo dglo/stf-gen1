@@ -6,7 +6,8 @@
 	<uses>
 		<libs>
                   domhub-common.jar
-		  daq-db.jar
+		  daq-db-dommon.jar
+		  daq-db-stftest.jar
                 </libs>
 		<tools>log4j.jar</tools>
 	</uses>
