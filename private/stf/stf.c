@@ -8,6 +8,7 @@
 #include <string.h>
 
 #include "stf/stf.h"
+#include "hal/DOM_MB_hal.h"
 
 /* Prototypes
  */

@@ -29,7 +29,12 @@
 /** Definition of boolean (This can be removed if we 
  * have a general xxxTypes.h file)
  */
+#include "hal/DOM_MB_types.h"
+
+#if 0
 #define BOOLEAN int
+#endif
+
 /** See BOOLEAN */
 #define TRUE 1
 /** See BOOLEAN */
@@ -107,10 +112,15 @@ struct STF_DESCRIPTOR_STRUCT {
 	int	majorVersion;
 	/** integer value for this test's minor version number */
 	int	minorVersion;
+
+        /** common parameters...
+	 */
+
 	/** BOOLEAN to indicate that this test is runnable (determined
 	 * at initialization time) */
 	BOOLEAN	testRunnable;
         BOOLEAN passed; /* valid after entryPt called... */
+        const char *boardID; /* board id is read before test is started */
    
          /** number of parameters */
         int nParams;

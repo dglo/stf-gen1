@@ -36,6 +36,7 @@
 #include "xmlparse/xmlparse.h"
 
 #include "stf/stf.h"
+#include "hal/DOM_MB_hal.h"
 
 extern int read(int , void *, int);
 extern int write(int , void *, int);
@@ -222,7 +223,11 @@ static int dirToXML(char *buf, int max, STF_DESCRIPTOR *stf) {
 	   stf->testRunnable ? BOOLEAN_TRUE : BOOLEAN_FALSE);
    sprintf(buf+idx, "  </outputParameter>\r\n");
    
-
+   sprintf(buf+idx, "  <outputParameter>\r\n");
+   sprintf(buf+idx, "    <name>boardID</name>\r\n");
+   sprintf(buf+idx, "    <value>%s</value>\r\n", getBoardID());
+   sprintf(buf+idx, "  </outputParameter>\r\n");
+   
    idx += sprintf(buf+idx, "</test-results>\r\n");
    return idx;
 }

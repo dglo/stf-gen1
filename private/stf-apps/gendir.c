@@ -268,7 +268,7 @@ int main(int argc, char *argv[]) {
 	 fprintf(fptr, "};\n");
 	 
 	 fprintf(fptr, "\n");
-	 fprintf(fptr, "extern void %sInit(STF_DESCRIPTOR *);\n", tdn->desc.name);
+	 fprintf(fptr, "extern BOOLEAN %sInit(STF_DESCRIPTOR *);\n", tdn->desc.name);
 	 fprintf(fptr, "extern BOOLEAN %sEntry(STF_DESCRIPTOR *);\n",
 		 tdn->desc.name);
 	 
