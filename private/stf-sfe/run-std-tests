@@ -48,6 +48,7 @@ stfmode > /tmp/dhtab.$$
 
 ndoms=`wc -l /tmp/dhtab.$$ | awk '{print $1; }'`
 ntests=`echo ${testnames} | wc -w`
+ntests=`printf "%d" ${ntests}`
 
 #
 #
@@ -59,17 +60,15 @@ echo "<title>Run all tests</title>"
 echo "</head>"
 echo "<body>"
 
-echo "<h2>ntests: ${ntests}</h2>"
-
 #
 # setup the table
 #
 echo "<table><tbody>"
-echo "<tr> <th>Card</th> <th>Channel</th> <th>DOM</th>";
-for (( i=1; i <= ${ntests} ; i++ )); do
+echo "<tr> <th>Card</th> <th>Channel</th> <th>DOM</th>"
+for (( i=1; i<=${ntests}; i++ )); do
     echo "<th>${i}</th>"
 done
-echo "</tr>";
+echo "</tr>"
 
 for (( i=1; i<=${ndoms}; i++ )); do
     dhline=`sed -n "${i}p" /tmp/dhtab.$$`
@@ -117,12 +116,10 @@ for (( i=1; i<=${ndoms}; i++ )); do
 	cgiurl="http://deimos.lbl.gov/cgi-bin/stf"
 	echo "<td><a href=\"${cgiurl}/view-results?file=${resid}\">"
 	
-	restt=/usr/lib/cgi-bin/stf/xml/bin/restotab.awk
-	torf=`xmlv ${fullrxml} | awk -f ${restt} | \
-	    egrep "^${testname}	passed	" | \
-	    awk -F "\t" '{ print $3; }'`
+	qry="select passed from STFResult where stf_result_id=${resid};"
+	torf=`${mysqlcmd} "${qry}"`
 
-	if [[ ${torf} = "true" ]]; then
+	if [[ ${torf} = "1" ]]; then
 	    echo "P"
 	else
 	    echo "F"
