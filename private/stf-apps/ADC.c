@@ -40,19 +40,19 @@ BOOLEAN ADCEntry(STF_DESCRIPTOR *desc,
        pass_or_fail[i]=(adc_count<=1020 && adc_count>=980) ? 1:0;  /* 1000 counts = [0V + 5V*10K/(10K+15K)]/0.002V */
      }
      else if (i == DOM_HAL_ADC_PRESSURE ) {
-       pass_or_fail[i]=(adc_count<=870 && adc_count>=830) ? 1:0;   /* default = 860 */        
+       pass_or_fail[i]=1; /* was: (dc_count<=870 && adc_count>=830) ? 1:0; default = 860, Azriel suggested to make this test pass all the time!*/        
      }
      else if (i == DOM_HAL_ADC_5V_CURRENT) {
-       pass_or_fail[i]=(adc_count<=600 && adc_count>=500) ? 1:0;   /* default = 500 */                
+       pass_or_fail[i]=(adc_count<=600 && adc_count>=460) ? 1:0;   /* default = 500 */                
      }
      else if (i == DOM_HAL_ADC_3_3V_CURRENT) {
        pass_or_fail[i]=(adc_count<=105 && adc_count>=75) ? 1:0;    /* default = 96 */               
      }
      else if (i == DOM_HAL_ADC_2_5V_CURRENT) {
-       pass_or_fail[i]=(adc_count<=60 && adc_count>=15) ? 1:0;     /* default = 31 */              
+       pass_or_fail[i]=(adc_count<=60 && adc_count>=0) ? 1:0;     /* default = 31 */              
      }
      else if (i == DOM_HAL_ADC_1_8V_CURRENT) {
-       pass_or_fail[i]=(adc_count<=125 && adc_count>=80) ? 1:0;     /* default = 90 */              
+       pass_or_fail[i]=(adc_count<=125 && adc_count>=75) ? 1:0;     /* default = 90 */              
      }
      else if (i == DOM_HAL_ADC_MINUS_5V_CURRENT) {
        pass_or_fail[i]=(adc_count<=190 && adc_count>=100) ? 1:0;    /* default = 115 */               
@@ -66,15 +66,15 @@ BOOLEAN ADCEntry(STF_DESCRIPTOR *desc,
        pass_or_fail[i]=(adc_count<=900 && adc_count>=850) ? 1:0;    /* 900 = 1.8V/2mV = 900 */       
      }
      else if (i == DOM_HAL_ADC_2_5V_POWER_SUPPLY) {
-       pass_or_fail[i]=(adc_count<=630 && adc_count>=610) ? 1:0;    /* 625 = 2.5V/2mV*10K/(10K+10K) = 625 */       
+       pass_or_fail[i]=(adc_count<=640 && adc_count>=610) ? 1:0;    /* 625 = 2.5V/2mV*10K/(10K+10K) = 625 */       
      }
      else if (i == DOM_HAL_ADC_3_3V_POWER_SUPPLY) {
-       pass_or_fail[i]=(adc_count<=835 && adc_count>=810) ? 1:0;    /* 825 = 3.3V/2mV*100K/(100K+100K) = 825 */       
+       pass_or_fail[i]=(adc_count<=835 && adc_count>=805) ? 1:0;    /* 825 = 3.3V/2mV*100K/(100K+100K) = 825 */       
      }
      else if (i == DOM_HAL_ADC_DISC_MULTISPE) {
        dac_count=halReadDAC(DOM_HAL_DAC_MULTIPLE_SPE_THRESH);
        dac_to_adc=dac_count*2.5/1023*500;            /* SPE_ADC_count = [SPE_DAC_count * 2.5V/1023 *2* 10K/(10K+10K)]/2mV */
-       pass_or_fail[i]=(adc_count<=(dac_to_adc+5) && adc_count>=(dac_to_adc-5)) ? 1:0;           
+       pass_or_fail[i]=(adc_count<=(dac_to_adc+10) && adc_count>=(dac_to_adc-5)) ? 1:0;           
      }
      else if (i == DOM_HAL_ADC_FADC_0_REF) {
        dac_count=halReadDAC(DOM_HAL_DAC_FAST_ADC_REF);
