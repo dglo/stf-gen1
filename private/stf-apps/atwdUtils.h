@@ -10,3 +10,8 @@ void reverseATWDWaveform(short *p);
 void reverseATWDIntWaveform(unsigned *p);
 
 int speDACNominal(float disc_mv, int pedestal_dac);
+
+void getSummedWaveform(int loop_count, unsigned trigger_mask, int channel,
+		       unsigned *waveform);
+
+

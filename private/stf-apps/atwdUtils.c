@@ -1,4 +1,5 @@
 #include <stddef.h>
+#include <stdlib.h>
 
 #include "hal/DOM_MB_hal.h"
 #include "hal/DOM_MB_fpga.h"
@@ -80,4 +81,36 @@ int speDACNominal(float disc_mv, int pedestal_dac) {
    return (int)
       (disc_mv*9.6*(2240+249)/249.0 + pedestal_dac*5000.0/4096.0);
 }
+
+void getSummedWaveform(int loop_count, unsigned trigger_mask, int channel,
+		       unsigned *waveform) {
+   int i;
+   const int cnt = 128;
+   short *buffer = (short *) calloc(cnt, sizeof(short));
+   short *ch[4] = { NULL, NULL, NULL, NULL };
+   
+   /* set proper channel */
+   ch[channel] = buffer;
+   
+   /* 1) */
+   for (i=0; i<(int)loop_count; i++) {
+      int j;
+      
+      hal_FPGA_TEST_trigger_forced(trigger_mask);
+      
+      hal_FPGA_TEST_readout(ch[0], ch[1], ch[2], ch[3],
+			    ch[0], ch[1], ch[2], ch[3],
+			    cnt, NULL, 0, trigger_mask);
+
+      /* get summed waveform... */
+      for (j=0; j<cnt; j++) waveform[j]+=buffer[j];
+   }
+
+   for (i=0; i<cnt; i++) waveform[i]/=loop_count;
+
+   reverseATWDIntWaveform(waveform);
+
+   free(buffer);
+}
+
 
