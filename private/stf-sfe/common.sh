@@ -75,6 +75,23 @@ javacmd="java -classpath /usr/lib/cgi-bin/stf/xml/bin"
 # FIXME: this should be _much_ better, at least get rid of xmlv step...
 #
 function viewResults() {
+#
+# qry in case we don't want to use
+# the resultxml...
+#
+    local qry=`printf \
+    "select distinct tt.name, p.name, rp.value, rp.value_index from \
+     STFTestType tt, STFTest t, STFResult r, STFParameter p, \
+     STFParameterType pt, STFResultParameter rp \
+   where \
+     r.stf_result_id=%s and \
+     rp.stf_result_id=%s and \
+     rp.stf_param_id=p.stf_param_id and \
+     r.stf_test_id=t.stf_test_id and \
+     t.stf_testtype_id=tt.stf_testtype_id \
+   order by \
+     p.name;" ${fname} ${fname}`
+
     local tabth=/usr/lib/cgi-bin/stf/xml/bin/tabtohtml.awk
     local restt=/usr/lib/cgi-bin/stf/xml/bin/restotab.awk
     local qry=`printf \

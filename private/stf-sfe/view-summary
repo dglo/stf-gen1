@@ -20,8 +20,6 @@ echo "  <body>"
 #
 # FIXME: check for parameters -- add link to search...
 #
-#sort -rn /var/www/stf/xml/summary | \
-
 qry="select \
        r.date_tested, tt.name, r.prod_id, r.passed, r.stf_result_id \
      from \
@@ -31,9 +29,10 @@ qry="select \
        t.stf_testtype_id=tt.stf_testtype_id \
      order by \
        r.date_tested \
-     desc;"
+     desc
+     limit 200;"
 
-${mysqlcmd} "${qry}" | head -1000 | \
+${mysqlcmd} "${qry}" | \
     gawk -F "\t" -f /usr/lib/cgi-bin/stf/xml/bin/sumtotable.awk
 
 #

@@ -23,29 +23,9 @@ if [[ ${#fname} == 0 ]]; then
 fi
 
 #
-# qry in case we don't want to use
-# the resultxml...
-#
-qry=`printf "select distinct tt.name, p.name, rp.value, rp.value_index from \
-     STFTestType tt, STFTest t, STFResult r, STFParameter p, \
-     STFParameterType pt, STFResultParameter rp \
-   where \
-     r.stf_result_id=%s and \
-     rp.stf_result_id=%s and \
-     rp.stf_param_id=p.stf_param_id and \
-     r.stf_test_id=t.stf_test_id and \
-     t.stf_testtype_id=tt.stf_testtype_id \
-   order by \
-     p.name;" ${fname} ${fname}`
-
-#
 # 6) display results...
 #
 viewResults ${fname}
-#tabth=/usr/lib/cgi-bin/stf/xml/bin/tabtohtml.awk
-#restt=/usr/lib/cgi-bin/stf/xml/bin/restotab.awk
-#qry=`printf "select text from STFResultXML where stf_result_id=%s" ${fname}`
-#${mysqlcmd} "${qry}" | xmlv | awk -f ${restt} | awk -v xml=${fname} -f ${tabth}
 
 
 
