@@ -110,5 +110,4 @@ rm -f /tmp/stf.out
 #
 # 5) add test results to db and view them...
 #
-viewResults `${javacmd} addresults -resultid -technician arthur ${fullrxml} | \
-    egrep '^resultid	' | awk '{print $2;}'`
+viewResults `addResults ${fullrxml}`

@@ -191,5 +191,37 @@ function getPick() {
     fi
 }
 
+#
+# add results xml to database...
+#
+function addResults() {
+    local restt=${awkpath}/restotab.awk
+    local domid=`xmlv $1 | awk -f ${restt} | \
+	awk '{ print $2, $3; }' | egrep '^boardID' | awk '{print $2;}'`
+
+    local prodid=`${mysqlcmd} \
+	"select prod_id from Product \
+	 where prodtype_id=6 and lab_id=2 and hardware_serial='${domid}';"`
+
+    # add hw id if necessary...
+    if [[ ${#prodid} == 0 ]]; then
+	${javacmd} addhw ${domid}
+    fi
+	
+    # get results...
+    ${javacmd} \
+	addresults -resultid -technician arthur $1 | \
+	    egrep '^resultid	' | awk '{print $2;}'
+}
+
+
+
+
+
+
+
+
+
+
 
 

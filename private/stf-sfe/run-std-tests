@@ -46,8 +46,6 @@ fi
 #
 stfmode > /tmp/dhtab.$$
 
-sleep 5
-
 ndoms=`wc -l /tmp/dhtab.$$ | awk '{print $1; }'`
 ntests=`echo ${testnames} | wc -w`
 ntests=`printf "%d" ${ntests}`
@@ -84,7 +82,12 @@ echo "</tr>"
 qstfserver=`currentServer`
 qstfport=`currentPort`
 
+session=`mk-name`
+mkdir ${xmlpath}/std-results/${session}
+
 for (( i=1; i<=${ndoms}; i++ )); do
+    respath=`printf "%s/%04d" ${xmlpath}/std-results/${session} $i`
+    mkdir ${respath}
     dhline=`sed -n "${i}p" /tmp/dhtab.$$`
     stfserver=`echo ${dhline} | awk '{print $1;}'`
     stfport=`echo ${dhline} | awk '{print $2;}'`
@@ -103,7 +106,7 @@ for (( i=1; i<=${ndoms}; i++ )); do
 
     for f in ${testnames}; do
 	fullqxml=${xmlpath}/std-tests/$f
-	fullrxml=${xmlpath}/std-results/$f
+	fullrxml=${respath}/$f
 
 	testname=`xmlv ${fullqxml} | \
 	    awk '/^\(/ { depth++; if (depth==2) print substr($0, 2); } '`
@@ -130,9 +133,7 @@ for (( i=1; i<=${ndoms}; i++ )); do
 	#
 	# add results to db...
 	#
-	resid=`${javacmd} \
-		addresults -resultid -technician arthur ${fullrxml} | \
-	    egrep '^resultid	' | awk '{print $2;}'`
+	resid=`addResults ${fullrxml}`
 
 	#
 	# find out if we passed...

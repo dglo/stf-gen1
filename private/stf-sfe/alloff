@@ -20,7 +20,7 @@ echo "<html><body>"
 #
 # hack for gtp stf setup...
 #
-~arthur/bin/dhclient -off 131.243.36.211
+dhclient -off 131.243.36.211
 
 echo "<h2>Done</h2>"
 echo "</body></html>"
