@@ -2,8 +2,13 @@
 <xsl:stylesheet version="1.0" xmlns:stf="http://glacier.lbl.gov/icecube/daq/stf"
   xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:output indent="yes" method="text"/>
+  <xsl:variable name="nl">
+<xsl:text>
+</xsl:text>
+  </xsl:variable>
   <xsl:template match="/">
     <xsl:apply-templates select="xs:schema"/>
+<xsl:copy-of select="$nl"/>
   </xsl:template>
   <xsl:template match="xs:schema">
 #include "stf/stf.h"

@@ -6,6 +6,10 @@
     <xsl:apply-templates select="stf:test"/>
   </xsl:template>
   <xsl:template match="stf:test">
+  <xsl:variable name="nl">
+<xsl:text>
+</xsl:text>
+  </xsl:variable>
   <xsl:variable name="testName" select="name"/>
 static STF_PARAM <xsl:copy-of select="$testName"/>_params[] = {
     <xsl:apply-templates mode="PARAM" select="inputParameter"/>
@@ -28,6 +32,7 @@ static STF_DESCRIPTOR <xsl:copy-of select="$testName"/>_descriptor = {
   .entryPt = <xsl:copy-of select="$testName"/>Entry,
   .isInit = 0
 };
+<xsl:copy-of select="$nl"/>
   </xsl:template>
   <xsl:template match="stf:test/*/*" mode="PARAM">
    {
