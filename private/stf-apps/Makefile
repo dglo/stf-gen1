@@ -24,10 +24,14 @@ TESTOBJS  = ADC.o memory.o StfEg.o atwd_pedestal.o atwd_baseline.o \
 	pmt_hv_ramp.o pmt_hv_stability.o pressure.o pulser_spe_mpe.o \
 	atwd_pedestal_sweep_forced.o atwd_pulser_spe.o atwd_pedestal_spe.o \
 	atwd_clock1x_forced.o pmt_pv_ratio.o \
-	fadc_fe_pulser.o fadc_baseline.o fadc_fe_forced.o
+	fadc_fe_pulser.o fadc_baseline.o fadc_fe_forced.o disc_scan.o
 
 XMLFILES  = $(TESTOBJS:.o=.xml)
 CFILES    = $(TESTOBJS:.o=.c)
+XMLTEMPLATES = $(TESTOBJS:%.o=%-template.xml)
+
+$(XMLTEMPLATES): %-template.xml: %.xml
+	xmln $< | awk -f ../stf-sfe/stftotab.awk | awk -f mktemplate.awk > $@
 
 #
 # generated links...
@@ -82,12 +86,12 @@ $(HDRFILES): stfDirectory.h
 ../bin/echomode: echomode.o $(EXOBJS)
 	gcc -o echomode echomode.o $(EXOBJS) $(LIBHAL) -lm
 
+#
+# java code gen...
+#
+STFParameterLookup.java: $(XMLFILES) genspl.awk
+	xmln $(XMLFILES) | awk -f ../stf-sfe/stftotab.awk | \
+		awk -f genspl.awk 
 
-
-
-
-
-
-
-
-
+templates.tar.gz: $(XMLTEMPLATES)
+	tar cf - $(XMLTEMPLATES) | gzip -c > templates.tar.gz
