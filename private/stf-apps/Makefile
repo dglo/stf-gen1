@@ -41,11 +41,11 @@ HDRFILES  = $(TESTOBJS:.o=.h)
 #
 # java code gen...
 #
-GENJAVA=../../../stf/src/icecube/daq/stf/STFParameterLookup.java
-
-java: $(GENJAVA)
+GENJAVA=../../../stf/src/icecube/daq/stf/autogen/STFParameterLookup.java
 
 all: stfserv.elf menu.elf echomode.elf $(GENJAVA)
+
+java: $(GENJAVA)
 
 clean:
 	rm -f *.o *.i *.bin *.elf *.srec \
