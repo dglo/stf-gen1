@@ -5,7 +5,7 @@
 #include <math.h>
 
 #include "stf/stf.h"
-#include "stfDirectory.h"
+#include "stf-apps/pressure.h"
 #include "hal/DOM_MB_hal.h"
 
 
