@@ -13,7 +13,7 @@
 #include "stf/stf.h"
 #include "stf/memtests.h"
 
-#include "stfDirectory.h"
+#include "stf-apps/memory.h"
 
 #include "stfUtils.h"
 

@@ -1,7 +1,7 @@
 /* StfEg.c, skeleton file created by gendir
  */
 #include "stf/stf.h"
-#include "stfDirectory.h"
+#include "stf-apps/StfEg.h"
 
 BOOLEAN StfEgInit(STF_DESCRIPTOR *d) {
    return TRUE;

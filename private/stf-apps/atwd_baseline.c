@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "stf/stf.h"
-#include "stfDirectory.h"
+#include "stf-apps/atwd_baseline.h"
 
 #include "hal/DOM_MB_hal.h"
 #include "hal/DOM_MB_fpga.h"
