@@ -12,7 +12,7 @@
 #include "hal/DOM_MB_fpga.h"
 
 BOOLEAN fadc_baselineInit(STF_DESCRIPTOR *d) {
-   return FALSE;
+   return TRUE;
 }
 
 BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
@@ -38,7 +38,7 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   short *histogram = (short *) calloc(1024, sizeof(short));
   /*  unsigned waveform[256];
       unsigned histogram[1024];*/
-
+  loop_count = 200;
   /*  A.Pretest checks:*/ 
   /*    1.The two input DAC settings are programmed.*/
   halWriteDAC(DOM_HAL_DAC_FAST_ADC_REF,fadc_reference_dac);
@@ -55,6 +55,8 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   baseline_sqr=0;
   baseline_max=0;
   baseline_min=1024;
+
+  /*printf("setup done\n\r");*/
   for(lp1=0;lp1<loop_count;lp1++)
     {
       histogram[lp1]=0;
@@ -62,14 +64,16 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
   for(lp2=0;lp2<loop_count;lp2++)
     {
            hal_FPGA_TEST_trigger_forced(HAL_FPGA_TEST_TRIGGER_FADC);
-           hal_FPGA_TEST_readout(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,256,waveform,0,HAL_FPGA_TEST_TRIGGER_FADC);
+           hal_FPGA_TEST_readout(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,waveform,256,HAL_FPGA_TEST_TRIGGER_FADC);
   /*    2.Calculate the mean of all the 256 samples values (integers ok, range [0-1023]):
           this is the baseline for this waveform.*/
 	   count=0;	   
 	   for(lp1=0;lp1<256;lp1++)
 	   {
-	     count+=waveform[lp1];
+	     /*printf("%d",waveform[lp1]);*/
+	       count+=(unsigned int)waveform[lp1];
            } 
+	   /*printf("\n\r"); */
 	   baseline=count/256;
   /*    3.Keep a sum of all baselines, and a sum of the squares for RMS calculation.
           Also keep the minimum and maximum baselines.*/
@@ -81,12 +85,14 @@ BOOLEAN fadc_baselineEntry(STF_DESCRIPTOR *d,
 	(it is a 1024-bins histogram) of the baselines obtained.*/
 	   if(baseline>=0 && baseline<1024) histogram[baseline]+=1;
     }
-  /*    5.If FILL_OUTPUT_ARRAYS=1, fill the output array FADC_BASELINE_HISTOGRAM with the baseline distribution.*/
+  /*printf("loops complete\n");  */
+/*    5.If FILL_OUTPUT_ARRAYS=1, fill the output array FADC_BASELINE_HISTOGRAM with the baseline distribution.*/
   if(fill_output_arrays)
     {
+      /*printf("filling output arrays\n");*/
       for(lp1=0;lp1<256;lp1++)
       {
-	fadc_baseline_histogram[lp1] = histogram[lp1];
+	fadc_baseline_histogram[lp1] = (unsigned int)histogram[lp1];
       }
     }
   /*    6.Compute the mean and the RMS using the running sums (integer arithmetic is ok).*/

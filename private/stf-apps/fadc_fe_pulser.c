@@ -12,7 +12,7 @@
 #include "hal/DOM_MB_fpga.h"
 
 BOOLEAN fadc_fe_pulserInit(STF_DESCRIPTOR *d) {
-   return FALSE;
+   return TRUE;
 }
 
 BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
@@ -20,7 +20,7 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
                     unsigned atwd_pedestal_dac,
                     unsigned long pulser_amplitude_uvolt,
                     unsigned long loop_count,
-                    BOOLEAN fill_output_arrays,
+
                     unsigned *triggerable_spe_dac,
                     unsigned *fadc_baseline_mean,
                     unsigned *fadc_fe_pulser_amplitude,
@@ -38,9 +38,13 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
   unsigned discrim_in_mv = 0;
   int time_out,time_out_error=0;
   short *waveform = (short *) calloc(512, sizeof(short));
-  short *waveform_sum = (short *) calloc(512, sizeof(short));
-  short *waveform_avg = (short *) calloc(512, sizeof(short));
-   /*  unsigned waveform[512];
+  int *waveform_sum = (int *) calloc(512, sizeof(int));                                                                             
+  int *waveform_avg = (int *) calloc(512, sizeof(int));
+ 
+  /*  short *waveform_sum = (short *) calloc(512, sizeof(short));
+      short *waveform_avg = (short *) calloc(512, sizeof(short));*/
+ 
+  /*  unsigned waveform[512];
   unsigned waveform_sum[512];
   unsigned waveform_avg[512];*/
 
@@ -110,7 +114,12 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
     read_fail = 1;
   }
   if(read_fail)
-    return FALSE;
+  {
+       free(waveform); 
+       free(waveform_sum); 
+       free(waveform_avg); 
+       return FALSE;
+  }
 
   /*  8.Set the TRIGGERABLE_SPE_DAC output variable to
       2 + the first SPE_DAC setting that gave a Non-Zero value of the SPE rate.*/
@@ -127,7 +136,7 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
 
   /*  1.Take one waveform for the FADC with FORCED (CPU) trigger */
     hal_FPGA_TEST_trigger_forced(HAL_FPGA_TEST_TRIGGER_FADC);
-    hal_FPGA_TEST_readout(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,512,waveform,0,HAL_FPGA_TEST_TRIGGER_FADC);
+    hal_FPGA_TEST_readout(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,waveform,512,HAL_FPGA_TEST_TRIGGER_FADC);
 
   /*  2.Calculate the mean of all the 512 samples values (integers ok, range [0-1023]):
 	this is the baseline for this waveform.*/
@@ -173,7 +182,7 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
   for(lp2=0;lp2<loop_count;lp2++)
   {
     hal_FPGA_TEST_trigger_disc(HAL_FPGA_TEST_TRIGGER_FADC);
-    time_out= hal_FPGA_TEST_readout(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,512,waveform,0,HAL_FPGA_TEST_TRIGGER_FADC);
+    time_out= hal_FPGA_TEST_readout(NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,waveform,512,HAL_FPGA_TEST_TRIGGER_FADC);
     if(time_out)
     {
 	loop_count=lp2;
@@ -199,13 +208,11 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
   }
 	
   /*   10.If requested, fill the FADC_FE_PULSER_WAVEFORM output array with the baseline subtracted average waveform.*/
-  /*  if(fill_output_arrays==FALSE)
-      {*/
     for(lp1=0;lp1<512;lp1++)
     {
 	fadc_fe_pulser_waveform[lp1] = waveform_avg[lp1];
     }
-    /*  }*/
+
   /*   11.Find the position of the largest sample in the average waveform.
        Fill FADC_FE_PULSER_POSITION with that position (a number between 1 and 512).
        If the maximum value appears in more that one sample,
