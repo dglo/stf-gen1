@@ -52,7 +52,7 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
       halWriteDAC(8, *atwd_disc_threshold_dac);
    }
 
-   /* Thorsten recommends we wait a bit...
+   /* FIXME: Thorsten recommends we wait a bit...
    halUSleep(1000);
     */
 

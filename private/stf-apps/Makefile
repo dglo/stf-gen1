@@ -40,11 +40,15 @@ SYSLIBS = /usr/local/arm-elf/arm-elf/lib/libc.a \
 #
 # add tests to each here...
 #
-TESTOBJS  = ADC.o memory.o StfEg.o atwd_pedestal.o
-TABS      = ADC.tab memory.tab StfEg.tab atwd_pedestal.tab
-XMLFILES  = ADC.xml memory.xml StfEg.xml atwd_pedestal.xml
-HTMLFILES = ADC.html memory.html StfEg.html atwd_pedestal.html
-HTMLDIRS  = ADC memory StfEg atwd_pedestal
+TESTOBJS  = ADC.o memory.o StfEg.o atwd_pedestal.o \
+		atwd_baseline.o
+TABS      = ADC.tab memory.tab StfEg.tab atwd_pedestal.tab \
+		atwd_baseline.tab
+XMLFILES  = ADC.xml memory.xml StfEg.xml atwd_pedestal.xml \
+		atwd_baseline.xml
+HTMLFILES = ADC.html memory.html StfEg.html atwd_pedestal.html \
+		atwd_baseline.html
+HTMLDIRS  = ADC memory StfEg atwd_pedestal atwd_baseline
 
 all: stfserv.elf menu.elf
 

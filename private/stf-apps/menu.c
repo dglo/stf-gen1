@@ -35,8 +35,9 @@ int  main()
     STF_DESCRIPTOR *d=NULL;
     int i;
 
-    stfInitAllTests();
-
+    printf("--------\r\n");
+    printf("stf menu:\r\n\r\n");
+    
     for (;;) {
         printf("\r\n\r\nTests present:\r\n");
 
@@ -101,8 +102,17 @@ int  main()
 	   }
 	   
 	   printf("\r\n\r\ntesting\r\n");
-	   executeTest(d);
-	   printf("done!\r\n\r\n");
+
+	   if (!d->isInit) {
+	      d->testRunnable = d->initPt(d);
+	      d->isInit = 1;
+	   }
+	   
+	   if (d->testRunnable==0) {
+	      printf("\r\ntest '%s' is not runnable", d->name);
+	   }
+	   d->passed = d->entryPt(d);
+	   printf("done [%d]!\r\n\r\n", d->passed);
 	   
 	   for (i=0; i<d->nParams; i++) {
 	      STF_PARAM *p=d->params + i;
