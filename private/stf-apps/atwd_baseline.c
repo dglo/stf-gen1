@@ -26,7 +26,6 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
                     unsigned atwd_trig_forced_or_spe,
                     unsigned spe_discriminator_uvolt,
                     unsigned loop_count,
-                    BOOLEAN fill_output_arrays,
                     unsigned *atwd_baseline_mean,
                     unsigned *atwd_baseline_rms,
                     unsigned *atwd_baseline_min,
@@ -36,7 +35,7 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
 
    const int ch = 
       (atwd_chip_a_or_b) ? 
-      DOM_HAL_DAC_ATWD1_TRIGGER_BIAS : DOM_HAL_DAC_ATWD0_TRIGGER_BIAS;
+      DOM_HAL_DAC_ATWD0_TRIGGER_BIAS : DOM_HAL_DAC_ATWD1_TRIGGER_BIAS;
    int i;
    unsigned minv, maxv;
    const int cnt = 128;
@@ -66,6 +65,10 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
    }
 
    prescanATWD(trigger_mask);
+
+   /* clear histogram...
+    */
+   memset(atwd_baseline_histogram, 0, 1024*sizeof(unsigned));
    
    for (i=0; i<(int)loop_count; i++) {
       int j;
@@ -87,8 +90,8 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
        */
       channels[atwd_channel] = buffer;
       hal_FPGA_TEST_readout(channels[0], channels[1], channels[2], channels[3],
-			    NULL, NULL, NULL, NULL,
-			    cnt, NULL, 0, atwd_chip_a_or_b);
+			    channels[0], channels[1], channels[2], channels[3],
+			    cnt, NULL, 0, trigger_mask);
 
       /* sum it and create histogram... */
       for (j=0; j<cnt; j++) {

@@ -24,11 +24,10 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
 			   unsigned atwd_trig_forced_or_spe,
 			   unsigned spe_descriminator_uvolt,
 			   unsigned loop_count,
-			   BOOLEAN fill_output_arrays,
 			   unsigned *atwd_pedestal_amplitude,
 			   unsigned *atwd_pedestal_pattern,
 			   unsigned *atwd_disc_threshold_dac) {
-   const int ch = (atwd_chip_a_or_b) ? 4 : 0;
+   const int ch = (atwd_chip_a_or_b) ? 0 : 4;
    int i;
    unsigned minv, maxv;
    const int cnt = 128;
@@ -42,8 +41,8 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
    halWriteDAC(ch, atwd_sampling_speed_dac);
    halWriteDAC(ch+1, atwd_ramp_top_dac);
    halWriteDAC(ch+2, atwd_ramp_bias_dac);
-   halWriteDAC(3, atwd_analog_ref_dac);
-   halWriteDAC(7, atwd_pedestal_dac);
+   halWriteDAC(DOM_HAL_DAC_ATWD_ANALOG_REF, atwd_analog_ref_dac);
+   halWriteDAC(DOM_HAL_DAC_PMT_FE_PEDESTAL, atwd_pedestal_dac);
 
    /* C. if the SPE trigger was requested, calculate the SPE DAC that
     * corresponds to SPE_DISCRIMINATOR_UVOLT and program it...
@@ -55,6 +54,7 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
       halWriteDAC(8, *atwd_disc_threshold_dac);
    }
 
+   /* warm up the atwd... */
    prescanATWD(trigger_mask);
 
    for (i=0; i<(int)loop_count; i++) {
@@ -75,10 +75,9 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
       /* D.  Take one waveform for the channel requested...
        */
       channels[atwd_channel] = buffer;
-      hal_FPGA_TEST_readout(channels[0], channels[1], channels[2],
-			    channels[3], 
-			    NULL, NULL, NULL, NULL,
-			    cnt, NULL, 0, atwd_chip_a_or_b);
+      hal_FPGA_TEST_readout(channels[0], channels[1], channels[2], channels[3], 
+			    channels[0], channels[1], channels[2], channels[3],
+			    cnt, NULL, 0, trigger_mask);
 
       /* get summed waveform... */
       for (j=0; j<cnt; j++) atwd_pedestal_pattern[j]+=buffer[j];
@@ -92,11 +91,6 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
     */
    for (i=0; i<cnt; i++) atwd_pedestal_pattern[i]/=loop_count;
    
-   /* G. fill output arrays...
-    *
-    * this is a noop, they are filled no matter what...
-    */
-
    /* H. Analyze pedestal waveform:
     *
     *  - obtain maximum and minimum value of the average pedestal waveform...
@@ -115,7 +109,7 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
 
    free(buffer);
    
-   return minv>0 && maxv<1023 && (maxv-minv)<20;
+   return minv>0 && maxv<1023 && (maxv-minv)<60;
 }
 
 

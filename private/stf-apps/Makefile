@@ -21,7 +21,8 @@
 # add new tests here...
 #
 TESTOBJS  = ADC.o memory.o StfEg.o atwd_pedestal.o atwd_baseline.o \
-	pmt_hv_ramp.o pmt_hv_stability.o pressure.o pulser_spe_mpe.o
+	pmt_hv_ramp.o pmt_hv_stability.o pressure.o pulser_spe_mpe.o \
+	atwd_pedestal_sweep_forced.o
 
 XMLFILES  = $(TESTOBJS:.o=.xml)
 CFILES    = $(TESTOBJS:.o=.c)

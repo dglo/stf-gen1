@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 #include "stf/stf.h"
-#include "stf-apps/pulser_smpe.h"
+#include "stf-apps/pulser_spe_mpe.h"
 
 #include "hal/DOM_MB_hal.h"
 #include "hal/DOM_MB_fpga.h"
