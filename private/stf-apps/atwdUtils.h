@@ -14,4 +14,6 @@ int speDACNominal(float disc_mv, int pedestal_dac);
 void getSummedWaveform(int loop_count, unsigned trigger_mask, int channel,
 		       unsigned *waveform);
 
-
+/* convert spe uvolts to dac...
+ */
+int speUVoltToDAC(float uv, int pedestal_dac);

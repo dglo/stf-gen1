@@ -112,3 +112,7 @@ void getSummedWaveform(int loop_count, unsigned trigger_mask, int channel,
    free(buffer);
 }
 
+int speUVoltToDAC(float uv, int pedestal_dac) {
+   return (int) 
+      ( ( uv*9.6*(2200+249)/249.0 + pedestal_dac*5e6/4096) * 1024/5e6);
+}
