@@ -34,7 +34,7 @@ CFILES    = $(TESTOBJS:.o=.c)
 #
 HDRFILES  = $(TESTOBJS:.o=.h)
 
-all: stfserv.elf menu.elf
+all: stfserv.elf menu.elf echomode.elf
 
 clean:
 	rm -f *.o *.i *.bin *.elf *.srec \
@@ -54,6 +54,10 @@ stfserv.elf: stfserv.o $(EXOBJS) $(STFOBJS) $(LIBHAL)
 menu.elf: menu.o $(EXOBJS) $(STFOBJS) $(LIBHAL)
 	$(LD) --script=$(KERNELX) -o menu.elf \
 		$(KOBJS) menu.o $(STFOBJS) $(EXOBJS) $(LIBHAL) $(SYSLIBS)
+
+echomode.elf: echomode.o $(LIBHAL)
+	$(LD) --script=$(KERNELX) -o echomode.elf \
+		$(KOBJS) echomode.o $(STFOBJS) $(EXOBJS) $(LIBHAL) $(SYSLIBS)
 
 ../bin/%.bin.gz: %.bin; gzip -c $< > $@
 
