@@ -96,7 +96,7 @@
   <outputParameter>
     <description>Histogram of waveform baseline values in ATWD counts units.</description>
     <name>atwd_baseline_histogram</name>
-    <unsignedInt/>
+    <unsignedIntArray length="1024" />
   </outputParameter>
 
   <outputParameter>

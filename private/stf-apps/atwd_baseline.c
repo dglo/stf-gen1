@@ -67,6 +67,14 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
     */
    halUSleep(1000);
 
+   /* azriel recommends to throw away a few atwd captures first...
+    */
+   for (i=0; i<8; i++) {
+      hal_FPGA_TEST_trigger_forced(trigger_mask);
+      while (!hal_FPGA_TEST_readout_done(trigger_mask)) ;
+      halUSleep(1000);
+   }
+
    for (i=0; i<(int)loop_count; i++) {
       int j;
       unsigned sum = 0;
@@ -90,8 +98,11 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
 			    NULL, NULL, NULL, NULL,
 			    cnt, NULL, 0, atwd_chip_a_or_b);
 
-      /* sum it... */
-      for (j=0; j<cnt; j++) sum+=buffer[j];
+      /* sum it and create histogram... */
+      for (j=0; j<cnt; j++) {
+	 sum+=buffer[j];
+	 atwd_baseline_histogram[ buffer[j]&0x3ff ] ++;
+      }
 
       /* record it... */
       values[i] = sum/cnt;
@@ -118,10 +129,11 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
    *atwd_baseline_rms = (int) sqrt( (1.0/(loop_count-1)) * sm2 );
    *atwd_baseline_min = minv;
    *atwd_baseline_max = maxv;
-   *atwd_baseline_histogram = 0;
 
    free(buffer);
    free(values);
    
    return TRUE;
 }
+
+

@@ -102,8 +102,9 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
    for (i=0; i<cnt; i++) atwd_pedestal_pattern[i]/=loop_count;
    
    /* G. fill output arrays...
+    *
+    * this is a noop, they are filled no matter what...
     */
-   for (i=0; i<128; i++) atwd_pedestal_pattern[i] = sum[i];
 
    /* H. Analyze pedestal waveform:
     *
@@ -113,16 +114,15 @@ BOOLEAN atwd_pedestalEntry(STF_DESCRIPTOR *d,
     *      -> maximum value of average pedestal waveform < 1023
     *      -> maximum-minimum < 20
     */
-   minv = maxv = sum[0];
+   minv = maxv = atwd_pedestal_pattern[0];
    for (i=1; i<cnt; i++) {
-      if (sum[i]<minv) minv=sum[i];
-      else if (sum[i]>maxv) maxv=sum[i];
+      if (atwd_pedestal_pattern[i]<minv) minv=atwd_pedestal_pattern[i];
+      else if (atwd_pedestal_pattern[i]>maxv) maxv=atwd_pedestal_pattern[i];
    }
 
    *atwd_pedestal_amplitude = maxv-minv;
 
    free(buffer);
-   free(sum);
    
    return minv>0 && maxv<1023 && (maxv-minv)<20;
 }
