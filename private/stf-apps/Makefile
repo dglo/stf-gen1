@@ -56,8 +56,17 @@ gendir: gendir.c ../../include/stf/stf.h
 genqry: genqry.c
 	gcc -o genqry -I/usr/include/libxml2 genqry.c -Wall -g -lxml2
 
-run-tests.html: genqry $(XMLFILES)
-	./genqry $(XMLFILES)
+LIBXMLINC = -I/d/apps/libxml2-2.4.30.win32/include \
+	-I/d/apps/iconv-1.8.win32/include \
+	-I/d/apps/openssl-0.9.6c/include
+LIBXMLLIBPATH = -L/d/apps/libxml2-2.4.30.win32/lib
+
+genqry.exe: genqry.c
+	gcc -o genqry.exe $(LIBXMLINC) -Wall -g \
+		$(LIBXMLLIBPATH) genqry.c -lxml2
+
+run-tests.html: genqry.exe $(XMLFILES)
+	./genqry.exe $(XMLFILES)
 
 stfDirectory.c: $(XMLFILES) gendir
 	./gendir $(XMLFILES)
@@ -79,12 +88,13 @@ memory.html: memory.xml restohtml.xsl
 StfEg.h: StfEg.xml stfDefn2Header.xsl
 	xalan -IN StfEg.xml -OUT StfEg.h -XSL stfDefn2Header.xsl -Q
 
-html-install: run-tests.html
-	cp *.html ${HOME}/public_html/stf
+html-install: run-tests.html index.html
+	cp *.html "/c/program files/apache group/apache2/htdocs/stf"
+#	cp *.html ${HOME}/public_html/stf
 
-CGIS = run-test
+CGIS = run-test view-results view-summary
 CGIHELPERS = show-time.exe mk-name.exe get-test-name.exe mk-test-xml.exe \
-	stf.exe
+	stf.exe sumtotable.awk
 XSLFILES = restohtml.xsl restosum.xsl
 
 cgi: $(CGIS) $(CGIHELPERS)

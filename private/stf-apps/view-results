@@ -1,0 +1,70 @@
+#!d:\apps\msys-1.0\bin\sh.exe
+
+#
+# set proper path...
+#
+xpath=/e/apps/xerces-c2_1_0-win32/bin
+xpath=${xpath}:/e/apps/xml-xalan/c/Build/Win32/VC6/Release
+PATH=/d/apps/msys-1.0/bin:/d/apps/mingw/bin:/e/arthur/xml/bin:${xpath}
+
+xmlpath=e:\\arthur\\xml
+
+#
+# view-results?file=basename
+#
+# 1) fname     <- get file name (mk-name)
+# 2) testname  <- get test name from query string (get-test-name)
+# 3) fname.xml <- create xml file from query string (mk-test-xml)
+# 4) run test [ stf -send fname -go testname -rcv testname fname-results]
+# 5) update summary file (database) [use:
+#     `show-time` `-Xalan fname-results restosum.xsl` fname >> summary-file]
+# 6) format results as html [Xalan fname-results.xml restohtml.html]
+#
+echo "Content-type: text/html"
+echo
+
+#
+# 1) get fname
+#
+fname=`echo ${QUERY_STRING} | awk 'BEGIN {FS="="; LS="&"} ; { print $1, $2}' \
+	| awk '/^file / { print $2 }'`
+
+if [ ${#fname} == 0 ]; then
+  echo "<h2>Error! file not specified</h2>"
+  exit 0
+fi
+
+#
+# get this record from the summary file...
+#
+sumrec=`grep -e "${fname}\$" /e/arthur/xml/summary`
+
+#
+# 2) get test name from the summary file...
+#
+testname=`echo ${sumrec} | awk '{print $2}'`
+
+if [ ${#testname} == 0 ]; then
+  echo "<h2>Error! no test found</h2>"
+  exit 0
+fi
+
+#
+# make sure testname exists!
+#
+if [ ! -d ${xmlpath}/${testname} ]; then 
+    echo "<h2>Error\!  Test ${testname} not found</h2>"
+    exit 0
+fi
+
+fullrxml=${xmlpath}/${testname}/${fname}-results.xml
+
+#
+# make sure file exists...
+#
+if [ ! -e ${fullrxml} ]; then
+    echo "<h2>Error! can't find results file</h2>"
+    exit 0
+fi
+
+Xalan ${fullrxml} ${xmlpath}\\restohtml.xsl
