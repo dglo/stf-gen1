@@ -33,9 +33,8 @@ BOOLEAN pressureEntry(STF_DESCRIPTOR *d,
   unsigned short pressure_value, voltage_value;
   unsigned Adc_5v_mean_counts;
   double pressure_float, temp_float, temp2_float, sum_sqr_float;
-  unsigned short *buff;
-
-buff = (unsigned short *) calloc(loop_count+2, sizeof(short));
+  unsigned short *buff = 
+     (unsigned short *) calloc(loop_count, sizeof(short));
  
   if(buff == NULL)return FALSE;
   /*  adc_5v_mean_mvolts = &here;*/
@@ -48,7 +47,7 @@ buff = (unsigned short *) calloc(loop_count+2, sizeof(short));
   voltage_sum = 0;
   *adc_max_counts = 0;
   *adc_min_counts = 0xffff;
-  for(loop_n=5;loop_n<loop_count+5;loop_n++)
+  for(loop_n=0;loop_n<loop_count;loop_n++)
     {
       buff[loop_n] = halReadADC(DOM_HAL_ADC_PRESSURE);
       pressure_sum +=buff[loop_n];
@@ -60,19 +59,19 @@ buff = (unsigned short *) calloc(loop_count+2, sizeof(short));
     }
   halDisableBarometer();
 
-  *adc_mean_counts = pressure_sum/loop_n;
-  Adc_5v_mean_counts = voltage_sum/loop_n;
+  *adc_mean_counts = pressure_sum/loop_count;
+  Adc_5v_mean_counts = voltage_sum/loop_count;
   temp_float = (double)Adc_5v_mean_counts * 0.002 * (25.0/10.0)*1000.0;
   *adc_5v_mean_mvolts = (unsigned short)floor(temp_float);
 
   sum_sqr_float = 0;
-  for(loop_n=5;loop_n<loop_count+5;loop_n++)
+  for(loop_n=0;loop_n<loop_count;loop_n++)
     {
       pressure_value = buff[loop_n];
       pressure_float = (double)(pressure_value-*adc_mean_counts);
       sum_sqr_float += pressure_float * pressure_float;
     }
-  temp_float = sqrt( (1.0/((double)loop_n-1.0)) * sum_sqr_float );  
+  temp_float = sqrt( (1.0/((double)loop_count-1.0)) * sum_sqr_float );  
   *adc_rms_counts = (unsigned short)floor(temp_float);
     
   temp2_float = Adc_5v_mean_counts;
@@ -110,3 +109,7 @@ buff = (unsigned short *) calloc(loop_count+2, sizeof(short));
  
   return TRUE; 
 }
+
+
+
+
