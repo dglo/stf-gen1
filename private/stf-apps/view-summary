@@ -20,7 +20,8 @@ echo "  <body>"
 #
 # FIXME: check for parameters -- add link to search...
 #
-gawk -f /usr/lib/cgi-bin/stf/xml/bin/sumtotable.awk /var/www/stf/xml/summary
+sort -rn /var/www/stf/xml/summary | \
+    gawk -f /usr/lib/cgi-bin/stf/xml/bin/sumtotable.awk
 
 #
 # FIXME: search code goes here...
