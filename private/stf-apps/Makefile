@@ -25,7 +25,7 @@ TESTOBJS  = ADC.o memory.o StfEg.o atwd_pedestal.o atwd_baseline.o \
 	atwd_pedestal_sweep_forced.o atwd_pulser_spe.o atwd_pedestal_spe.o \
 	atwd_clock1x_forced.o pmt_pv_ratio.o \
 	fadc_fe_pulser.o fadc_baseline.o fadc_fe_forced.o disc_scan.o \
-	loopback_lc.o
+	loopback_lc.o atwd_pedestal_noise.o
 
 XMLFILES  = $(TESTOBJS:.o=.xml)
 CFILES    = $(TESTOBJS:.o=.c)
