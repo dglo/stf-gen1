@@ -57,8 +57,6 @@ buff = (unsigned short *) calloc(loop_count+2, sizeof(short));
 
       if(buff[loop_n]<*adc_min_counts) *adc_min_counts = buff[loop_n];
       if(buff[loop_n]>*adc_max_counts) *adc_max_counts = buff[loop_n];
-      }
-
     }
   halDisableBarometer();
 
@@ -73,7 +71,6 @@ buff = (unsigned short *) calloc(loop_count+2, sizeof(short));
       pressure_value = buff[loop_n];
       pressure_float = (double)(pressure_value-*adc_mean_counts);
       sum_sqr_float += pressure_float * pressure_float;
-      }
     }
   temp_float = sqrt( (1.0/((double)loop_n-1.0)) * sum_sqr_float );  
   *adc_rms_counts = (unsigned short)floor(temp_float);
