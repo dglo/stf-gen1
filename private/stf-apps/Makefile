@@ -45,7 +45,7 @@ HDRFILES  = $(TESTOBJS:.o=.h)
 #
 GENJAVA=../../../stf/src/icecube/daq/stf/autogen/STFParameterLookup.java
 
-all: stfserv.elf menu.elf echomode.elf $(GENJAVA)
+all: stfserv.elf menu.elf echomode.elf $(GENJAVA) wiggle.elf
 
 java: $(GENJAVA)
 
@@ -71,6 +71,10 @@ menu.elf: menu.o $(EXOBJS) $(STFOBJS) $(LIBHAL)
 echomode.elf: echomode.o $(LIBHAL)
 	$(LD) --script=$(KERNELX) -o echomode.elf \
 		$(KOBJS) echomode.o $(LIBHAL) $(SYSLIBS)
+
+wiggle.elf: wiggle.o $(LIBHAL)
+	$(LD) --script=$(KERNELX) -o wiggle.elf \
+		$(KOBJS) wiggle.o $(LIBHAL) $(SYSLIBS)
 
 ../bin/%.bin.gz: %.bin; gzip -c $< > $@
 
@@ -101,3 +105,16 @@ $(GENJAVA): $(XMLFILES) tcal.xml genspl.awk
 
 templates.tar.gz: $(XMLTEMPLATES)
 	tar cf - $(XMLTEMPLATES) | gzip -c > templates.tar.gz
+
+
+
+
+
+
+
+
+
+
+
+
+
