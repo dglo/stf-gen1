@@ -39,7 +39,7 @@ if xmlv $xmlfname | \
 	cat /tmp/$$.Rout
 	echo "</pre>"
     fi
-    rm -f /tmp/plot.$$.png /tmp/$$.Rout
+    rm -f /tmp/plot.$$.png /tmp/$$.Rout /tmp/$$.R
 else
     echo "Content-type: text/html"
     echo

@@ -1,10 +1,12 @@
-/^\(/ { 
-   if ($1 == "(" param ) {
+/^\(/ {
+   depth++;
+   if ($1 == "(" param && depth==4) {
       inParameter = 1;
    }
 }
 
 /^\)/ { 
+   depth--;
    if ($1 == ")" param ) {
       inParameter = 0;
    }
