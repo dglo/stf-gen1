@@ -2,8 +2,7 @@
 <stf:test xmlns:stf="http://glacier.lbl.gov/icecube/daq/stf"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://glacier.lbl.gov/icecube/daq/stf file:/Volumes/IceCube/WorkSpaces/junk/stf/private/stf-apps/stfDefn.xsd">
     <name>StfEg</name>
-    <description>This defines a test that gives example of how to define, in
-        XML, the different parts of a test.</description>
+    <description>This defines a test that gives example of how to define, in XML, the different parts of a test.</description>
     <version major="1" minor="0"/>
     <fpgaDependencies>
         <COM_FIFO/>
@@ -63,4 +62,16 @@
 	<unsignedIntArray length="10" />
     </outputParameter>
 </stf:test>
+
+
+
+
+
+
+
+
+
+
+
+
 
