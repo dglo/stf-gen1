@@ -42,8 +42,8 @@
 #include "stf/stf.h"
 #include "hal/DOM_MB_hal.h"
 
-extern int read(int , void *, int);
-extern int write(int , void *, int);
+extern ssize_t read(int , void *, size_t);
+extern ssize_t write(int , const void *, size_t);
 
 #define talloc(a) ((a) *) malloc(sizeof(a))
 
