@@ -106,7 +106,6 @@ static void endElement(void *userData, const char *name) {
 
 /* s is not 0 terminated. */
 static void characterData(void *userData, const XML_Char *s, int len) {
-   const int *depth = userData;
    char str[64];
    
    memcpy(str, s, len);
@@ -220,16 +219,16 @@ static int getLine(char *line, int max) {
 
    memset(line, 0, max);
    while (idx<max-1) {
-       int i;
-      char *t;
-
       if ((read(0, line+idx, 1))<=0) {
 	 return 1;
       }
 
 #if 0
-      for (i=0; i<idx; i++) fprintf(stderr, "%02x ", line[i]);
-      fprintf(stderr, "\r\n");
+      {  int i;
+	  
+         for (i=0; i<idx; i++) fprintf(stderr, "%02x ", line[i]);
+	 fprintf(stderr, "\r\n");
+      }
 #endif
 
       /* look for '\r'...
