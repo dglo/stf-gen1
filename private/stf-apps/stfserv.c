@@ -81,7 +81,7 @@ static void startElement(void *userData, const char *name, const char **atts) {
 
   if (*depth == 0) {
      if (strcmp(xmlTag, "test")) {
-	printf("invalid top level object '%s', expecting 'test'\r\n",
+	fprintf(stdout, "invalid top level object '%s', expecting 'test'\r\n",
 	       xmlTag);
      }
   }
@@ -115,7 +115,7 @@ static void characterData(void *userData, const XML_Char *s, int len) {
    if (len==0) return;
 
 #if 0   
-   printf("xmlTag = %s, desc = %p, param = %p, depth = %d, s = '%s'\r\n",
+   fprintf(stdout, "xmlTag = %s, desc = %p, param = %p, depth = %d, s = '%s'\r\n",
 	  (xmlTag==NULL) ? "NULL" : xmlTag, desc, param, *depth, str);
 #endif
 
@@ -252,8 +252,8 @@ static int getLine(char *line, int max) {
       }
 
 #if 0
-      for (i=0; i<idx+nr; i++) printf("%02x ", line[i]);
-      printf("\r\n");
+      for (i=0; i<idx+nr; i++) fprintf(stdout, "%02x ", line[i]);
+      fprintf(stdout, "\r\n");
 #endif
 
       /* look for '\r'...
@@ -298,7 +298,7 @@ int main() {
    int depth = 0;
 
    while (1) {
-      /* printf("state: %d, needAck: %d\r\n", state, needAck);*/
+      /* fprintf(stdout, "state: %d, needAck: %d\r\n", state, needAck);*/
       
       if (needAck) {
 	 if (getLine(line, sizeof(line))) {
@@ -313,7 +313,7 @@ int main() {
        }
 
       if (state==1) {
-	 printf("OK\r\n");
+	 fprintf(stdout, "OK\r\n");
 
 	 if (getLine(line, sizeof(line))) {
 	    strcpy(msg, "unable to read line!");
@@ -321,7 +321,7 @@ int main() {
 	 }
 	 else {
 	    if (strcmp(line, "EXIT")==0) {
-	       printf("exiting...\r\n");
+	       fprintf(stdout, "exiting...\r\n");
 	       return 0;
 	    }
 	    else if (sscanf(line, "SEND %d", &nbytes)==1) {
@@ -357,7 +357,7 @@ int main() {
 	    buf = nb;
 	    buflen = nbytes+1;
 	 }
-	 printf("OK\r\n");
+	 fprintf(stdout, "OK\r\n");
 
 	 /* read xml file
 	  */
@@ -370,7 +370,7 @@ int main() {
 	    XML_Parser parser = XML_ParserCreate(NULL);
 
 	    buf[nbytes] = 0;
-	    printf("parse: '%s'\r\n", buf);
+	    fprintf(stdout, "parse: '%s'\r\n", buf);
 	    
 	    /* now parse data...
 	     */
@@ -445,7 +445,7 @@ int main() {
 	       state = 6;
 	    }
 	    else {
-	       printf("SEND %d\r\n", nbytes);
+	       fprintf(stdout, "SEND %d\r\n", nbytes);
 	       needAck = 1;
 	       state = 5;
 	    }
@@ -465,7 +465,7 @@ int main() {
 	 state = 1;
       }
       else if (state==6) {
-	 printf("ERR '%s'\r\n", msg);
+	 fprintf(stdout, "ERR '%s'\r\n", msg);
 	 strcpy(msg, "");
 	 state = 1;
       }
