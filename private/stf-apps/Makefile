@@ -40,7 +40,7 @@ clean:
 
 TESTOBJS = memory.o StfEg.o
 STFOBJS = $(TESTOBJS) stfserv.o ../stf/stf.o stfDirectory.o
-XMLFILES = memory.xml # StfEg.xml
+XMLFILES = memory.xml StfEg.xml
 
 stfserv.elf: $(STFOBJS) 
 	$(LD) -r -o stfserv.elf \
