@@ -79,6 +79,8 @@ $(HDRFILES): stfDirectory.h
 ../bin/menu: menu.o $(STFOBJS) $(EXOBJS)
 	gcc -o menu menu.o $(STFOBJS) $(EXOBJS) $(LIBHAL) -lm
 
+../bin/echomode: echomode.o $(EXOBJS)
+	gcc -o echomode echomode.o $(EXOBJS) $(LIBHAL) -lm
 
 
 
