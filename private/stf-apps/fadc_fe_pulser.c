@@ -28,6 +28,7 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
                     unsigned *fadc_fe_pulser_position,
                     unsigned *fadc_fe_pulser_waveform) {
 
+  DOM_HAL_FPGA_PULSER_RATES rate;
   unsigned  spe_dac_nominal,scan_start,scan_stop;
   unsigned read_zero,read_nonzero,read_fail;
   unsigned baseline,baseline_sum,baseline_mean,waveform_mean;
@@ -64,6 +65,9 @@ BOOLEAN fadc_fe_pulserEntry(STF_DESCRIPTOR *d,
   halUSleep(500000);
 
   /*  4.Turn ON  the front end pulser.*/
+   /* pretest 4) turn on fe pulser */
+  lookupPulserRate(78e3, &rate, NULL);
+  hal_FPGA_TEST_set_pulser_rate(rate);
   hal_FPGA_TEST_enable_pulser();
 
   /*  5.Find if there is a reasonable value for the SPE discriminator level such that will not trigger on noise.
