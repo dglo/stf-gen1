@@ -124,7 +124,7 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
    good_rms = sqrt( (1.0/(loop_count-1)) * sm2 );
 
    *atwd_baseline_mean = sm;
-   *atwd_baseline_rms = 1000.0*good_rms;
+   *atwd_baseline_rms = good_rms;
    *atwd_baseline_min = minv;
    *atwd_baseline_max = maxv;
 
@@ -147,7 +147,7 @@ BOOLEAN atwd_baselineEntry(STF_DESCRIPTOR *d,
      return FALSE;
    if(*atwd_baseline_max >valid_max || *atwd_baseline_min <valid_min)
      return FALSE;
-   if(*atwd_baseline_rms/1000 >2)
+   if(*atwd_baseline_rms >2)
      return FALSE;
 
    return TRUE;
