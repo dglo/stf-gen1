@@ -1,4 +1,4 @@
-.SUFFIXES: .c .o .S .elf .srec .xml .html .tab
+.SUFFIXES: .c .o .S .elf .srec .xml .html .tab .bin
 
 .c.o:
 	$(CC) -c $(CFLAGS) $<
@@ -6,6 +6,13 @@
 .S.o:
 	$(CPP) $(CPPFLAGS) -o $*.i $<
 	$(AS) $(AFLAGS) -o $*.o $*.i
+
+.elf.bin:
+	$(OBJCOPY) -O binary $*.elf $*.bin
+	$(CPP) $(CPPFLAGS) -DBINFILE=\"$*.bin\" -o $*-raw.i $(RAWS)
+	$(AS) $(AFLAGS) -o $*-raw.o $*-raw.i
+	$(LD) --script=$(RAWX) -o $*-raw.elf $*-raw.o
+	$(OBJCOPY) -O binary $*-raw.elf $*.bin
 
 .elf.srec:
 	$(OBJCOPY) -O binary $*.elf $*.bin
@@ -44,27 +51,21 @@ clean:
 		stftcp mk-name
 
 STFOBJS = $(TESTOBJS) ../stf/stf.o stfDirectory.o memtests.o stfUtils.o
+KOBJS = ../lib/crt0.o ../lib/libkernel.a
 
-stfserv.elf: $(STFOBJS) stfserv.o
-	$(LD) -r -o stfserv.elf \
-		$(STFOBJS) stfserv.o \
-		$(LIBEXPAT) $(LIBHAL) $(SYSLIBS)
+stfserv.elf: stfserv.o $(STFOBJS)
+	$(LD) --script=$(KERNELX) -o stfserv.elf \
+		$(KOBJS) stfserv.o $(STFOBJS) $(LIBHAL) $(LIBEXPAT) $(SYSLIBS)
 
-$(STFSERVBIN): $(STFOBJS) stfserv.o
-	$(CC) -o $(STFSERVBIN) stfserv.o \
-		$(STFOBJS) $(LIBEXPAT) $(LIBHAL) $(SYSLIBS)
+menu.elf: menu.o $(STFOBJS)
+	$(LD) --script=$(KERNELX) -o menu.elf \
+		$(KOBJS) menu.o $(STFOBJS) $(LIBHAL) $(SYSLIBS)
 
-menu.elf: $(STFOBJS) menu.o
-	$(LD) -r -o menu.elf \
-		$(STFOBJS) menu.o \
-		../../../epxa10/lib/libhal.a \
-		$(SYSLIBS)
+$(STFSERVBINGZ): stfserv.bin
+	gzip -c stfserv.bin > $(STFSERVBINGZ)
 
-$(MENUBIN): $(STFOBJS) menu.o
-	$(CC) -o $(STFSERVBIN) menu.o \
-		$(STFOBJS) $(LIBEXPAT) $(LIBHAL) $(SYSLIBS)
-
-
+$(MENUBINGZ): menu.bin
+	gzip -c menu.bin > $(MENUBINGZ)
 
 gendir: gendir.c ../public/stf/stf.h
 	gcc -o gendir -I../public \
