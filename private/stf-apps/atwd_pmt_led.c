@@ -196,6 +196,10 @@ BOOLEAN atwd_pmt_ledEntry(STF_DESCRIPTOR *d,
    free(sum_waveform_LED);
    free(sum_waveform_PMT);
 
+   /*turn off PMT and LED*/
+   halPowerDownBase();
+   halDisableLEDPS();
+
    /* 8) reverse waveform */
    reverseATWDIntWaveform(atwd_waveform_pmtLED);
    reverseATWDIntWaveform(LED_waveform_pmtLED);
