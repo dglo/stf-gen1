@@ -13,8 +13,8 @@ static STF_PARAM <xsl:copy-of select="$testName"/>_params[] = {
    { .name = "" }
 };
 
-extern void <xsl:copy-of select="$testName"/>Init(STF_DESCRIPTOR *);
-extern void <xsl:copy-of select="$testName"/>Entry(STF_DESCRIPTOR *);
+extern BOOLEAN <xsl:copy-of select="$testName"/>Init(STF_DESCRIPTOR *);
+extern BOOLEAN <xsl:copy-of select="$testName"/>Entry(STF_DESCRIPTOR *);
 
 static STF_DESCRIPTOR <xsl:copy-of select="$testName"/>_descriptor = {
   .name = "<xsl:copy-of select="$testName"/>",
