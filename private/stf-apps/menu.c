@@ -11,20 +11,19 @@
 #include "stf/stf.h"
 
 static void getstr(char *str) {
-   while (1) {
-      const int nr = read(0, str, 1);
-      if (nr==1) {
-	 if (*str == '\r') {
-	    *str = 0;
-	    return;
-	 }
-	 else {
-	    write(1, str, 1);
-	    str++;
-	 }
-	 
-      }
-   }
+    while (1) {
+        const int nr = read(0, str, 1);
+        if (nr==1) {
+            if (*str == '\r') {
+                *str = 0;
+                return;
+            }
+            else if (*str != '\n') {
+                write(1, str, 1);
+                str++;
+            }            
+        }
+    }
 }
 
 /*------------------------------------------------------------
@@ -53,6 +52,12 @@ int  main()
 	fflush(stdout);
 
         getstr(selectCmd);
+
+        /*  FIX ME */
+        int j;
+        for (j = 0; j < strlen(selectCmd); j++)
+            printf("%c(%x) ",selectCmd[j], selectCmd[j]);
+
         if(!strcmp(selectCmd,"")) {
   	    printf("exiting.......\r\n");
 	    return 1;
@@ -109,7 +114,7 @@ int  main()
 	      printf("\r\ntest '%s' is not runnable", d->name);
 	   }
 	   d->passed = d->entryPt(d);
-	   printf("done [%d]!\r\n\r\n", d->passed);
+	   printf("done [%s]!\r\n\r\n", d->passed ? "pass" : "fail");
 	   
 	   for (i=0; i<d->nParams; i++) {
 	      STF_PARAM *p=d->params + i;
