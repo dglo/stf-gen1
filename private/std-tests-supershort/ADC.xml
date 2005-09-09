@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://glacier.lbl.gov/icecube/daq/stf file:/Volumes/IceCube/WorkSpaces/jas-1/xml/daq/stf.xsd">
 <ADC>
 <parameters>
-<loopCount>10</loopCount>
+<loop_count>10</loop_count>
 </parameters>
 </ADC>
 </stf:setup>
